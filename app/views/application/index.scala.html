@@ -1,5 +1,15 @@
-@(title: String)
+@(openIDForm: Form[models.form.OpenIDUser])
 
-@main(title) {
+@main() {
     <p>This is the first page of this <i>web</i> application.</p>
+    
+    <h2>Autenticação</h2>
+    @*<form action="@routes.Authentication.openID()" method="POST">
+    	<input type="text" name="id" required></input>
+    	<input type="submit" name="Submit">
+    </form>*@
+    @helper.form(action = routes.Authentication.openID(), 'id -> "openIDForm") {
+    	@helper.inputText(openIDForm("id"), 'id -> "openID", 'showConstraints -> false)
+    	<input type="submit" name="Submit">
+    }
 }
