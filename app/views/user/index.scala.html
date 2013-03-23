@@ -1,5 +1,6 @@
 @(username: String)
 
 @main("User Home Page") {
-	<p>Username: @username</p>
+    <p>Hi @username!</p>
+    <a href="@routes.Authentication.logout()" id="logout">Logout</a>
 }

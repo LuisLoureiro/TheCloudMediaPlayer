@@ -63,4 +63,15 @@ public class Authentication extends Controller {
 			return internalServerError(ex.toString() + "\n" + ex.getMessage());
 		}
 	}
+	
+	public static Result logout() {
+		// Remove the username from the session.
+		if(session("username") != null)
+			session().remove("username");
+		
+		// Notify the identity provider if needed
+		
+		// Redirect to the index page
+		return redirect(routes.Application.index());
+	}
 }

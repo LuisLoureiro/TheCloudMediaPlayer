@@ -5,9 +5,11 @@
 # Home page
 GET     /                           controllers.Application.index()
 
-POST	/auth/openid			controllers.Authentication.openID()
+POST	/auth/openid				controllers.Authentication.openID()
 
 GET		/auth/openidcallback		controllers.Authentication.openIDCallback()
+
+GET 	/auth/logout				controllers.Authentication.logout()
 
 # User home page
 GET		/user						controllers.User.index()
