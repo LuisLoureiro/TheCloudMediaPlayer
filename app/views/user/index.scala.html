@@ -1,6 +1,10 @@
-@(username: String)
+@(username: String, authProvider: String)
 
 @main("User Home Page") {
     <p>Hi @username!</p>
-    <a href="@routes.Authentication.logout()" id="logout">Logout</a>
+    @if("google".equals(authProvider)) {
+    	<a href="#" id="googleSignOut">Sign out</a>
+    } else {
+    	<a href="@routes.Authentication.signOut()" id="signOut">Sign out</a>
+    }
 }
