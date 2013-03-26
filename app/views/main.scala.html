@@ -11,13 +11,16 @@
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
     </head>
     <body>
-    <div id="fb-root"></div>
 	@if(!flash.isEmpty()) {
 		@for((key, value) <- flash) { 
 	        <div class="alert-@key">@value</div>
 	    }
 	}
     @content
-	<script src="@routes.Assets.at("javascripts/fb-functions.js")"></script>
+    @***** FACEBOOK SIGNIN
+    	<div id="fb-root"></div>
+		<script src="@routes.Assets.at("javascripts/fb-functions.js")"></script>
+	************************@
+	<script src="@routes.Assets.at("javascripts/google-functions.js")"></script>
     </body>
 </html>
