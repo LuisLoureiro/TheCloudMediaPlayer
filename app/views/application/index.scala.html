@@ -1,15 +1,26 @@
 @(openIDForm: Form[models.form.OpenIDUser])
 
 @main() {
-    <p>This is the first page of this <i>web</i> application.</p>
-    
+	@***********************************************************
+	* passar esta parte da autenticação para o main.scala.html,
+	* para que apareça esta informação em todas as páginas,
+	* sem necessidade de código repetido
+	************************************************************@
     <h2>Autenticação</h2>
-    @*<form action="@routes.Authentication.openID()" method="POST">
-    	<input type="text" name="id" required></input>
-    	<input type="submit" name="Submit">
-    </form>*@
     @helper.form(action = routes.Authentication.openID(), 'id -> "openIDForm") {
-    	@helper.inputText(openIDForm("id"), 'id -> "openID", 'showConstraints -> false)
-    	<input type="submit" name="Submit">
-    }
+    	@helper.inputText(openIDForm("id"), 'id -> "openID", '_label -> "OpenID", '_showConstraints -> false)
+    	<input type="submit" name="Sign in"/>
+    }<br/>
+	<div id="signinButton">
+		<span class="g-signin"
+		    data-scope="https://www.googleapis.com/auth/plus.login"
+		    data-clientid="458134068157.apps.googleusercontent.com"
+		    data-redirecturi="postmessage"
+		    data-accesstype="offline"
+		    data-cookiepolicy="single_host_origin"
+		    data-callback="signInCallback"
+		    data-width="wide">
+		</span>
+	</div>
+	<div id="result"></div>
 }

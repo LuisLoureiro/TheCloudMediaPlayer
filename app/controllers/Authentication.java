@@ -1,5 +1,7 @@
 package controllers;
 
+import java.util.Map;
+
 import models.form.OpenIDUser;
 import play.api.libs.openid.Errors;
 import play.data.Form;
@@ -37,6 +39,25 @@ public class Authentication extends Controller {
 		}
 	}
 	
+	// TODO wait a json request and return a json response
+	public static Result exchangeCodeWithAccessToken() {
+		// if code == null throw exception
+		Map<String, String[]> body = request().body().asFormUrlEncoded();
+		if(!body.containsKey("code"))
+			return badRequest("The authorization code cannot be null or empty");
+//		// Ensure that this is no request forgery going on.
+//		if (!body.containsKey("csrf") || !body.get("csrf")[0].equals(session("csrf")))
+//		    return unauthorized("Invalid CSRF token.");
+
+		// exchange the code with an access token
+		// save the access token and the refresh token
+		// authenticate user
+		session("username", body.get("code")[0]);
+		// redirect to the user home page
+		flash("success", "Successfully signed in.");
+		return redirect(routes.User.index("google"));
+	}
+	
 	public static Result openIDCallback() {
 		// If the information is not correct or if the server check is false (for example if the redirect URL has been forged), the returned Promise will be a Thrown.
 		try {
@@ -54,7 +75,7 @@ public class Authentication extends Controller {
 			
 			// redirect to the user home page
 			flash("success", "Successfully signed in.");
-			return redirect(routes.User.index());
+			return redirect(routes.User.index("openID"));
 		} catch(Throwable ex) {
 			if(ex instanceof Errors.AUTH_CANCEL$) {
 				flash("error", "The authentication process was interrupted by the user.");
@@ -64,7 +85,7 @@ public class Authentication extends Controller {
 		}
 	}
 	
-	public static Result logout() {
+	public static Result signOut() {
 		// Remove the username from the session.
 		if(session("username") != null)
 			session().remove("username");
@@ -72,6 +93,7 @@ public class Authentication extends Controller {
 		// Notify the identity provider if needed
 		
 		// Redirect to the index page
+		flash("success", "Successfully signed out.");
 		return redirect(routes.Application.index());
 	}
 }
