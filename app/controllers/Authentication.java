@@ -1,6 +1,8 @@
 package controllers;
 
+import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import models.form.OpenIDUser;
 import play.api.libs.openid.Errors;
@@ -31,11 +33,17 @@ public class Authentication extends Controller {
 //			});
 			return redirect(OpenID.redirectURL(user.getId(), routes.Authentication.openIDCallback().absoluteURL(request())).get());
 		} catch(Throwable ex) {
-			if(ex instanceof Errors.NETWORK_ERROR$) {
-				flash("error", "The provided OpenID id is invalid or it wasn't possible to discover the corresponding provider.");
+			Throwable exCause = ex.getCause();
+			if(exCause != null && exCause.getClass().equals(URISyntaxException.class)) {
+				flash("error", "There's an error with your OpenID.\nPlease review it and try again.");
 				return badRequest(index.render(openIDUserForm));
 			}
-			return internalServerError(ex.toString() + "\n" + ex.getMessage());
+			if(ex instanceof Errors.NETWORK_ERROR$) {
+				flash("error", "The provided OpenID doesn't exist or it wasn't possible to discover the corresponding provider.");
+				return badRequest(index.render(openIDUserForm));
+			}
+			flash("error", "Some unexpected error occured. Verify your OpenID and try again. Please contact us if the problem continues.");
+			return internalServerError(index.render(openIDUserForm));
 		}
 	}
 	
@@ -69,7 +77,7 @@ public class Authentication extends Controller {
 //					redirect(routes.User.index());
 //				}
 //			});
-			UserInfo info = OpenID.verifiedId().get();
+			UserInfo info = OpenID.verifiedId().get(10000L); // default is 5000. It may be too short.
 			// Save user info in the session
 			session("username", info.id); // TODO create an object of type User and associate it to the request/response or session.
 			
@@ -77,11 +85,19 @@ public class Authentication extends Controller {
 			flash("success", "Successfully signed in.");
 			return redirect(routes.User.index("openID"));
 		} catch(Throwable ex) {
+			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
+			if(ex.getClass().equals(TimeoutException.class)) {
+				flash("error", "The OpenID provider is taking too much time to verify the ID. " +
+						"This could be a temporary problem. Please try to sign in again.");
+				return status(GATEWAY_TIMEOUT, index.render(form));
+			}
 			if(ex instanceof Errors.AUTH_CANCEL$) {
 				flash("error", "The authentication process was interrupted by the user.");
-				return badRequest(index.render(Form.form(OpenIDUser.class)));
+				return badRequest(index.render(form));
 			}
-			return internalServerError(ex.toString() + "\n" + ex.getMessage());
+			flash("error", "Some unexpected error occured during the verification of your OpenID. " +
+					"Please try to sign in again. Contact us if the problem continues.");
+			return internalServerError(index.render(form));
 		}
 	}
 	
