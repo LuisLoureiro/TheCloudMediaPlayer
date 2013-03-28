@@ -7,16 +7,24 @@
         <title>@title</title>
 		<meta charset="utf-8">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/bootstrap.min.js")"></script>
     </head>
     <body>
-	@if(!flash.isEmpty()) {
-		@for((key, value) <- flash) { 
-	        <div class="alert-@key">@value</div>
-	    }
-	}
-    @content
+    	<div class="container-fluid">
+		@if(!flash.isEmpty()) {
+			@for((key, value) <- flash) {
+			<div class="row-fluid"><div class="span12">
+				<div class="alert alert-@key">@value</div>
+			</div></div>
+		    }
+		}
+			<div class="row-fluid">
+		    @content
+		    </div>
+    	</div>
     @***** FACEBOOK SIGNIN
     	<div id="fb-root"></div>
 		<script src="@routes.Assets.at("javascripts/fb-functions.js")"></script>
