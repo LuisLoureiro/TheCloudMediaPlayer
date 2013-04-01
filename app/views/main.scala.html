@@ -7,18 +7,17 @@
         <title>@title</title>
 		<meta charset="utf-8">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootswatch/2.3.1/superhero/bootstrap.min.css">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/bootstrap.min.js")"></script>
+        <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+        <script src="@routes.Assets.at("javascripts/main.js")"></script>
     </head>
     <body>
     	<div class="container-fluid">
 		@if(!flash.isEmpty()) {
 			@for((key, value) <- flash) {
-			<div class="row-fluid"><div class="span12">
-				<div class="alert alert-@key">@value</div>
-			</div></div>
+			<script type="text/javascript">appendAlert(@key, @value);</script>
 		    }
 		}
 			<div class="row-fluid">
