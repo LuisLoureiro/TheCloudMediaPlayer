@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -12,6 +13,12 @@ import play.libs.OpenID.UserInfo;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.application.index;
+
+import com.google.api.client.auth.oauth2.TokenResponse;
+
+import controllers.operations.authentication.IOAuth2;
+import controllers.operations.authentication.exceptions.OAuth2ValidationException;
+import controllers.operations.authentication.factory.OAuth2Factory;
 
 public class Authentication extends Controller {
 
@@ -47,23 +54,50 @@ public class Authentication extends Controller {
 		}
 	}
 	
-	// TODO wait a json request and return a json response
 	public static Result exchangeCodeWithAccessToken() {
-		// if code == null throw exception
-		Map<String, String[]> body = request().body().asFormUrlEncoded();
-		if(!body.containsKey("code"))
-			return badRequest("The authorization code cannot be null or empty");
-//		// Ensure that this is no request forgery going on.
-//		if (!body.containsKey("csrf") || !body.get("csrf")[0].equals(session("csrf")))
-//		    return unauthorized("Invalid CSRF token.");
+		try {
+			// if code == null throw exception
+			Map<String, String[]> body = request().body().asFormUrlEncoded();
+			if(!body.containsKey("code") || !body.containsKey("userId")) {
+				throw new IllegalStateException("The authorization code and/or the user id cannot be null or empty.");
+			}
+			// Capture the name of the provider used to authenticate.
+			String providerName = request().getQueryString("provider");
+//			// Ensure that this is no request forgery going on.
+//			if (!body.containsKey("csrf") || !body.get("csrf")[0].equals(session("csrf")))
+//			    return unauthorized("Invalid CSRF token.");
 
-		// exchange the code with an access token
-		// save the access token and the refresh token
-		// authenticate user
-		session("username", body.get("code")[0]);
-		// redirect to the user home page
-		flash("success", "Successfully signed in.");
-		return redirect(routes.User.index("google"));
+			// Create an OAuth2 object based on the OAuth2 authentication provider used by the user using the factory method pattern.
+			IOAuth2 oauth2Object = OAuth2Factory.getInstanceFromProviderName(providerName);
+			// exchange the code with an access token
+			TokenResponse token = oauth2Object.exchangeAuthCode(body.get("code")[0]);
+			// validate token
+			oauth2Object.validateToken(token, body.get("userId")[0]);
+			// TODO save the access token and the refresh token
+			
+			// authenticate user
+			session("username", token.getAccessToken());
+		    // Store the token in the session for later use.
+			session("token", token.getAccessToken());
+			// redirect to the user home page
+			flash("success", "Successfully signed in.");
+			return redirect(routes.User.index().absoluteURL(request())+"?provider="+providerName);
+		} catch(Exception ex) {
+			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
+			if(ex.getClass().equals(OAuth2ValidationException.class)) {
+				flash("error", ex.getMessage());
+				return forbidden(index.render(form));
+			} else if(ex.getClass().equals(IOException.class)) {
+				flash("error", ex.getMessage());
+				return status(BAD_GATEWAY, index.render(form)); // TODO be sure that this is the correct error code!
+			} else if(ex.getClass().equals(IllegalStateException.class)) {
+				flash("error", ex.getMessage());
+				return badRequest(index.render(form));
+			}
+			flash("error", "Some unexpected error occured during the exchange of the authorization code. " +
+					"Please try to sign in again. Contact us if the problem continues.");
+			return internalServerError(index.render(form));
+		}
 	}
 	
 	public static Result openIDCallback() {
@@ -83,13 +117,13 @@ public class Authentication extends Controller {
 			
 			// redirect to the user home page
 			flash("success", "Successfully signed in.");
-			return redirect(routes.User.index("openID"));
+			return redirect(routes.User.index().absoluteURL(request())+"?provider=openID");
 		} catch(Throwable ex) {
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
 			if(ex.getClass().equals(TimeoutException.class)) {
 				flash("error", "The OpenID provider is taking too much time to verify the ID. " +
 						"This could be a temporary problem. Please try to sign in again.");
-				return status(GATEWAY_TIMEOUT, index.render(form));
+				return status(GATEWAY_TIMEOUT, index.render(form)); // TODO be sure that this is the correct error code!
 			}
 			if(ex instanceof Errors.AUTH_CANCEL$) {
 				flash("error", "The authentication process was interrupted by the user.");
