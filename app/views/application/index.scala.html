@@ -8,12 +8,12 @@
 	************************************************************@
     <h2>Autenticação</h2>
     @helper.form(action = routes.Authentication.openID(), 'id -> "openIDForm") {
-    	@helper.inputText(openIDForm("id"), 'id -> "openID", '_label -> "OpenID", '_showConstraints -> false)
+    	@helper.inputText(openIDForm("id"), 'id -> "openID", 'autofocus -> "autofocus", '_label -> "OpenID", '_showConstraints -> false)
     	<input type="submit" name="Sign in"/>
     }<br/>
 	<div id="signinButton">
 		<span class="g-signin"
-		    data-scope="https://www.googleapis.com/auth/plus.login"
+		    data-scope="https://www.googleapis.com/auth/plus.me"
 		    data-clientid="458134068157.apps.googleusercontent.com"
 		    data-redirecturi="postmessage"
 		    data-accesstype="offline"
