@@ -3,8 +3,8 @@
 @main("User Home Page") {
     <p>Hi @username!</p>
     @if("google".equals(authProvider)) {
-    	<a href="#" id="googleSignOut">Sign out</a>
+    	<a class="btn btn-primary" href="#" id="googleSignOut">Sign out</a>
     } else {
-    	<a href="@routes.Authentication.signOut()" id="signOut">Sign out</a>
+    	<a class="btn btn-primary" href="@routes.Authentication.signOut()" id="signOut">Sign out</a>
     }
 }
