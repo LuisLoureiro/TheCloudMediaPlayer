@@ -1,10 +1,38 @@
-@(username: String, authProvider: String)
+@(fullname: String, email: String, authProvider: String)
 
 @main("User Home Page") {
-    <p>Hi @username!</p>
-    @if("google".equals(authProvider)) {
-    	<a class="btn btn-primary" href="#" id="googleSignOut">Sign out</a>
-    } else {
-    	<a class="btn btn-primary" href="@routes.Authentication.signOut()" id="signOut">Sign out</a>
-    }
+	<section>
+	  <div class="navbar navbar-inverse">
+	    <div class="navbar-inner">
+	      <div class="container" style="width: auto;">
+	        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	        </a>
+	        <a class="brand" href="#">The Cloud Media Player</a>
+	        <div class="nav-collapse">
+	          <ul class="nav pull-right">
+	            <li class="divider-vertical"></li>
+	            <li class="dropdown">
+	              <a href="#" class="dropdown-toggle" data-toggle="dropdown">@fullname <b class="caret"></b></a>
+	              <ul class="dropdown-menu">
+	                @if(!email.isEmpty()) {
+	                	<li>@email</li>
+	                }
+	                <li class="divider"></li>
+	                <li>@if("google".equals(authProvider)) {
+    					<a class="btn btn-primary" href="#" id="googleSignOut">Sign out</a>
+    					} else {
+    					<a class="btn btn-primary" href="@routes.Authentication.signOut()" id="signOut">Sign out</a>
+    				}</li>
+	              </ul>
+	            </li>
+	          </ul>
+	        </div><!-- /.nav-collapse -->
+	      </div>
+	    </div><!-- /navbar-inner -->
+	  </div>
+	</section>
+    <p>Welcome @fullname!</p>
 }
