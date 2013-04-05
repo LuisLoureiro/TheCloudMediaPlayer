@@ -17,7 +17,7 @@
     	<div class="container-fluid">
 		@if(!flash.isEmpty()) {
 			@for((key, value) <- flash) {
-			<script type="text/javascript">appendAlert(@key, @value);</script>
+			<script type="text/javascript">appendAlert("@key", "@value");</script>
 		    }
 		}
 			<div class="row-fluid">
