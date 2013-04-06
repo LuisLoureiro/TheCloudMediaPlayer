@@ -2,13 +2,13 @@ function appendAlert(errorType, message) {
 	$('body>.container-fluid').prepend('<div class="row-fluid"><div class="span12"><div class="alert alert-'+errorType+'"><a class="close">x</a>'+message+'</div></div></div>');
 }
 function appendErrorAlert(message) {
-	funcAlert("error", message);
+	appendAlert("error", message);
 }
 function appendInfoAlert(message) {
-	funcAlert("info", message);
+	appendAlert("info", message);
 }
 function appendSuccessAlert(message) {
-	funcAlert("success", message);
+	appendAlert("success", message);
 }
 $(document).ready(function(){
 	$('a.close').click(function(){
