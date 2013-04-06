@@ -34,6 +34,7 @@ var googleHelper = (function() {
 		renderUserInfo: function() {
 			var request = gapi.client.plus.people.get({'userId': 'me'});
 	    	request.execute(function(profile) {
+	    		// https://developers.google.com/+/api/latest/people#resource
 	    		if (profile.error) {
 	    			appendErrorAlert(profile.error);
 	    			return;
@@ -52,17 +53,22 @@ var googleHelper = (function() {
 		    	type: 'POST',
 		    	url: '/auth/exchangecode?provider=google',
 			    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-		    	success: function() {
-		    		window.location.assign('/user?provider=google');
-		    	},
+			    dataType: 'json',
 		    	data: {
 		    		'code': authorizationCode,
 		    		'userId': userId
 //		    		'csrf': 
 		    	},
+		    	success: function(data) {
+		    		if(data && data.status == 'OK'){
+		    			window.location.assign(data.url);
+		    		}
+		    	},
 			    error: function(e) {
 			        // Handle the error
 			        console.log(e);
+			        appendErrorAlert("Some unexpected error occured during the exchange of the authorization code. " +
+					"Please try to sign in again. Contact us if the problem continues.");
 			    }
 		    });
 		},
