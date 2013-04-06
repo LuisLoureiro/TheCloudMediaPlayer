@@ -7,8 +7,12 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import models.form.OpenIDUser;
+
+import org.codehaus.jackson.node.ObjectNode;
+
 import play.api.libs.openid.Errors;
 import play.data.Form;
+import play.libs.Json;
 import play.libs.OpenID;
 import play.libs.OpenID.UserInfo;
 import play.mvc.Controller;
@@ -152,7 +156,15 @@ public class Authentication extends Controller {
 			session(SESSION.ACCESS_TOKEN.getId(), token.getAccessToken());
 			// redirect to the user home page
 			flash("success", "Successfully signed in.");
-			return redirect(routes.User.index().absoluteURL(request())+"?provider="+providerName);
+			
+			// Content negotiation
+			String returnURL = routes.User.index().absoluteURL(request())+"?provider="+providerName;
+			if (request().accepts("text/json") || request().accepts("application/json")) {
+				// Return a json object with the url to redirect to.
+				ObjectNode result = Json.newObject(); result.put("status", "OK"); result.put("url", returnURL);
+				return ok(result);
+			}
+			return redirect(returnURL);
 		} catch(Exception ex) {
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
 			if(ex.getClass().equals(OAuth2ValidationException.class)) {
@@ -172,9 +184,11 @@ public class Authentication extends Controller {
 	}
 	
 	public static Result signOut() {
-		// Remove the username from the session.
-		if(session(SESSION.USERNAME.getId()) != null)
-			session().remove(SESSION.USERNAME.getId());
+		// Clear session. TODO Maybe is better to selectively remove the unneeded information.
+		session().clear();
+//		// Remove the username from the session.
+//		if(session(SESSION.USERNAME.getId()) != null)
+//			session().remove(SESSION.USERNAME.getId());
 		
 		// Notify the identity provider if needed
 		
