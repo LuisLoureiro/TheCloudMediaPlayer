@@ -21,8 +21,9 @@ var googleHelper = (function() {
 			if (authResult.access_token) {
 		        // The user is signed in. Save the access token to be used in the client side.
 		        this.authResult = authResult;
-		        // After we load the Google+ API, render the user info from Google+.
-		        gapi.client.load('plus','v1',this.renderUserInfo);
+		        // After we load the Google+ API, render the user info.
+//		        gapi.client.load('plus','v1',this.renderUserInfo);
+		        gapi.client.load('oauth2', 'v2', this.renderUserInfo);
 			} else if (authResult['error']) {
 			    // There was an error.
 			    // Possible error codes:
@@ -32,15 +33,16 @@ var googleHelper = (function() {
 			}
 		},
 		renderUserInfo: function() {
-			var request = gapi.client.plus.people.get({'userId': 'me'});
+//			var request = gapi.client.plus.people.get({'userId': 'me'}); // https://developers.google.com/+/api/latest/people#resource
+			var request = gapi.client.oauth2.userinfo.get();
 	    	request.execute(function(profile) {
-	    		// https://developers.google.com/+/api/latest/people#resource
+	    		// https://developers.google.com/+/web/people/
 	    		if (profile.error) {
 	    			appendErrorAlert(profile.error);
 	    			return;
 	    		}
 			    // Send the code to the server
-	    		googleHelper.serverExchangeCode(googleHelper.authResult.code, profile.id);
+	    		googleHelper.serverExchangeCode(googleHelper.authResult.code, profile.id, profile.email, profile.name);
 //	    		$('#profile').append($('<p><img src=\"' + profile.image.url + '\"></p>'));
 //	    		$('#profile').append($('<p>Hello ' + profile.displayName + '!<br />Tagline: ' + profile.tagline + '<br />About: ' + profile.aboutMe + '</p>'));
 //	    		if (profile.cover && profile.coverPhoto) {
@@ -48,7 +50,7 @@ var googleHelper = (function() {
 //	    		}
 	        });
 		},
-		serverExchangeCode: function(authorizationCode, userId) {
+		serverExchangeCode: function(authorizationCode, userId, userEmail, userName) {
 			$.ajax({
 		    	type: 'POST',
 		    	url: '/auth/exchangecode?provider=google',
@@ -56,7 +58,9 @@ var googleHelper = (function() {
 			    dataType: 'json',
 		    	data: {
 		    		'code': authorizationCode,
-		    		'userId': userId
+		    		'userId': userId,
+		    		'userEmail' : userEmail,
+		    		'userName' : userName
 //		    		'csrf': 
 		    	},
 		    	success: function(data) {

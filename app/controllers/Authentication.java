@@ -137,7 +137,10 @@ public class Authentication extends Controller {
 				throw new IllegalStateException("The authorization code and/or the user id cannot be null or empty.");
 			}
 			// Capture the name of the provider used to authenticate.
-			String providerName = request().getQueryString("provider");
+			String providerName = request().getQueryString("provider"),
+					userId = body.get("userId")[0],
+					userEmail = body.get("userEmail") != null ? body.get("userEmail")[0] : "",
+					userName = body.get("userName") != null ? body.get("userName")[0] : "";
 //			// Ensure that this is no request forgery going on.
 //			if (!body.containsKey("csrf") || !body.get("csrf")[0].equals(session("csrf")))
 //			    return unauthorized("Invalid CSRF token.");
@@ -147,11 +150,13 @@ public class Authentication extends Controller {
 			// exchange the code with an access token
 			TokenResponse token = oauth2Object.exchangeAuthCode(body.get("code")[0]);
 			// validate token
-			oauth2Object.validateToken(token, body.get("userId")[0]);
+			oauth2Object.validateToken(token, userId);
 			// TODO save the access token and the refresh token
 			
-			// authenticate user
-			session(SESSION.USERNAME.getId(), body.get("userId")[0]);
+			// Save user info in the session
+			session(SESSION.USERNAME.getId(), userId);
+			session(SESSION.FULL_NAME.getId(), userName);
+			session(SESSION.EMAIL.getId(), userEmail);
 		    // Store the token in the session for later use.
 			session(SESSION.ACCESS_TOKEN.getId(), token.getAccessToken());
 			// redirect to the user home page
