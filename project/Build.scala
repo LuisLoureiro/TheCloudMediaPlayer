@@ -12,11 +12,13 @@ object ApplicationBuild extends Build {
     javaCore,
     javaJdbc,
     javaEbean,
+    filters,
     // groupID % artifactID % revision % configuration
     "com.google.api-client" % "google-api-client" % "1.14.1-beta",
     "com.google.http-client" % "google-http-client-jackson" % "1.14.1-beta",
     "com.google.http-client" % "google-http-client-gson" % "1.14.1-beta",
-    "com.google.apis" % "google-api-services-oauth2" % "v2-rev32-1.14.1-beta"
+    "com.google.apis" % "google-api-services-oauth2" % "v2-rev32-1.14.1-beta",
+    "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
