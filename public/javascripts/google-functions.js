@@ -71,6 +71,8 @@ var googleHelper = (function() {
 			    error: function(e) {
 			        // Handle the error
 			        console.log(e);
+			        // Clean previous errors
+			        emptyAlerts();
 			        appendErrorAlert("Some unexpected error occured during the exchange of the authorization code. " +
 					"Please try to sign in again. Contact us if the problem continues.");
 			    }

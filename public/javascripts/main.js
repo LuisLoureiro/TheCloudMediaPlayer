@@ -1,5 +1,5 @@
 function appendAlert(errorType, message) {
-	$('body>.container-fluid').prepend('<div class="row-fluid"><div class="span12"><div class="alert alert-'+errorType+'"><a class="close">x</a>'+message+'</div></div></div>');
+	$('#alerts').prepend('<div class="row-fluid"><div class="span12"><div class="alert alert-'+errorType+'"><a class="close">x</a>'+message+'</div></div></div>');
 }
 function appendErrorAlert(message) {
 	appendAlert("error", message);
@@ -10,8 +10,11 @@ function appendInfoAlert(message) {
 function appendSuccessAlert(message) {
 	appendAlert("success", message);
 }
+function emptyAlerts() {
+	$('#alerts').empty();
+}
 $(document).ready(function(){
-	$('a.close').click(function(){
+	$(document).on("click", 'a.close', function(){
 		// a.close <- div.alert.alert-X <- div.span# <- div.row-fluid
 		$(this).parent().parent().parent().slideUp('slow');
 	});

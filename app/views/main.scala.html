@@ -15,11 +15,13 @@
     </head>
     <body>
     	<div class="container-fluid">
-		@if(!flash.isEmpty()) {
-			@for((key, value) <- flash) {
-			<script type="text/javascript">appendAlert("@key", "@value");</script>
-		    }
-		}
+    		<section id="alerts">
+			@if(!flash.isEmpty()) {
+				@for((key, value) <- flash) {
+				<script type="text/javascript">$(appendAlert("@key", "@value"));</script>
+			    }
+			}
+			</section>
 			<div class="row-fluid">
 		    @content
 		    </div>
