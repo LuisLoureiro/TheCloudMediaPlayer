@@ -11,20 +11,25 @@ object ApplicationBuild extends Build {
     // Add your project dependencies here,
     javaCore,
     javaJdbc,
-    javaEbean,
+    javaJpa,
     filters,
     // groupID % artifactID % revision % configuration
-    "com.google.api-client" % "google-api-client" % "1.14.1-beta",
-    "com.google.http-client" % "google-http-client-jackson" % "1.14.1-beta",
-    "com.google.http-client" % "google-http-client-gson" % "1.14.1-beta",
-    "com.google.apis" % "google-api-services-oauth2" % "v2-rev32-1.14.1-beta",
-    "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
+    "com.google.api-client" % "google-api-client" % "1.14.1-beta"
+    , "com.google.http-client" % "google-http-client-jackson" % "1.14.1-beta"
+    , "com.google.http-client" % "google-http-client-gson" % "1.14.1-beta"
+    , "com.google.apis" % "google-api-services-oauth2" % "v2-rev32-1.14.1-beta"
+    , "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
+    , "org.eclipse.persistence" % "org.eclipse.persistence.jpa" % "2.4.0"
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
+      ebeanEnabled := false,
     // Add your own project settings here
       resolvers += (
           "Google api services" at "http://google-api-client-libraries.appspot.com/mavenrepo"
+      ),
+      resolvers += (
+          "EclipseLink JPA" at "http://download.eclipse.org/rt/eclipselink/maven.repo"
       )
   )
 
