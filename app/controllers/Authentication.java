@@ -6,12 +6,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import javax.persistence.NoResultException;
+
+import models.db.OAuth2User;
+import models.db.User;
 import models.form.OpenIDUser;
 
 import org.codehaus.jackson.node.ObjectNode;
 
 import play.api.libs.openid.Errors;
 import play.data.Form;
+import play.db.jpa.Transactional;
 import play.libs.Json;
 import play.libs.OpenID;
 import play.libs.OpenID.UserInfo;
@@ -68,7 +73,7 @@ public class Authentication extends Controller {
 		} catch(Throwable ex) {
 			Throwable exCause = ex.getCause();
 			if(exCause != null && exCause.getClass().equals(URISyntaxException.class)) {
-				flash("error", "There's an error with your OpenID.\nPlease review it and try again.");
+				flash("error", "There's an error with your OpenID. Please review it and try again.");
 				return badRequest(index.render(openIDUserForm));
 			}
 			if(ex instanceof Errors.NETWORK_ERROR$) {
@@ -80,6 +85,7 @@ public class Authentication extends Controller {
 		}
 	}
 	
+	@Transactional
 	public static Result openIDCallback() {
 		// If the information is not correct or if the server check is false (for example if the redirect URL has been forged), the returned Promise will be a Thrown.
 		try {
@@ -104,6 +110,38 @@ public class Authentication extends Controller {
 								: "";
 			String email = attributes.containsKey(OPENID_ATTRIBUTES.EMAIL.getName()) ? attributes.get(OPENID_ATTRIBUTES.EMAIL.getName())
 					: attributes.containsKey(OPENID_ATTRIBUTES.EMAIL.getNameWithIndex()) ? attributes.get(OPENID_ATTRIBUTES.EMAIL.getNameWithIndex()) : "";
+
+			// save the openid user if don't exists.
+			User user = User.findById(info.id);
+			if(user == null)
+			{
+				// if there's an user with the same email address...
+				User existingRecord = null;
+				if(!email.isEmpty())
+				{
+					try 
+					{
+						existingRecord = User.createQuery("SELECT u.id FROM users u WHERE u.email = :email")
+							.setParameter("email", email)
+							.setMaxResults(1) // Will it be different of the previous query with the same email??
+							.getSingleResult();
+					}
+					catch(NoResultException ex)
+					{
+						//existingRecord = null;
+					}
+				}
+				// Insert the new user.
+				user = new User();
+				user.setId(info.id);
+				user.setEmail(email);
+				if(existingRecord != null) 
+				{
+					user.setFirstAuth(existingRecord);
+					existingRecord.getRelatedAuth().add(user);
+				}
+				user.save();
+			}
 			// Save user info in the session
 			session(SESSION.USERNAME.getId(), info.id);
 			session(SESSION.FULL_NAME.getId(), name);
@@ -113,6 +151,9 @@ public class Authentication extends Controller {
 			flash("success", "Successfully signed in.");
 			return redirect(routes.User.index().absoluteURL(request())+"?provider=openID");
 		} catch(Throwable ex) {
+			// TODO remove
+			ex.printStackTrace();
+			
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
 			if(ex.getClass().equals(TimeoutException.class)) {
 				flash("error", "The OpenID provider is taking too much time to verify the ID. " +
@@ -129,7 +170,9 @@ public class Authentication extends Controller {
 		}
 	}
 	
-	public static Result exchangeCodeWithAccessToken() {
+	@Transactional
+	public static Result exchangeCodeWithAccessToken()
+	{
 		try {
 			// if code == null throw exception
 			Map<String, String[]> body = request().body().asFormUrlEncoded();
@@ -151,7 +194,44 @@ public class Authentication extends Controller {
 			TokenResponse token = oauth2Object.exchangeAuthCode(body.get("code")[0]);
 			// validate token
 			oauth2Object.validateToken(token, userId);
-			// TODO save the access token and the refresh token
+			
+			// save the access token and the refresh token
+			OAuth2User user = OAuth2User.findById(userId);
+			if(user == null)
+			{
+				// if there's an user with the same email address...
+				User existingRecord = null;
+				if(!userEmail.isEmpty())
+				{
+					try 
+					{
+						existingRecord = User.createQuery("SELECT u.id FROM users u WHERE u.email = :email")
+							.setParameter("email", userEmail)
+							.setMaxResults(1) // Will it be different of the previous query with the same email??
+							.getSingleResult();
+					}
+					catch(NoResultException ex)
+					{
+						// existingRecord = null;
+					}
+				}
+				// Insert the new oauth2 user.
+				user = new OAuth2User();
+				user.setId(userId);
+				user.setEmail(userEmail);
+				user.setAccessToken(token.getAccessToken());
+				user.setRefreshToken(token.getRefreshToken());
+				if(existingRecord != null) 
+				{
+					user.setFirstAuth(existingRecord);
+					existingRecord.getRelatedAuth().add(user);
+				}
+				user.save();
+			} else {
+				// Update existing oauth2 user.
+				user.setAccessToken(token.getAccessToken());
+				user.update();
+			}
 			
 			// Save user info in the session
 			session(SESSION.USERNAME.getId(), userId);
@@ -171,14 +251,22 @@ public class Authentication extends Controller {
 			}
 			return redirect(returnURL);
 		} catch(Exception ex) {
+			// TODO remove
+			ex.printStackTrace();
+			
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
-			if(ex.getClass().equals(OAuth2ValidationException.class)) {
+			if(ex.getClass().equals(OAuth2ValidationException.class))
+			{
 				flash("error", ex.getMessage());
 				return forbidden(index.render(form));
-			} else if(ex.getClass().equals(IOException.class)) {
+			}
+			if(ex.getClass().equals(IOException.class))
+			{
 				flash("error", ex.getMessage());
 				return status(BAD_GATEWAY, index.render(form)); // TODO be sure that this is the correct error code!
-			} else if(ex.getClass().equals(IllegalStateException.class)) {
+			}
+			if(ex.getClass().equals(IllegalStateException.class))
+			{
 				flash("error", ex.getMessage());
 				return badRequest(index.render(form));
 			}
@@ -188,7 +276,8 @@ public class Authentication extends Controller {
 		}
 	}
 	
-	public static Result signOut() {
+	public static Result signOut()
+	{
 		// Clear session. TODO Maybe is better to selectively remove the unneeded information.
 		session().clear();
 //		// Remove the username from the session.
