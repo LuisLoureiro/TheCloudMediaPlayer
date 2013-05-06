@@ -1,6 +1,7 @@
 ## Projeto realizado no âmbito da unidade curricular "Projecto e Seminário", semestre de verão 2012/2013.
 
 1. [Proposta de projeto](https://www.dropbox.com/s/larslc6nq7cau5f/pp32186.pdf)
+1. [Relatório de progresso](https://www.dropbox.com/s/8gjpnj9l9v25uo4/rp32186.pdf)
 1. [The Cloud Media Player](http://thecloudmediaplayer.herokuapp.com)
 
 
