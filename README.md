@@ -7,7 +7,11 @@
 
 1. Configurações da aplicação
 	1. Variáveis de ambiente
+	
+        Para evitar que alguns valores sejam disponibilizadas publicamente, mantendo a compatibilidade com o serviço *Heroku*, é necessário criar algumas variáveis de ambiente do sistema operativo:
+
 		1. Utilizador da base de dados: ${PGUSER}
 		1. _Password_ do utilizador da base de dados: ${PGPASSWORD}
-		1. Chave secreta da aplicação: ${APP_SECRET}
+		1. Chave secreta da aplicação: ${THE_CLOUD_MEDIA_PLAYER_APP_SECRET}
+
 	1. 
