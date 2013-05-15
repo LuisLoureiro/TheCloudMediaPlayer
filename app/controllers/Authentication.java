@@ -17,6 +17,8 @@ import org.codehaus.jackson.node.ObjectNode;
 import play.api.libs.openid.Errors;
 import play.data.Form;
 import play.db.jpa.Transactional;
+import play.i18n.Lang;
+import play.i18n.Messages;
 import play.libs.Json;
 import play.libs.OpenID;
 import play.libs.OpenID.UserInfo;
@@ -73,14 +75,14 @@ public class Authentication extends Controller {
 		} catch(Throwable ex) {
 			Throwable exCause = ex.getCause();
 			if(exCause != null && exCause.getClass().equals(URISyntaxException.class)) {
-				flash("error", "There's an error with your OpenID. Please review it and try again.");
+				flash("error", Messages.get("authentication.errors.openIdUriSyntax"));
 				return badRequest(index.render(openIDUserForm));
 			}
 			if(ex instanceof Errors.NETWORK_ERROR$) {
-				flash("error", "The provided OpenID doesn't exist or it wasn't possible to discover the corresponding provider.");
+				flash("error", Messages.get("authentication.errors.openIdDiscovery"));
 				return badRequest(index.render(openIDUserForm));
 			}
-			flash("error", "Some unexpected error occured. Verify your OpenID and try again. Please contact us if the problem continues.");
+			flash("error", Messages.get("authentication.errors.openIdUnexpected"));
 			return internalServerError(index.render(openIDUserForm));
 		}
 	}
@@ -148,7 +150,7 @@ public class Authentication extends Controller {
 			session(SESSION.EMAIL.getId(), email);
 			
 			// redirect to the user home page
-			flash("success", "Successfully signed in.");
+			flash("success", Messages.get("authentication.signedIn"));
 			return redirect(routes.User.index().absoluteURL(request())+"?provider=openID");
 		} catch(Throwable ex) {
 			// TODO remove
@@ -156,16 +158,14 @@ public class Authentication extends Controller {
 			
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
 			if(ex.getClass().equals(TimeoutException.class)) {
-				flash("error", "The OpenID provider is taking too much time to verify the ID. " +
-						"This could be a temporary problem. Please try to sign in again.");
+				flash("error", Messages.get("authentication.errors.openIdVerificationTimeout"));
 				return status(GATEWAY_TIMEOUT, index.render(form)); // TODO be sure that this is the correct error code!
 			}
 			if(ex instanceof Errors.AUTH_CANCEL$) {
-				flash("error", "The authentication process was interrupted by the user.");
+				flash("error", Messages.get("authentication.errors.openIdProcessCanceled"));
 				return badRequest(index.render(form));
 			}
-			flash("error", "Some unexpected error occured during the verification of your OpenID. " +
-					"Please try to sign in again. Contact us if the problem continues.");
+			flash("error", Messages.get("authentication.errors.openIdVerificationUnexpected"));
 			return internalServerError(index.render(form));
 		}
 	}
@@ -177,7 +177,7 @@ public class Authentication extends Controller {
 			// if code == null throw exception
 			Map<String, String[]> body = request().body().asFormUrlEncoded();
 			if(!body.containsKey("code") || !body.containsKey("userId")) {
-				throw new IllegalStateException("The authorization code and/or the user id cannot be null or empty.");
+				throw new IllegalStateException(Messages.get("authentication.errors.oauthMissingParams"));
 			}
 			// Capture the name of the provider used to authenticate.
 			String providerName = request().getQueryString("provider"),
@@ -187,13 +187,17 @@ public class Authentication extends Controller {
 //			// Ensure that this is no request forgery going on.
 //			if (!body.containsKey("csrf") || !body.get("csrf")[0].equals(session("csrf")))
 //			    return unauthorized("Invalid CSRF token.");
+			
+			// Client preferred language
+			// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
+			Lang lang = Lang.preferred(request().acceptLanguages());
 
 			// Create an OAuth2 object based on the OAuth2 authentication provider used by the user using the factory method pattern.
-			IOAuth2 oauth2Object = OAuth2Factory.getInstanceFromProviderName(providerName);
+			IOAuth2 oauth2Object = OAuth2Factory.getInstanceFromProviderName(providerName, lang);
 			// exchange the code with an access token
 			TokenResponse token = oauth2Object.exchangeAuthCode(body.get("code")[0]);
 			// validate token
-			oauth2Object.validateToken(token, userId);
+			oauth2Object.validateToken(token, userId, lang);
 			
 			// save the access token and the refresh token
 			OAuth2User user = OAuth2User.findById(userId);
@@ -240,7 +244,7 @@ public class Authentication extends Controller {
 		    // Store the token in the session for later use.
 			session(SESSION.ACCESS_TOKEN.getId(), token.getAccessToken());
 			// redirect to the user home page
-			flash("success", "Successfully signed in.");
+			flash("success", Messages.get("authentication.signedIn"));
 			
 			// Content negotiation
 			String returnURL = routes.User.index().absoluteURL(request())+"?provider="+providerName;
@@ -270,8 +274,7 @@ public class Authentication extends Controller {
 				flash("error", ex.getMessage());
 				return badRequest(index.render(form));
 			}
-			flash("error", "Some unexpected error occured during the exchange of the authorization code. " +
-					"Please try to sign in again. Contact us if the problem continues.");
+			flash("error", Messages.get("authentication.errors.oauthExchangeCodeUnexpected"));
 			return internalServerError(index.render(form));
 		}
 	}
@@ -287,7 +290,7 @@ public class Authentication extends Controller {
 		// Notify the identity provider if needed
 		
 		// Redirect to the index page
-		flash("success", "Successfully signed out.");
+		flash("success", Messages.get("authentication.signedOut"));
 		return redirect(routes.Application.index());
 	}
 }

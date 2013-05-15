@@ -1,4 +1,5 @@
 @(fullname: String, email: String, authProvider: String)
+@import play.i18n._
 
 @main("User Home Page") {
 	<section>
@@ -22,9 +23,9 @@
 	                }
 	                <li class="divider"></li>
 	                <li>@if("google".equals(authProvider)) {
-    					<a class="btn btn-primary" href="#" id="googleSignOut">Sign out</a>
+    					<a class="btn btn-primary" href="#" id="googleSignOut">@Messages.get("authentication.signOut")</a>
     					} else {
-    					<a class="btn btn-primary" href="@routes.Authentication.signOut()" id="signOut">Sign out</a>
+    					<a class="btn btn-primary" href="@routes.Authentication.signOut()" id="signOut">@Messages.get("authentication.signOut")</a>
     				}</li>
 	              </ul>
 	            </li>
@@ -34,5 +35,5 @@
 	    </div><!-- /navbar-inner -->
 	  </div>
 	</section>
-    <p>Welcome @fullname!</p>
+    <p>@Messages.get("user.welcome", fullname)</p>
 }

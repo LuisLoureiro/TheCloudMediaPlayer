@@ -2,6 +2,8 @@ package controllers.operations.authentication;
 
 import java.io.IOException;
 
+import play.i18n.Lang;
+
 import com.google.api.client.auth.oauth2.TokenResponse; // TODO temporary. Try to create a new class to be able to use other authentication providers.
 
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
@@ -20,7 +22,10 @@ public interface IOAuth2 {
 	 * Make sure the token we got is for our app.
 	 * 
 	 * If the validation has errors an OAuth2ValidationException is thrown.
+	 * @param token
+	 * @param userId
+	 * @throws OAuth2ValidationException
 	 * @throws IOException 
 	 */
-	public void validateToken(TokenResponse token, String userId) throws OAuth2ValidationException, IOException;
+	public void validateToken(TokenResponse token, String userId, Lang lang) throws OAuth2ValidationException, IOException;
 }

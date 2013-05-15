@@ -1,4 +1,5 @@
 @(openIDForm: Form[models.form.OpenIDUser])
+@import play.i18n._
 
 @main() {
 	@***********************************************************
@@ -6,7 +7,7 @@
 	* para que apareça esta informação em todas as páginas,
 	* sem necessidade de código repetido
 	************************************************************@
-    <h2>Autenticação</h2>
+    <h2>@Messages.get("authentication.title")</h2>
     @helper.form(action = routes.Authentication.openID(), 'id -> "openIDForm") {
     	@helper.inputText(openIDForm("id"), 'id -> "openID", 'autofocus -> "autofocus", '_label -> "OpenID", '_showConstraints -> false)
     	<input type="submit" name="Sign in"/>

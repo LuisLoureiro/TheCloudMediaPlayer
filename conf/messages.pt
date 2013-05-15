@@ -1,1 +1,18 @@
-authentication.title=Authenticação
+authentication.title=Autenticação
+authentication.signIn=Iniciar sessão
+authentication.signedIn=Sessão iniciada com sucesso.
+authentication.signOut=Terminar sessão
+authentication.signedOut=Sessão terminada com sucesso.
+authentication.errors.openIdUriSyntax=Existe algum erro com o seu OpenID. Por favor, altere-o e volte a tentar.
+authentication.errors.openIdDiscovery=O OpenID indicado não existe ou não foi possível descobrir o correspondente fornecedor de autenticação.
+authentication.errors.openIdUnexpected=Ocorreu um erro inesperado. Verifique o seu OpenID e volte a tentar. Contacte-nos se o problema persistir.
+authentication.errors.openIdVerificationTimeout=O fornecedor de autenticação excedeu o tempo limite para verificar o ID. Isto pode dever-se a um problema temporário. Por favor, volte a iniciar sessão.
+authentication.errors.openIdProcessCanceled=O processo de autenticação foi interrompido pelo utilizador.
+authentication.errors.openIdVerificationUnexpected=Ocorreu um erro inesperado durante a verificação do seu OpenID. Por favor, volte a iniciar sessão. Contacte-nos se o problema persistir.
+authentication.errors.oauthMissingParams=O código de autorização e/ou o ID do utilizador não pode ser nulo ou vazio.
+authentication.errors.oauthExchangeCodeUnexpected=Ocorreu um erro inesperado durante o processo de troca do código de autorização. Por favor, volte a iniciar sessão. Contacte-nos se o problema persistir.
+authentication.errors.oauthTokenIntendedUser=O ID de utilizador recebido não corresponde ao do token.
+authentication.errors.oauthTokenIntendedApp=O ID da aplicação não corresponde ao ID de cliente do token.
+authentication.errors.oauthFactoryProviderName=Não existe correspondência para o nome do fornecedor de autenticação recebido.
+
+user.welcome=Bem-vindo {0}!
