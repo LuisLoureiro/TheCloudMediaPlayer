@@ -5,6 +5,8 @@
 # Home page
 GET     /                           controllers.Application.index()
 
+GET     /auth                       controllers.Authentication.index()
+
 POST	/auth/openid				controllers.Authentication.openID()
 
 GET		/auth/openidcallback		controllers.Authentication.openIDCallback()

@@ -24,7 +24,8 @@ import play.libs.OpenID;
 import play.libs.OpenID.UserInfo;
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.application.index;
+import play.mvc.Security.Authenticated;
+import views.html.authentication.index;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
 
@@ -35,8 +36,15 @@ import controllers.operations.authentication.exceptions.OAuth2ValidationExceptio
 import controllers.operations.authentication.factory.OAuth2Factory;
 
 public class Authentication extends Controller {
+	
+	public static Result index()
+	{
+    	Form<OpenIDUser> openIDForm = Form.form(OpenIDUser.class);
+        return ok(index.render(openIDForm));
+	}
 
-	public static Result openID() {
+	public static Result openID()
+	{
     	Form<OpenIDUser> openIDUserForm = Form.form(OpenIDUser.class).bindFromRequest();
     	if(openIDUserForm.hasErrors()) {
     		return badRequest(index.render(openIDUserForm));
@@ -279,6 +287,7 @@ public class Authentication extends Controller {
 		}
 	}
 	
+	@Authenticated
 	public static Result signOut()
 	{
 		// Clear session. TODO Maybe is better to selectively remove the unneeded information.

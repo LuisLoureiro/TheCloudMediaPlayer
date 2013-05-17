@@ -1,0 +1,22 @@
+@(openIDForm: Form[models.form.OpenIDUser])
+@import play.i18n._
+
+@main() {
+    <h2>@Messages.get("authentication.title")</h2>
+    @helper.form(action = routes.Authentication.openID(), 'id -> "openIDForm") {
+    	@helper.inputText(openIDForm("id"), 'id -> "openID", 'autofocus -> "autofocus", '_label -> "OpenID", '_showConstraints -> false)
+    	<input type="submit" name="Sign in"/>
+    }<br/>
+	<div id="signinButton">
+		<span class="g-signin"
+		    data-scope="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+		    data-clientid="458134068157.apps.googleusercontent.com"
+		    data-redirecturi="postmessage"
+		    data-accesstype="offline"
+		    data-cookiepolicy="single_host_origin"
+		    data-callback="signInCallback"
+		    data-width="wide">
+		</span>
+	</div>
+	<div id="result"></div>
+}

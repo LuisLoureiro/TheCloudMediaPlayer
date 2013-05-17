@@ -1,27 +1,10 @@
-@(openIDForm: Form[models.form.OpenIDUser])
 @import play.i18n._
 
 @main() {
-	@***********************************************************
-	* passar esta parte da autenticação para o main.scala.html,
-	* para que apareça esta informação em todas as páginas,
-	* sem necessidade de código repetido
-	************************************************************@
-    <h2>@Messages.get("authentication.title")</h2>
-    @helper.form(action = routes.Authentication.openID(), 'id -> "openIDForm") {
-    	@helper.inputText(openIDForm("id"), 'id -> "openID", 'autofocus -> "autofocus", '_label -> "OpenID", '_showConstraints -> false)
-    	<input type="submit" name="Sign in"/>
-    }<br/>
-	<div id="signinButton">
-		<span class="g-signin"
-		    data-scope="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
-		    data-clientid="458134068157.apps.googleusercontent.com"
-		    data-redirecturi="postmessage"
-		    data-accesstype="offline"
-		    data-cookiepolicy="single_host_origin"
-		    data-callback="signInCallback"
-		    data-width="wide">
-		</span>
-	</div>
-	<div id="result"></div>
+@** Passar para o main.scala.html, mas de forma a que seja possível alterar o estado: se estiver autenticado tem que ser um botão diferente, de sign out! **@
+	@if(ctx.session().get("username") == null) {
+		<a class="btn btn-info btn-large" href="@routes.Authentication.index()">@Messages.get("authentication.signIn")</a>
+	} else {
+		<a class="btn btn-danger btn-large" href="@routes.Authentication.signOut()">@Messages.get("authentication.signOut")</a>
+	}
 }
