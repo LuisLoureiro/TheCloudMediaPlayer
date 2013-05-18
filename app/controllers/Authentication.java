@@ -6,10 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import javax.persistence.NoResultException;
-
-import models.db.OAuth2User;
-import models.db.User;
 import models.form.OpenIDUser;
 
 import org.codehaus.jackson.node.ObjectNode;
@@ -34,6 +30,8 @@ import controllers.operations.authentication.IOAuth2;
 import controllers.operations.authentication.enums.OPENID_ATTRIBUTES;
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
 import controllers.operations.authentication.factory.OAuth2Factory;
+import controllers.operations.persistence.PersistOAuth2User;
+import controllers.operations.persistence.PersistUser;
 
 public class Authentication extends Controller {
 	
@@ -94,7 +92,7 @@ public class Authentication extends Controller {
 			return internalServerError(index.render(openIDUserForm));
 		}
 	}
-	
+
 	@Transactional
 	public static Result openIDCallback() {
 		// If the information is not correct or if the server check is false (for example if the redirect URL has been forged), the returned Promise will be a Thrown.
@@ -122,36 +120,8 @@ public class Authentication extends Controller {
 					: attributes.containsKey(OPENID_ATTRIBUTES.EMAIL.getNameWithIndex()) ? attributes.get(OPENID_ATTRIBUTES.EMAIL.getNameWithIndex()) : "";
 
 			// save the openid user if don't exists.
-			User user = User.findById(info.id);
-			if(user == null)
-			{
-				// if there's an user with the same email address...
-				User existingRecord = null;
-				if(!email.isEmpty())
-				{
-					try 
-					{
-						existingRecord = User.createQuery("SELECT u.id FROM users u WHERE u.email = :email")
-							.setParameter("email", email)
-							.setMaxResults(1) // Will it be different of the previous query with the same email??
-							.getSingleResult();
-					}
-					catch(NoResultException ex)
-					{
-						//existingRecord = null;
-					}
-				}
-				// Insert the new user.
-				user = new User();
-				user.setId(info.id);
-				user.setEmail(email);
-				if(existingRecord != null) 
-				{
-					user.setFirstAuth(existingRecord);
-					existingRecord.getRelatedAuth().add(user);
-				}
-				user.save();
-			}
+			PersistUser.saveUser(info.id, email);
+			
 			// Save user info in the session
 			session(SESSION.USERNAME.getId(), info.id);
 			session(SESSION.FULL_NAME.getId(), name);
@@ -177,7 +147,7 @@ public class Authentication extends Controller {
 			return internalServerError(index.render(form));
 		}
 	}
-	
+
 	@Transactional
 	public static Result exchangeCodeWithAccessToken()
 	{
@@ -208,42 +178,7 @@ public class Authentication extends Controller {
 			oauth2Object.validateToken(token, userId, lang);
 			
 			// save the access token and the refresh token
-			OAuth2User user = OAuth2User.findById(userId);
-			if(user == null)
-			{
-				// if there's an user with the same email address...
-				User existingRecord = null;
-				if(!userEmail.isEmpty())
-				{
-					try 
-					{
-						existingRecord = User.createQuery("SELECT u.id FROM users u WHERE u.email = :email")
-							.setParameter("email", userEmail)
-							.setMaxResults(1) // Will it be different of the previous query with the same email??
-							.getSingleResult();
-					}
-					catch(NoResultException ex)
-					{
-						// existingRecord = null;
-					}
-				}
-				// Insert the new oauth2 user.
-				user = new OAuth2User();
-				user.setId(userId);
-				user.setEmail(userEmail);
-				user.setAccessToken(token.getAccessToken());
-				user.setRefreshToken(token.getRefreshToken());
-				if(existingRecord != null) 
-				{
-					user.setFirstAuth(existingRecord);
-					existingRecord.getRelatedAuth().add(user);
-				}
-				user.save();
-			} else {
-				// Update existing oauth2 user.
-				user.setAccessToken(token.getAccessToken());
-				user.update();
-			}
+			PersistOAuth2User.saveUser(token, userId, userEmail);
 			
 			// Save user info in the session
 			session(SESSION.USERNAME.getId(), userId);
