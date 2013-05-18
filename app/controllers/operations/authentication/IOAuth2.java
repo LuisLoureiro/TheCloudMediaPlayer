@@ -11,16 +11,18 @@ import controllers.operations.authentication.exceptions.OAuth2ValidationExceptio
 public interface IOAuth2 {
 
 	/**
-	 * Exchange the authorization code for an access token and a refresh token.
+	 * Exchange the authorisation code for an access token and a refresh token.
 	 * @throws IOException 
 	 */
 	public TokenResponse exchangeAuthCode(String authorizationCode) throws IOException;
 	
 	/**
 	 * Check that the token is valid.
-	 * Make sure the token we got is for the intended user. ??
+	 * <p>
+	 * Make sure the token we got is for the intended user.
+	 * <p>
 	 * Make sure the token we got is for our app.
-	 * 
+	 * <p>
 	 * If the validation has errors an OAuth2ValidationException is thrown.
 	 * @param token
 	 * @param userId
