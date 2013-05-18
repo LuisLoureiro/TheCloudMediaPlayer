@@ -22,7 +22,7 @@ public class InternationalizationTest
 		running(testServer(3333, fakeApplication(inMemoryDatabase())), new Runnable() {
 			@Override
 			public void run() {
-				Response responde = WS.url("http://localhost:3333")
+				Response responde = WS.url("http://localhost:3333/auth")
 					.setHeader("Accept-Language", "pt")
 					.get()
 					.get();
@@ -40,7 +40,7 @@ public class InternationalizationTest
 		running(testServer(3333, fakeApplication(inMemoryDatabase())), new Runnable() {
 			@Override
 			public void run() {
-				Response responde = WS.url("http://localhost:3333")
+				Response responde = WS.url("http://localhost:3333/auth")
 					.setHeader("Accept-Language", "en")
 					.get()
 					.get();
@@ -58,7 +58,7 @@ public class InternationalizationTest
 		running(testServer(3333, fakeApplication(inMemoryDatabase())), new Runnable() {
 			@Override
 			public void run() {
-				Response responde = WS.url("http://localhost:3333")
+				Response responde = WS.url("http://localhost:3333/auth")
 					.setHeader("Accept-Language", "fr")
 					.get()
 					.get();
