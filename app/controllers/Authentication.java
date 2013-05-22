@@ -3,7 +3,9 @@ package controllers;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
 import models.form.OpenIDUser;
@@ -26,10 +28,15 @@ import views.html.authentication.index;
 import com.google.api.client.auth.oauth2.TokenResponse;
 
 import controllers.enums.SESSION;
+import controllers.operations.authentication.DropboxOAuth1;
+import controllers.operations.authentication.IOAuth1;
 import controllers.operations.authentication.IOAuth2;
 import controllers.operations.authentication.enums.OPENID_ATTRIBUTES;
+import controllers.operations.authentication.exceptions.OAuth1TokenException;
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
+import controllers.operations.authentication.factory.OAuth1Factory;
 import controllers.operations.authentication.factory.OAuth2Factory;
+import controllers.operations.persistence.PersistOAuth1User;
 import controllers.operations.persistence.PersistOAuth2User;
 import controllers.operations.persistence.PersistUser;
 
@@ -158,10 +165,10 @@ public class Authentication extends Controller {
 				throw new IllegalStateException(Messages.get("authentication.errors.oauthMissingParams"));
 			}
 			// Capture the name of the provider used to authenticate.
-			String providerName = request().getQueryString("provider"),
-					userId = body.get("userId")[0],
-					userEmail = body.get("userEmail") != null ? body.get("userEmail")[0] : "",
-					userName = body.get("userName") != null ? body.get("userName")[0] : "";
+			String providerName = request().getQueryString("provider")
+					,userId = body.get("userId")[0]
+					,userEmail = body.get("userEmail") != null ? body.get("userEmail")[0] : ""
+					,userName = body.get("userName") != null ? body.get("userName")[0] : "";
 //			// Ensure that this is no request forgery going on.
 //			if (!body.containsKey("csrf") || !body.get("csrf")[0].equals(session("csrf")))
 //			    return unauthorized("Invalid CSRF token.");
@@ -178,7 +185,7 @@ public class Authentication extends Controller {
 			oauth2Object.validateToken(token, userId, lang);
 			
 			// save the access token and the refresh token
-			PersistOAuth2User.saveUser(token, userId, userEmail);
+			PersistOAuth2User.saveUser(token, userId, "email", userEmail);
 			
 			// Save user info in the session
 			session(SESSION.USERNAME.getId(), userId);
@@ -219,6 +226,80 @@ public class Authentication extends Controller {
 			}
 			flash("error", Messages.get("authentication.errors.oauthExchangeCodeUnexpected"));
 			return internalServerError(index.render(form));
+		}
+	}
+	
+	@Authenticated
+	@Transactional
+	public static Result connectTo(String provider)
+	{
+		// Check the service the user wants to connect to.
+		if(provider == null || provider.isEmpty())
+		{
+			flash("error", "The provider cannot be null or empty."); // TODO
+			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.USERNAME.getId()), provider, null)); // TODO return json.
+		}
+		
+		// Client preferred language
+		// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
+		Lang lang = Lang.preferred(request().acceptLanguages());
+		
+		try {
+			// Create the object that represents the service
+			IOAuth1 oauth1Object = OAuth1Factory.getInstanceFromProviderName(provider, lang);
+			
+			// Get request token
+			String redirectUrl = oauth1Object.getRequestToken(routes.Authentication.connectToCallback(provider).absoluteURL(request()));
+			
+			// Redirect to the authentication url
+			return redirect(redirectUrl);
+		} catch (InstantiationException ex) {
+			flash("error", ex.getMessage());
+			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.USERNAME.getId()), provider, null)); // TODO return json.
+		}
+	}
+	
+	@Authenticated
+	@Transactional
+	public static Result connectToCallback(String provider)
+	{
+		// Check the service the user wants to connect to and grab the query string parameters.
+		String uid = request().getQueryString("uid")
+				,requestToken = request().getQueryString("oauth_token")
+				,notApproved = request().getQueryString("not_approved");
+		
+		if(notApproved != null && Boolean.parseBoolean(notApproved))
+		{
+			flash(Messages.get("authentication.errors.oauthProcessCanceled"));
+			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.USERNAME.getId()), provider, null)); // TODO return json.
+		}
+		if(provider == null || provider.isEmpty() ||
+				uid == null || uid.isEmpty() || requestToken == null || requestToken.isEmpty())
+		{
+			flash(); // TODO
+			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.USERNAME.getId()), provider, null)); // TODO return json.
+		}
+		
+		// Client preferred language
+		// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
+		Lang lang = Lang.preferred(request().acceptLanguages());
+		
+		try {
+			// Create the object that represents the service
+			IOAuth1 oauth1Object = OAuth1Factory.getInstanceFromProviderName(provider, lang);
+
+			// Get oauth_token_secret and oauth_token
+			Entry<String, String> oauthToken = oauth1Object.exchangeRequestTokenForAnAccessToken(requestToken);
+			
+			// MAPPER PART
+			// If the user doesn't exists, insert in the database and create relationship
+			PersistOAuth1User.saveUser(oauthToken.getKey(), oauthToken.getValue(), uid, "id", SESSION.USERNAME.getId());
+			// Get files
+			List<com.dropbox.client2.DropboxAPI.Entry> contents = ((DropboxOAuth1)oauth1Object).getFiles();
+			return ok(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.USERNAME.getId()), provider, contents));
+		} catch (InstantiationException | OAuth1TokenException ex) {
+			flash("error", ex.getMessage());
+			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.USERNAME.getId()), provider, null)); // TODO return json.
 		}
 	}
 	
