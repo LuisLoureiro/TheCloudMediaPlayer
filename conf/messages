@@ -14,5 +14,8 @@ authentication.errors.oauthExchangeCodeUnexpected=Some unexpected error occurred
 authentication.errors.oauthTokenIntendedUser=Token''s user ID doesn''t match given user ID.
 authentication.errors.oauthTokenIntendedApp=Token''s client ID does not match app''s.
 authentication.errors.oauthFactoryProviderName=There''s no match for the given provider name.
+authentication.errors.oauthTokenInexistent=The request token does not exist.
+authentication.errors.oauthProcessCanceled=The authentication process was interrupted by the user.
 
 user.welcome=Welcome {0}!
+user.connectTo=Connect to

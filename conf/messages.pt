@@ -14,5 +14,8 @@ authentication.errors.oauthExchangeCodeUnexpected=Ocorreu um erro inesperado dur
 authentication.errors.oauthTokenIntendedUser=O ID de utilizador recebido não corresponde ao do token.
 authentication.errors.oauthTokenIntendedApp=O ID da aplicação não corresponde ao ID de cliente do token.
 authentication.errors.oauthFactoryProviderName=Não existe correspondência para o nome do fornecedor de autenticação recebido.
+authentication.errors.oauthTokenInexistent=O token não existe.
+authentication.errors.oauthProcessCanceled=O processo de autenticação foi interrompido pelo utilizador.
 
 user.welcome=Bem-vindo {0}!
+user.connectTo=Ligar a
