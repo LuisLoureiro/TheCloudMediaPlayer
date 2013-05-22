@@ -12,6 +12,6 @@ public class User extends Controller {
 	public static Result index() {
 		String name = session(SESSION.FULL_NAME.getId()) == null || session(SESSION.FULL_NAME.getId()).isEmpty()
 				? session(SESSION.USERNAME.getId()) : session(SESSION.FULL_NAME.getId());
-		return ok(index.render(name, session(SESSION.EMAIL.getId()), request().getQueryString("provider")));
+		return ok(index.render(name, session(SESSION.EMAIL.getId()), request().getQueryString("provider"), null));
 	}
 }

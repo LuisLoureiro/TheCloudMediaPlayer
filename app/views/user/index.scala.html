@@ -1,4 +1,4 @@
-@(fullname: String, email: String, authProvider: String)
+@(fullname: String, email: String, authProvider: String, entries: List[com.dropbox.client2.DropboxAPI.Entry])
 @import play.i18n._
 
 @main("User Home Page") {
@@ -11,9 +11,19 @@
 	          <span class="icon-bar"></span>
 	          <span class="icon-bar"></span>
 	        </a>
-	        <a class="brand" href="#">The Cloud Media Player</a>
+	        <a class="brand" href="@routes.User.index()">The Cloud Media Player</a>
 	        <div class="nav-collapse">
 	          <ul class="nav pull-right">
+	            <li class="dropdown">
+	              <a href="#" class="dropdown-toggle" data-toggle="dropdown">@Messages.get("connectTo") <b class="caret"></b></a>
+	              <ul class="dropdown-menu">
+	                <li><a href="@routes.Authentication.connectTo("dropbox")">Dropbox</a></li>
+	                <li><a href="@routes.Authentication.connectTo("cloudpt")">Cloudpt</a></li>
+	                <li class="divider"></li>
+	                <li><a href="@routes.Authentication.connectTo("soundcloud")">SoundCloud</a></li>
+	                <li><a href="@routes.Authentication.connectTo("youtube")">Youtube</a></li>
+	              </ul>
+	            </li>
 	            <li class="divider-vertical"></li>
 	            <li class="dropdown">
 	              <a href="#" class="dropdown-toggle" data-toggle="dropdown">@fullname <b class="caret"></b></a>
@@ -36,4 +46,17 @@
 	  </div>
 	</section>
     <p>@Messages.get("user.welcome", fullname)</p>
+    <div class="span4">
+      <h3 id="list">Files</h3>
+      <div class="well" style="padding: 8px 0;">
+        <ul class="nav nav-list">
+          @if(entries != null) {
+          <li class="nav-header">Dropbox Files</li>
+            @for(entry <- entries){
+                <li><a href="#">@entry.path</a></li>
+            }
+          }
+        </ul>
+      </div>
+    </div>
 }
