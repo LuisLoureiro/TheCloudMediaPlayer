@@ -20,9 +20,10 @@ public class PersistOAuth2User {
 	 * 
 	 * @param token
 	 * @param userId
-	 * @param userEmail
+	 * @param findByFieldName
+	 * @param findByFieldValue
 	 */
-	public static void saveUser(TokenResponse token, String userId, String userEmail)
+	public static void saveUser(TokenResponse token, String userId, String findByFieldName, String findByFieldValue)
 	{
 		IMapper<String, OAuth2User> oauth2Mapper = new OAuth2UserMapper(); // TODO ver a possibilidade de usar o padrão factory.
 		
@@ -31,9 +32,9 @@ public class PersistOAuth2User {
 		{
 			// if there's an user with the same email address...
 			User existingRecord = null;
-			if(userEmail != null && !userEmail.isEmpty())
+			if(findByFieldName != null && !findByFieldName.isEmpty())
 			{
-				for (User auxUser : new UserMapper().findBy("email", userEmail)) { // TODO ver a possibilidade de usar o padrão factory.
+				for (User auxUser : new UserMapper().findBy(findByFieldName, findByFieldValue)) { // TODO ver a possibilidade de usar o padrão factory.
 					existingRecord = auxUser;
 					break;
 				}
@@ -41,7 +42,7 @@ public class PersistOAuth2User {
 			// Insert the new oauth2 user.
 			user = new OAuth2User();
 			user.setId(userId);
-			user.setEmail(userEmail);
+			user.setEmail(existingRecord != null ? existingRecord.getEmail() : null);
 			user.setAccessToken(token.getAccessToken());
 			user.setRefreshToken(token.getRefreshToken());
 			// Create relationship
