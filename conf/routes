@@ -3,20 +3,25 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+GET     /                                   controllers.Application.index()
 
-GET     /auth                       controllers.Authentication.index()
+GET     /auth                               controllers.Authentication.index()
 
-POST	/auth/openid				controllers.Authentication.openID()
+POST	/auth/openid                        controllers.Authentication.openID()
 
-GET		/auth/openidcallback		controllers.Authentication.openIDCallback()
+GET		/auth/openidcallback                controllers.Authentication.openIDCallback()
 
-POST	/auth/exchangecode			controllers.Authentication.exchangeCodeWithAccessToken()
+POST	/auth/exchangecode                  controllers.Authentication.exchangeCodeWithAccessToken()
 
-GET 	/auth/signout				controllers.Authentication.signOut()
+GET     /auth/connectto/:provider           controllers.Authentication.connectTo(provider: String)
+
+# See 6.2.3 http://oauth.net/core/1.0/#auth_step2
+GET     /auth/connecttocallback/:provider   controllers.Authentication.connectToCallback(provider: String)
+
+GET 	/auth/signout				        controllers.Authentication.signOut()
 
 # User home page
-GET		/user						controllers.User.index()
+GET		/user						        controllers.User.index()
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /assets/*file                       controllers.Assets.at(path="/public", file)
