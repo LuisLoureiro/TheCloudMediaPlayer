@@ -39,5 +39,4 @@ public class UserMapper implements IMapper<String, User> {
 	public void delete(User object) {
         JPA.em().remove(object);
 	}
-
 }
