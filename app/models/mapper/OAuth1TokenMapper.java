@@ -14,14 +14,14 @@ public class OAuth1TokenMapper implements IMapper<String, OAuth1Token> {
 
 	@Override
 	public Collection<OAuth1Token> findBy(String field, String data) {
-		return JPA.em().createQuery("SELECT u.id FROM oauth1_token u WHERE u."+field+" = :value", OAuth1Token.class)
+		return JPA.em().createQuery("SELECT u FROM oauth1_token u WHERE u."+field+" = :value", OAuth1Token.class)
 				.setParameter("value", data)
 				.getResultList();
 	}
 
 	@Override
 	public Collection<OAuth1Token> getAll() {
-    	return JPA.em().createQuery("SELECT * FROM oauth1_token", OAuth1Token.class)
+    	return JPA.em().createQuery("SELECT u FROM oauth1_token u", OAuth1Token.class)
     			.getResultList();
 	}
 

@@ -14,14 +14,14 @@ public class OAuth2UserMapper implements IMapper<String, OAuth2User> {
 
 	@Override
 	public Collection<OAuth2User> findBy(String field, String data) {
-		return JPA.em().createQuery("SELECT u.id FROM oauth2_users u WHERE u."+field+" = :value", OAuth2User.class)
+		return JPA.em().createQuery("SELECT u FROM oauth2_users u WHERE u."+field+" = :value", OAuth2User.class)
 				.setParameter("value", data)
 				.getResultList();
 	}
 
 	@Override
 	public Collection<OAuth2User> getAll() {
-    	return JPA.em().createQuery("SELECT * FROM oauth2_users", OAuth2User.class)
+    	return JPA.em().createQuery("SELECT u FROM oauth2_users u", OAuth2User.class)
     			.getResultList();
 	}
 
