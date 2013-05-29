@@ -21,6 +21,7 @@ object ApplicationBuild extends Build {
     , "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
     , "org.eclipse.persistence" % "org.eclipse.persistence.jpa" % "2.4.0"
     , "org.syncloud" % "dropbox-client" % "1.5.3"
+    , "com.soundcloud" % "java-api-wrapper" % "1.3.0"
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
