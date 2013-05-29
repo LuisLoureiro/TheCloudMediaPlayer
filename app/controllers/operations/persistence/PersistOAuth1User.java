@@ -40,12 +40,12 @@ public class PersistOAuth1User {
 			// Insert the new oauth1 user.
 			user = new OAuth1User();
 			user.setId(userId);
-			user.setEmail(existingRecord != null ? existingRecord.getEmail() : null);
 			user.setOauthToken(oauthToken);
 			user.setOauthTokenSecret(oauthTokenSecret);
 			// Create relationship
 			if(existingRecord != null) 
 			{
+				user.setEmail(existingRecord.getEmail());
 				user.setFirstAuth(existingRecord);
 				existingRecord.getRelatedAuth().add(user);
 			}
