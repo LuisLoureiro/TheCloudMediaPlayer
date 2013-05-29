@@ -1,5 +1,6 @@
-@(fullname: String, email: String, authProvider: String, entries: List[com.dropbox.client2.DropboxAPI.Entry])
+@(authProvider: String, entries: List[com.dropbox.client2.DropboxAPI.Entry])
 @import play.i18n._
+@import controllers.enums._
 
 @main("User Home Page") {
 	<section>
@@ -26,7 +27,7 @@
 	            </li>
 	            <li class="divider-vertical"></li>
 	            <li class="dropdown">
-	              <a href="#" class="dropdown-toggle" data-toggle="dropdown">@fullname <b class="caret"></b></a>
+	              <a href="#" class="dropdown-toggle" data-toggle="dropdown">@ctx().session().get(SESSION.FULL_NAME.getId()) <b class="caret"></b></a>
 	              <ul class="dropdown-menu">
 	                @if(email != null && !email.isEmpty()) {
 	                	<li>@email</li>
@@ -47,16 +48,16 @@
 	</section>
     <p>@Messages.get("user.welcome", fullname)</p>
     <div class="span4">
+    @if(entries != null) {
       <h3 id="list">Files</h3>
       <div class="well" style="padding: 8px 0;">
         <ul class="nav nav-list">
-          @if(entries != null) {
           <li class="nav-header">Dropbox Files</li>
             @for(entry <- entries){
                 <li><a href="#">@entry.path</a></li>
             }
-          }
         </ul>
       </div>
+    }
     </div>
 }
