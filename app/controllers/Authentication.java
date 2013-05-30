@@ -237,7 +237,7 @@ public class Authentication extends Controller {
 		if(provider == null || provider.isEmpty())
 		{
 			flash("error", "The provider cannot be null or empty."); // TODO
-			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.EMAIL.getId()), provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
 		}
 		
 		// Client preferred language
@@ -255,7 +255,7 @@ public class Authentication extends Controller {
 			return redirect(redirectUrl);
 		} catch (InstantiationException ex) {
 			flash("error", ex.getMessage());
-			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.EMAIL.getId()), provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
 		}
 	}
 	
@@ -271,13 +271,13 @@ public class Authentication extends Controller {
 		if(notApproved != null && Boolean.parseBoolean(notApproved))
 		{
 			flash(Messages.get("authentication.errors.oauthProcessCanceled"));
-			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.EMAIL.getId()), provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
 		}
 		if(provider == null || provider.isEmpty() ||
 				uid == null || uid.isEmpty() || requestToken == null || requestToken.isEmpty())
 		{
 			flash(); // TODO
-			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.EMAIL.getId()), provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
 		}
 		
 		// Client preferred language
@@ -296,10 +296,10 @@ public class Authentication extends Controller {
 			PersistOAuth1User.saveUser(oauthToken.getKey(), oauthToken.getValue(), uid, "id", session(SESSION.EMAIL.getId()));
 			// Get files
 			List<com.dropbox.client2.DropboxAPI.Entry> contents = ((DropboxOAuth1)oauth1Object).getFiles();
-			return ok(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.EMAIL.getId()), provider, contents));
+			return ok(views.html.user.index.render(provider, contents));
 		} catch (InstantiationException | OAuth1TokenException ex) {
 			flash("error", ex.getMessage());
-			return badRequest(views.html.user.index.render(session(SESSION.FULL_NAME.getId()), session(SESSION.EMAIL.getId()), provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
 		}
 	}
 	
