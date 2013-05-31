@@ -25,7 +25,7 @@ import controllers.operations.authentication.exceptions.OAuth1TokenException;
  * 
  * Following the Core API - REST Reference.
  */
-public interface IOAuth1 {
+public interface IOAuth1 extends IOAuth {
 
 	/**
 	 * Get a request token.<p>
@@ -48,7 +48,7 @@ public interface IOAuth1 {
 	 *   it isn't possible for your application to obtain an access token from /oauth/access_token.<p>
 	 *  This method corresponds to Obtaining User (http://oauth.net/core/1.0/#auth_step2) in the OAuth Core 1.0 specification.
 	 */
-	public void askUserAuthorisation();
+//	public void askUserAuthorisation();
 	
 	/**
 	 * Once authorised, exchange the request token for an access token, which will be used for calling the Core API.<p>

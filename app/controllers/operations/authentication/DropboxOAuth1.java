@@ -4,17 +4,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import play.i18n.Messages;
-
 import models.db.OAuth1Token;
 import models.mapper.IMapper;
 import models.mapper.OAuth1TokenMapper;
+import play.i18n.Messages;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
@@ -75,12 +72,6 @@ public class DropboxOAuth1 implements IOAuth1 {
 			// TODO alterar!
 			return null;
 		}
-	}
-
-	@Override
-	public void askUserAuthorisation() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

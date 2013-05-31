@@ -8,7 +8,7 @@ import com.google.api.client.auth.oauth2.TokenResponse; // TODO temporary. Try t
 
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
 
-public interface IOAuth2 {
+public interface IOAuth2 extends IOAuth {
 
 	/**
 	 * Exchange the authorisation code for an access token and a refresh token.

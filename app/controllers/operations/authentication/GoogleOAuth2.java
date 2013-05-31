@@ -3,6 +3,7 @@ package controllers.operations.authentication;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -16,6 +17,7 @@ import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Tokeninfo;
 
+import controllers.operations.authentication.exceptions.OAuth1TokenException;
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
 
 public class GoogleOAuth2 extends AbstractOAuth2 {
@@ -75,5 +77,18 @@ public class GoogleOAuth2 extends AbstractOAuth2 {
 	@Override
 	public boolean isTokenForOurApp(Tokeninfo tokenInfo) {
 	    return tokenInfo.getIssuedTo().equals(CLIENT_ID);
+	}
+
+	@Override
+	public String getRequestToken(String callbackUrl) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Entry<String, String> exchangeRequestTokenForAnAccessToken(
+			String requestToken) throws OAuth1TokenException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
