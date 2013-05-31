@@ -3,11 +3,10 @@ package controllers.operations.authentication;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
+import models.authentication.AccessToken;
 import models.db.OAuth1Token;
 import models.mapper.IMapper;
 import models.mapper.OAuth1TokenMapper;
@@ -75,7 +74,7 @@ public class DropboxOAuth1 implements IOAuth1 {
 	}
 
 	@Override
-	public Map.Entry<String, String> exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuth1TokenException
+	public AccessToken exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuth1TokenException
 	{
 		try
 		{
@@ -86,18 +85,17 @@ public class DropboxOAuth1 implements IOAuth1 {
 			// Delete from database the request token pair. Are not necessary anymore.
 			oauth1TokenMapper.delete(token);
 			
-			/*String dropboxUID = */DROPBOX_API.getSession().retrieveWebAccessToken(
+			String dropboxUID = DROPBOX_API.getSession().retrieveWebAccessToken(
 					new RequestTokenPair(token.getToken(), token.getSecret()));
 			
 			// Get oauth_token_secret and oauth_token
 			AccessTokenPair tokenPair = DROPBOX_API.getSession().getAccessTokenPair();
 			
-			// Return the OAuth token to be used when accessing protected resources and the oauth token secret.
-			return new AbstractMap.SimpleEntry<String, String>(tokenPair.key, tokenPair.secret);
+			// Return the dropbox user id, OAuth token to be used when accessing protected resources and the oauth token secret.
+			return new AccessToken(dropboxUID, tokenPair.key, tokenPair.secret);
 		} catch(DropboxException ex)
 		{
-//			throws ??; TODO
-			return null;
+			throw new OAuth1TokenException(ex.getMessage(), ex);
 		}
 	}
 	

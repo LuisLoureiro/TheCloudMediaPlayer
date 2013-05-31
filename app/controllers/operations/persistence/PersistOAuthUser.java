@@ -1,5 +1,7 @@
 package controllers.operations.persistence;
 
+import models.authentication.AccessToken;
+
 import com.google.api.client.auth.oauth2.TokenResponse;
 
 /**
@@ -13,17 +15,17 @@ public class PersistOAuthUser {
 	/**
 	 * 
 	 */
-	public static void saveUser(String provider, String oauthToken, String oauthTokenSecret, String userId, String findByFieldName, String findByFieldValue)
+	public static void saveUser(String provider, AccessToken accessToken, String findByFieldName, String findByFieldValue)
 	{
 		switch (provider) {
 			case "dropbox":
-				PersistOAuth1User.saveUser(oauthToken, oauthTokenSecret, userId, findByFieldName, findByFieldValue);
+				PersistOAuth1User.saveUser(accessToken.getAccessToken(), accessToken.getRefreshToken(), accessToken.getUid(), findByFieldName, findByFieldValue);
 				return;
 				
 			case "soundcloud":
 				TokenResponse token = new TokenResponse();
-				token.setAccessToken(oauthToken); token.setRefreshToken(oauthTokenSecret);
-				PersistOAuth2User.saveUser(token, userId, findByFieldName, findByFieldValue);
+				token.setAccessToken(accessToken.getAccessToken()); token.setRefreshToken(accessToken.getRefreshToken());
+				PersistOAuth2User.saveUser(token, accessToken.getUid(), findByFieldName, findByFieldValue);
 				break;
 	
 			default:

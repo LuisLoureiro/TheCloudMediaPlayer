@@ -5,10 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.AbstractMap;
-import java.util.Map.Entry;
 import java.util.Properties;
 
+import models.authentication.AccessToken;
 import play.i18n.Lang;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
@@ -16,8 +15,8 @@ import com.soundcloud.api.ApiWrapper;
 import com.soundcloud.api.Endpoints;
 import com.soundcloud.api.Token;
 
-import controllers.operations.authentication.exceptions.OAuth1TokenException;
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
+import controllers.operations.authentication.exceptions.OAuthException;
 
 public class SoundcloudOAuth2 implements IOAuth2
 {
@@ -59,17 +58,18 @@ public class SoundcloudOAuth2 implements IOAuth2
 	}
 
 	@Override
-	public Entry<String, String> exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuth1TokenException
+	public AccessToken exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuthException
 	{
-		Entry<String, String> accessRefreshToken = null;
+		AccessToken uidAccessRefreshToken = new AccessToken();
 		try {
 			Token accessToken = new ApiWrapper(APP_KEY, APP_SECRET, null, null).authorizationCode(requestToken);
-			accessRefreshToken = new AbstractMap.SimpleEntry<String, String>(accessToken.access, accessToken.refresh);
+			uidAccessRefreshToken.setAccessToken(accessToken.access);
+			uidAccessRefreshToken.setRefreshToken(accessToken.refresh);
+			// TODO the uid
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OAuthException(e.getMessage(), e);
 		}
-		return accessRefreshToken;
+		return uidAccessRefreshToken;
 	}
 
 	@Override

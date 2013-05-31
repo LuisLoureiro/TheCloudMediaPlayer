@@ -1,8 +1,7 @@
 package controllers.operations.authentication;
 
-import java.util.Map;
-
-import controllers.operations.authentication.exceptions.OAuth1TokenException;
+import models.authentication.AccessToken;
+import controllers.operations.authentication.exceptions.OAuthException;
 
 
 /**
@@ -23,5 +22,5 @@ public interface IOAuth {
 	/**
 	 * 
 	 */
-	public Map.Entry<String, String> exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuth1TokenException;
+	public AccessToken exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuthException;
 }

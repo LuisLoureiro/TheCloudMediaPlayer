@@ -1,7 +1,6 @@
 package controllers.operations.authentication;
 
-import java.util.Map;
-
+import models.authentication.AccessToken;
 import controllers.operations.authentication.exceptions.OAuth1TokenException;
 
 
@@ -56,8 +55,8 @@ public interface IOAuth1 extends IOAuth {
 	 *  This method corresponds to Obtaining an Access Token (http://oauth.net/core/1.0/#auth_step3) in the OAuth Core 1.0 specification.
 	 *  
 	 * @param requestToken The token used to initiate the authorisation process.
-	 * @return the oauth token used to access protected resources and the oauth token secret. Both must be persisted.
+	 * @return the service user id, the oauth token used to access protected resources and the oauth token secret. Both must be persisted.
 	 * @throws OAuth1TokenException if the provided token is inexistent.
 	 */
-	public Map.Entry<String, String> exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuth1TokenException;
+	public AccessToken exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuth1TokenException;
 }
