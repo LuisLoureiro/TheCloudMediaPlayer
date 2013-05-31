@@ -27,6 +27,7 @@ import views.html.authentication.index;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
 
+import controllers.annotations.ValidateQueryString;
 import controllers.enums.SESSION;
 import controllers.operations.authentication.DropboxOAuth1;
 import controllers.operations.authentication.IOAuth;
@@ -231,15 +232,9 @@ public class Authentication extends Controller {
 	
 	@Authenticated
 	@Transactional
+	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is throw before reaching this action.
 	public static Result connectTo(String provider)
 	{
-		// Check the service the user wants to connect to.
-		if(provider == null || provider.isEmpty())
-		{
-			flash("error", "The provider cannot be null or empty."); // TODO
-			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
-		}
-		
 		// Client preferred language
 		// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
 		Lang lang = Lang.preferred(request().acceptLanguages());
@@ -261,6 +256,7 @@ public class Authentication extends Controller {
 	
 	@Authenticated
 	@Transactional
+	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is throw before reaching this action.
 	public static Result connectToCallback(String provider)
 	{
 		// Check the service the user wants to connect to and grab the query string parameters.
@@ -275,8 +271,7 @@ public class Authentication extends Controller {
 			flash(Messages.get("authentication.errors.oauthProcessCanceled"));
 			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
 		}
-		if(provider == null || provider.isEmpty() ||
-				uid == null || uid.isEmpty() || requestToken == null || requestToken.isEmpty())
+		if(uid == null || uid.isEmpty() || requestToken == null || requestToken.isEmpty())
 		{
 			flash(); // TODO
 			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
