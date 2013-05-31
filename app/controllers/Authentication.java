@@ -29,15 +29,15 @@ import com.google.api.client.auth.oauth2.TokenResponse;
 
 import controllers.enums.SESSION;
 import controllers.operations.authentication.DropboxOAuth1;
-import controllers.operations.authentication.IOAuth1;
+import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.IOAuth2;
 import controllers.operations.authentication.enums.OPENID_ATTRIBUTES;
 import controllers.operations.authentication.exceptions.OAuth1TokenException;
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
-import controllers.operations.authentication.factory.OAuth1Factory;
 import controllers.operations.authentication.factory.OAuth2Factory;
-import controllers.operations.persistence.PersistOAuth1User;
+import controllers.operations.authentication.factory.OAuthFactory;
 import controllers.operations.persistence.PersistOAuth2User;
+import controllers.operations.persistence.PersistOAuthUser;
 import controllers.operations.persistence.PersistUser;
 
 public class Authentication extends Controller {
@@ -246,10 +246,10 @@ public class Authentication extends Controller {
 		
 		try {
 			// Create the object that represents the service
-			IOAuth1 oauth1Object = OAuth1Factory.getInstanceFromProviderName(provider, lang);
+			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, lang);
 			
 			// Get request token
-			String redirectUrl = oauth1Object.getRequestToken(routes.Authentication.connectToCallback(provider).absoluteURL(request()));
+			String redirectUrl = oauthObject.getRequestToken(routes.Authentication.connectToCallback(provider).absoluteURL(request()));
 			
 			// Redirect to the authentication url
 			return redirect(redirectUrl);
@@ -265,8 +265,10 @@ public class Authentication extends Controller {
 	{
 		// Check the service the user wants to connect to and grab the query string parameters.
 		String uid = request().getQueryString("uid")
-				,requestToken = request().getQueryString("oauth_token")
+				,requestToken = request().getQueryString("oauth_token") == null ? request().getQueryString("code") : request().getQueryString("oauth_token")
 				,notApproved = request().getQueryString("not_approved");
+		String error = request().getQueryString("error"),
+				errorDescription = request().getQueryString("error_description");
 		
 		if(notApproved != null && Boolean.parseBoolean(notApproved))
 		{
@@ -286,16 +288,17 @@ public class Authentication extends Controller {
 		
 		try {
 			// Create the object that represents the service
-			IOAuth1 oauth1Object = OAuth1Factory.getInstanceFromProviderName(provider, lang);
+			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, lang);
 
 			// Get oauth_token_secret and oauth_token
-			Entry<String, String> oauthToken = oauth1Object.exchangeRequestTokenForAnAccessToken(requestToken);
+			Entry<String, String> oauthToken = oauthObject.exchangeRequestTokenForAnAccessToken(requestToken);
 			
 			// MAPPER PART
 			// If the user doesn't exists, insert in the database and create relationship
-			PersistOAuth1User.saveUser(oauthToken.getKey(), oauthToken.getValue(), uid, "id", session(SESSION.EMAIL.getId()));
+			// TODO save the expires in
+			PersistOAuthUser.saveUser(provider, oauthToken.getKey(), oauthToken.getValue(), uid, "id", session(SESSION.USERNAME.getId()));
 			// Get files
-			List<com.dropbox.client2.DropboxAPI.Entry> contents = ((DropboxOAuth1)oauth1Object).getFiles();
+			List<com.dropbox.client2.DropboxAPI.Entry> contents = ((DropboxOAuth1)oauthObject).getFiles();
 			return ok(views.html.user.index.render(provider, contents));
 		} catch (InstantiationException | OAuth1TokenException ex) {
 			flash("error", ex.getMessage());
