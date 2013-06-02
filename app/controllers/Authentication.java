@@ -240,7 +240,7 @@ public class Authentication extends Controller {
 		
 		try {
 			// Create the object that represents the service
-			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, lang);
+			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()), lang);
 			
 			// Get request token
 			String redirectUrl = oauthObject.getRequestToken(routes.Authentication.connectToCallback(provider).absoluteURL(request()));
@@ -259,8 +259,7 @@ public class Authentication extends Controller {
 	public static Result connectToCallback(String provider)
 	{
 		// Check the service the user wants to connect to and grab the query string parameters.
-		String uid = request().getQueryString("uid")
-				,requestToken = request().getQueryString("oauth_token") == null ? request().getQueryString("code") : request().getQueryString("oauth_token")
+		String requestToken = request().getQueryString("oauth_token") == null ? request().getQueryString("code") : request().getQueryString("oauth_token")
 				,notApproved = request().getQueryString("not_approved");
 		String error = request().getQueryString("error"),
 				errorDescription = request().getQueryString("error_description");
@@ -282,7 +281,7 @@ public class Authentication extends Controller {
 		
 		try {
 			// Create the object that represents the service
-			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, lang);
+			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()), lang);
 
 			// Get oauth_token_secret and oauth_token
 			AccessToken oauthToken = oauthObject.exchangeRequestTokenForAnAccessToken(requestToken);
@@ -291,6 +290,9 @@ public class Authentication extends Controller {
 			// If the user doesn't exists, insert in the database and create relationship
 			// TODO save the expires in
 			PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.getId()));
+			
+			// TODO update session object
+			
 			// Get files
 			List<com.dropbox.client2.DropboxAPI.Entry> contents = ((DropboxOAuth1)oauthObject).getFiles();
 			return ok(views.html.user.index.render(provider, contents));
