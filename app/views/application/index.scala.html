@@ -6,6 +6,7 @@
 	@if(ctx.session().get(SESSION.USERNAME.getId()) == null) {
 		<a class="btn btn-info btn-large" href="@routes.Authentication.index()">@Messages.get("authentication.signIn")</a>
 	} else {
-		<a class="btn btn-danger btn-large" href="@routes.Authentication.signOut()">@Messages.get("authentication.signOut")</a>
+		<a class="btn btn-danger" href="@routes.Authentication.signOut()">@Messages.get("authentication.signOut")</a>
+		<a class="btn btn-info btn-large" href="@routes.User.index()">@Messages.get("user.startPlayer")</a>
 	}
 }
