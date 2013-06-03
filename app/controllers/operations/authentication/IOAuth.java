@@ -29,5 +29,5 @@ public interface IOAuth {
 	 * 
 	 * @return The resources obtained from the oauth service.
 	 */
-	public ServiceResources getResources();
+	public ServiceResources getResources(AccessToken accessToken);
 }

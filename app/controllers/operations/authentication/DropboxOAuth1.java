@@ -105,7 +105,7 @@ public class DropboxOAuth1 implements IOAuth1 {
 	}
 
 	@Override
-	public ServiceResources getResources()
+	public ServiceResources getResources(AccessToken accessToken)
 	{
 		List<Resource> resources = new LinkedList<Resource>();
 		ServiceResources serviceResources = new ServiceResources(OAUTH_SERVICE_PROVIDERS.DROPBOX.getBestCase(), resources);
