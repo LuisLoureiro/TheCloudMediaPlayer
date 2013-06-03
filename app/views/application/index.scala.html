@@ -1,9 +1,7 @@
-@import play.i18n._
-@import controllers.enums._
+@import play.i18n._, controllers.enums._
 
 @main() {
-@** Passar para o main.scala.html, mas de forma a que seja possível alterar o estado: se estiver autenticado tem que ser um botão diferente, de sign out! **@
-	@if(ctx.session().get(SESSION.USERNAME.getId()) == null) {
+	@if(ctx.session.get(SESSION.USERNAME.toString) == null) {
 		<a class="btn btn-info btn-large" href="@routes.Authentication.index()">@Messages.get("authentication.signIn")</a>
 	} else {
 		<a class="btn btn-danger" href="@routes.Authentication.signOut()">@Messages.get("authentication.signOut")</a>

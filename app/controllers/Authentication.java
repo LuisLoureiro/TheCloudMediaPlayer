@@ -131,9 +131,9 @@ public class Authentication extends Controller {
 			PersistUser.saveUser(info.id, email);
 			
 			// Save user info in the session
-			session(SESSION.USERNAME.getId(), info.id);
-			session(SESSION.FULL_NAME.getId(), name);
-			session(SESSION.EMAIL.getId(), email);
+			session(SESSION.USERNAME.toString(), info.id);
+			session(SESSION.FULL_NAME.toString(), name);
+			session(SESSION.EMAIL.toString(), email);
 			
 			// redirect to the user home page
 			flash("success", Messages.get("authentication.signedIn"));
@@ -189,11 +189,11 @@ public class Authentication extends Controller {
 			PersistOAuth2User.saveUser(token, userId, "email", userEmail);
 			
 			// Save user info in the session
-			session(SESSION.USERNAME.getId(), userId);
-			session(SESSION.FULL_NAME.getId(), userName);
-			session(SESSION.EMAIL.getId(), userEmail);
+			session(SESSION.USERNAME.toString(), userId);
+			session(SESSION.FULL_NAME.toString(), userName);
+			session(SESSION.EMAIL.toString(), userEmail);
 		    // Store the token in the session for later use.
-			session(SESSION.ACCESS_TOKEN.getId(), token.getAccessToken());
+			session(SESSION.ACCESS_TOKEN.toString(), token.getAccessToken());
 			// redirect to the user home page
 			flash("success", Messages.get("authentication.signedIn"));
 			
@@ -290,7 +290,7 @@ public class Authentication extends Controller {
 			// MAPPER PART
 			// If the user doesn't exists, insert in the database and create relationship
 			// TODO save the expires in
-			PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.getId()));
+			PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.toString()));
 			
 			// TODO update session object
 			
