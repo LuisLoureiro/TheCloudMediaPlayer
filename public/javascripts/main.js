@@ -18,4 +18,8 @@ $(document).ready(function(){
 		// a.close <- div.alert.alert-X <- div.span# <- div.row-fluid
 		$(this).parent().parent().parent().slideUp('slow');
 	});
+	// Append song to play list.
+	$(document).on("click", "#resources-list>ul>li>a", function(){
+		var name=$(this).text(); $('#playlist-table>tbody').append('<tr><td><a href="#">'+name+'</a></td></tr>');
+	})
 });
