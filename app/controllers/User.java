@@ -9,6 +9,6 @@ public class User extends Controller {
 
 	@Authenticated
 	public static Result index() {
-		return ok(index.render(request().getQueryString("provider"), null));
+		return ok(index.render(null));
 	}
 }

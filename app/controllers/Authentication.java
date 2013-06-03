@@ -194,11 +194,14 @@ public class Authentication extends Controller {
 			session(SESSION.EMAIL.toString(), userEmail);
 		    // Store the token in the session for later use.
 			session(SESSION.ACCESS_TOKEN.toString(), token.getAccessToken());
+			// Store the authentication provider. See app/views/user/index.scala.html
+			session(SESSION.PROVIDER.toString(), providerName);
+			
 			// redirect to the user home page
 			flash("success", Messages.get("authentication.signedIn"));
 			
 			// Content negotiation
-			String returnURL = routes.User.index().absoluteURL(request())+"?provider="+providerName;
+			String returnURL = routes.User.index().absoluteURL(request());
 			if (request().accepts("text/json") || request().accepts("application/json")) {
 				// Return a json object with the url to redirect to.
 				ObjectNode result = Json.newObject(); result.put("status", "OK"); result.put("url", returnURL);
@@ -250,7 +253,7 @@ public class Authentication extends Controller {
 			return redirect(redirectUrl);
 		} catch (InstantiationException ex) {
 			flash("error", ex.getMessage());
-			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(null)); // TODO return json.
 		}
 	}
 	
@@ -268,12 +271,12 @@ public class Authentication extends Controller {
 		if(notApproved != null && Boolean.parseBoolean(notApproved))
 		{
 			flash(Messages.get("authentication.errors.oauthProcessCanceled"));
-			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(null)); // TODO return json.
 		}
 		if(requestToken == null || requestToken.isEmpty())
 		{
 			flash("The request token is missing!"); // TODO
-			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(null)); // TODO return json.
 		}
 		
 		// Client preferred language
@@ -297,10 +300,10 @@ public class Authentication extends Controller {
 			// Get resources
 			List<ServiceResources> listServiceResources = new LinkedList<ServiceResources>();
 			listServiceResources.add(oauthObject.getResources());
-			return ok(views.html.user.index.render(provider, listServiceResources));
+			return ok(views.html.user.index.render(listServiceResources));
 		} catch (InstantiationException | OAuthException ex) {
 			flash("error", ex.getMessage());
-			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
+			return badRequest(views.html.user.index.render(null)); // TODO return json.
 		}
 	}
 	

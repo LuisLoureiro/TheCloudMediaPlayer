@@ -6,6 +6,7 @@ public enum SESSION {
 	, FULL_NAME("full_name")
 	, EMAIL("email")
 	, ACCESS_TOKEN("access_token")
+	, PROVIDER("provider") // The authentication provider used to authenticate in the application.
 	;
 	
 	private final String id;
