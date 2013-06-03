@@ -1,4 +1,4 @@
-@(authProvider: String, entries: List[com.dropbox.client2.DropboxAPI.Entry])
+@(authProvider: String, resources: List[models.beans.ServiceResources])
 @import play.i18n._, controllers.enums._
 
 @main("User Home Page") {
@@ -17,11 +17,9 @@
 	            <li class="dropdown">
 	              <a href="#" class="dropdown-toggle" data-toggle="dropdown">@Messages.get("connectTo") <b class="caret"></b></a>
 	              <ul class="dropdown-menu">
-	                <li><a href="@routes.Authentication.connectTo("dropbox")">Dropbox</a></li>
-	                <li><a href="@routes.Authentication.connectTo("cloudpt")">Cloudpt</a></li>
-	                <li class="divider"></li>
-	                <li><a href="@routes.Authentication.connectTo("soundcloud")">SoundCloud</a></li>
-	                <li><a href="@routes.Authentication.connectTo("youtube")">Youtube</a></li>
+	                @for(provider <- OAUTH_SERVICE_PROVIDERS.values) {
+	                   <li><a href="@routes.Authentication.connectTo(provider.toString)">@provider.getBestCase</a></li>
+	                }
 	              </ul>
 	            </li>
 	            <li class="divider-vertical"></li>
@@ -45,18 +43,34 @@
 	    </div><!-- /navbar-inner -->
 	  </div>
 	</section>
-    <p>@Messages.get("user.welcome", ctx.session.get(SESSION.FULL_NAME.getId))</p>
-    <div class="span4">
-    @if(entries != null) {
-      <h3 id="list">Files</h3>
-      <div class="well" style="padding: 8px 0;">
-        <ul class="nav nav-list">
-          <li class="nav-header">Dropbox Files</li>
-            @for(entry <- entries){
-                <li><a href="#">@entry.path</a></li>
-            }
-        </ul>
-      </div>
-    }
+    <span id="playing" class="badge badge-info"></span>
+    <div class="row-fluid">
+	    <div class="span4">
+            <h3>Resources</h3>
+            <div id="resources-list" class="well" style="padding: 8px 0;">
+                <ul class="nav nav-list">
+			    @if(resources != null) {
+			        @for(listResources <- resources) {
+			              <li class="nav-header">@listResources.getServiceName</li>
+			                @for(resource <- listResources.getResources){
+			                    <li><a href="#">@resource.getName</a></li>
+			                }
+			        }
+			    }
+                </ul>
+            </div>
+	    </div>
+        <div class="span8">
+            <h3>Play list</h3>
+            <table id="playlist-table" class="table table-striped table-bordered table-hover table-condensed">
+                <thead>
+                    <tr>
+                      <th>Name</th>
+                    </tr>
+                  </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 }

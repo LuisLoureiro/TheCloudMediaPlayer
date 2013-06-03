@@ -2,10 +2,10 @@ package controllers.enums;
 
 public enum OAUTH_SERVICE_PROVIDERS {
 
-	Dropbox("dropbox", "Dropbox")
-	, SoundCloud("soundcloud", "SoundCloud")
-//	, YouTube("youtube", "YouTube")
-//	, CloudPT("cloudpt", "CloudPT")
+	DROPBOX("dropbox", "Dropbox")
+	, SOUNDCLOUD("soundcloud", "SoundCloud")
+//	, YOUTUBE("youtube", "YouTube")
+//	, CLOUDPT("cloudpt", "CloudPT")
 	;
 	
 	private final String lowerCase
