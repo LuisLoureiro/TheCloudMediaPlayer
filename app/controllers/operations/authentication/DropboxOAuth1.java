@@ -3,10 +3,14 @@ package controllers.operations.authentication;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
 import models.authentication.AccessToken;
+import models.beans.Resource;
+import models.beans.ServiceResources;
 import models.db.OAuth1Token;
 import models.mapper.IMapper;
 import models.mapper.OAuth1TokenMapper;
@@ -22,6 +26,7 @@ import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.WebAuthSession;
 import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 
+import controllers.enums.OAUTH_SERVICE_PROVIDERS;
 import controllers.operations.authentication.exceptions.OAuth1TokenException;
 
 
@@ -98,20 +103,27 @@ public class DropboxOAuth1 implements IOAuth1 {
 			throw new OAuth1TokenException(ex.getMessage(), ex);
 		}
 	}
-	
-	public List<Entry> getFiles()
+
+	@Override
+	public ServiceResources getResources()
 	{
+		List<Resource> resources = new LinkedList<Resource>();
+		ServiceResources serviceResources = new ServiceResources(OAUTH_SERVICE_PROVIDERS.DROPBOX.getBestCase(), resources);
 		try {
 			Entry metadata = DROPBOX_API.metadata("/", 10, null, true, null);
-//			Iterator<Entry> filteredEntries = metadata.contents.iterator();
-//			while(filteredEntries.hasNext()) {
-//				Entry entry = filteredEntries.next();
-//				if(!entry.mimeType in "audio ou video") filteredEntries.remove();
-//			}
-			return metadata.contents;
+			Iterator<Entry> filteredEntries = metadata.contents.iterator();
+			while(filteredEntries.hasNext()) {
+				Entry entry = filteredEntries.next();
+				if(!(entry.mimeType.startsWith("audio/") || entry.mimeType.startsWith("video/"))) 
+				{
+					filteredEntries.remove();
+					continue;
+				}
+				resources.add(new Resource(entry.path));
+			}
 		} catch (DropboxException e) {
 //			throws ??; TODO
-			return null;
 		}
+		return serviceResources;
 	}
 }

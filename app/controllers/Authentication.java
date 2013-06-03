@@ -3,11 +3,13 @@ package controllers;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import models.authentication.AccessToken;
+import models.beans.ServiceResources;
 import models.form.OpenIDUser;
 
 import org.codehaus.jackson.node.ObjectNode;
@@ -28,7 +30,6 @@ import views.html.authentication.index;
 import com.google.api.client.auth.oauth2.TokenResponse;
 
 import controllers.enums.SESSION;
-import controllers.operations.authentication.DropboxOAuth1;
 import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.IOAuth2;
 import controllers.operations.authentication.enums.OPENID_ATTRIBUTES;
@@ -293,9 +294,10 @@ public class Authentication extends Controller {
 			
 			// TODO update session object
 			
-			// Get files
-			List<com.dropbox.client2.DropboxAPI.Entry> contents = ((DropboxOAuth1)oauthObject).getFiles();
-			return ok(views.html.user.index.render(provider, contents));
+			// Get resources
+			List<ServiceResources> listServiceResources = new LinkedList<ServiceResources>();
+			listServiceResources.add(oauthObject.getResources());
+			return ok(views.html.user.index.render(provider, listServiceResources));
 		} catch (InstantiationException | OAuthException ex) {
 			flash("error", ex.getMessage());
 			return badRequest(views.html.user.index.render(provider, null)); // TODO return json.
