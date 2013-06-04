@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import models.authentication.AccessToken;
+import models.beans.ServiceResources;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
@@ -88,6 +89,12 @@ public class GoogleOAuth2 extends AbstractOAuth2 {
 
 	@Override
 	public AccessToken exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuthException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceResources getResources(AccessToken accessToken) {
 		// TODO Auto-generated method stub
 		return null;
 	}
