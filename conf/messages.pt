@@ -17,5 +17,8 @@ authentication.errors.oauthFactoryProviderName=Não existe correspondência para
 authentication.errors.oauthTokenInexistent=O token não existe.
 authentication.errors.oauthProcessCanceled=O processo de autenticação foi interrompido pelo utilizador.
 
+errors.parametersMissing=Alguns parâmetros obrigatórios estão em falta: [{0}].
+
 user.welcome=Bem-vindo {0}!
 user.connectTo=Ligar a
+user.startPlayer=Iniciar player.
