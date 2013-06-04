@@ -5,9 +5,12 @@ import play.i18n.Messages;
 import controllers.operations.authentication.DropboxOAuth1;
 import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.SoundcloudOAuth2;
+import controllers.operations.parsers.JsonParser;
 
-public class OAuthFactory {// TODO think about the use of the singleton pattern. NO. See method exchange of soundcloud. We're setting an oauth token to the wrapper. See again!!
-
+public class OAuthFactory // TODO think about the use of the singleton pattern. NO. See method exchange of soundcloud. We're setting an oauth token to the wrapper. See again!! 
+{
+	private static JsonParser jsonParser;
+	
 	// TODO think about the possibility of receiving the request as a parameter, collecting the actual parameters from the request object.
 	public static IOAuth getInstanceFromProviderName(String name, String redirectUri, Lang lang) throws InstantiationException
 	{
@@ -16,10 +19,19 @@ public class OAuthFactory {// TODO think about the use of the singleton pattern.
 				return new DropboxOAuth1();
 				
 			case "soundcloud":
-				return new SoundcloudOAuth2(redirectUri);
+				return new SoundcloudOAuth2(getJsonParser(), redirectUri);
 				
 			default:
 				throw new InstantiationException(Messages.get(lang, "authentication.errors.oauthFactoryProviderName"));
 		}
+	}
+	
+	private static synchronized JsonParser getJsonParser()
+	{
+		if(jsonParser == null)
+		{
+			jsonParser = new JsonParser();
+		}
+		return jsonParser;
 	}
 }
