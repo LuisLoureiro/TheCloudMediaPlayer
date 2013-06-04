@@ -134,10 +134,12 @@ public class Authentication extends Controller {
 			session(SESSION.USERNAME.toString(), info.id);
 			session(SESSION.FULL_NAME.toString(), name);
 			session(SESSION.EMAIL.toString(), email);
+			// Store the authentication provider. See app/views/user/index.scala.html
+			session(SESSION.PROVIDER.toString(), "openID");
 			
 			// redirect to the user home page
 			flash("success", Messages.get("authentication.signedIn"));
-			return redirect(routes.User.index().absoluteURL(request())+"?provider=openID");
+			return redirect(routes.User.index().absoluteURL(request()));
 		} catch(Throwable ex) {
 			// TODO remove
 			ex.printStackTrace();
@@ -299,7 +301,7 @@ public class Authentication extends Controller {
 			
 			// Get resources
 			List<ServiceResources> listServiceResources = new LinkedList<ServiceResources>();
-			listServiceResources.add(oauthObject.getResources());
+			listServiceResources.add(oauthObject.getResources(oauthToken));
 			return ok(views.html.user.index.render(listServiceResources));
 		} catch (InstantiationException | OAuthException ex) {
 			flash("error", ex.getMessage());
@@ -316,7 +318,7 @@ public class Authentication extends Controller {
 //		if(session(SESSION.USERNAME.getId()) != null)
 //			session().remove(SESSION.USERNAME.getId());
 		
-		// Notify the identity provider if needed
+		// Notify the identity provider if needed: Revoke access tokens.
 		
 		// Redirect to the index page
 		flash("success", Messages.get("authentication.signedOut"));
