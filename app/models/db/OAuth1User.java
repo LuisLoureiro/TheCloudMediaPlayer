@@ -6,18 +6,20 @@ import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.validation.constraints.NotNull;
 
+import models.db.notEntity.OAuthUser;
+
 import play.data.validation.Constraints.Required;
 
 @Entity(name="oauth1_users")
 @PrimaryKeyJoinColumn(name="id", referencedColumnName="id")
 @DiscriminatorValue(value="oauth1")
-public class OAuth1User extends User
+public class OAuth1User extends OAuthUser
 {
 	@Column(name="oauth_token", nullable=false)
 	@NotNull(message="The oauth token could not be null")
 	private String oauthToken;
-	@Required
 	@Column(name="oauth_token_secret", nullable=false)
+	@Required(message="The oauth token secret could not be null")
 	private String oauthTokenSecret;
 	
 	public String getOauthToken() {
