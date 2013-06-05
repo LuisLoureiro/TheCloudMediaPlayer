@@ -42,6 +42,7 @@ public class PersistOAuth2User {
 			user.setId(token.getUid());
 			user.setAccessToken(token.getAccessToken());
 			user.setRefreshToken(token.getRefreshToken());
+			user.setExpiresIn(token.getExpiresIn());
 			// Create relationship
 			if(existingRecord != null) 
 			{

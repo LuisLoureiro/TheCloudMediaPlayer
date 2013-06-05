@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -75,6 +76,8 @@ public class SoundcloudOAuth2 implements IOAuth2
 			
 			uidAccessRefreshToken.setAccessToken(accessToken.access);
 			uidAccessRefreshToken.setRefreshToken(accessToken.refresh);
+			uidAccessRefreshToken.setExpiresIn(new Date().getTime()+(accessToken.expiresIn*1000)); // See http://tools.ietf.org/html/draft-ietf-oauth-v2-31#page-40
+			
 			// TODO think about the possibility to use the public uri to be the id. It's unique! Think about it for every service!
 			// TODO beware about the .json and the PARSER.
 			HttpResponse response = this.WRAPPER.get(Request.to(Endpoints.MY_DETAILS+".json").usingToken(accessToken));

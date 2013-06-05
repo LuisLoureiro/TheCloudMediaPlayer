@@ -21,7 +21,9 @@ public class OAuth2User extends OAuthUser
 	@Column(name="refresh_token", nullable=false)
 	@Required(message="The refresh_token could not be null")
 	private String refreshToken;
-	
+	@Column(name="expires_in")
+	private long expiresIn;
+
 	public String getAccessToken() {
 		return accessToken;
 	}
@@ -33,5 +35,11 @@ public class OAuth2User extends OAuthUser
 	}
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
+	}
+	public long getExpiresIn() {
+		return expiresIn;
+	}
+	public void setExpiresIn(long expiresIn) {
+		this.expiresIn = expiresIn;
 	}
 }

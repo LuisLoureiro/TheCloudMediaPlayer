@@ -11,7 +11,8 @@ public class AccessToken
 	private String uid,
 		accessToken,
 		refreshToken;
-	
+	private long expiresIn;
+
 	public AccessToken(){}
 	
 	public AccessToken(String uid, String accessToken, String refreshToken)
@@ -55,5 +56,17 @@ public class AccessToken
 
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
+	}
+	
+	/**
+	 * This value must represent the concrete expiration date based on the server date.
+	 * @return
+	 */
+	public long getExpiresIn() {
+		return expiresIn;
+	}
+
+	public void setExpiresIn(long expiresIn) {
+		this.expiresIn = expiresIn;
 	}
 }
