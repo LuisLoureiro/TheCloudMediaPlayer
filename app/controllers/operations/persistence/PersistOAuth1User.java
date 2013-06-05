@@ -1,5 +1,6 @@
 package controllers.operations.persistence;
 
+import models.authentication.AccessToken;
 import models.db.OAuth1User;
 import models.db.User;
 import models.mapper.IMapper;
@@ -16,16 +17,15 @@ public class PersistOAuth1User {
 	 * Before saving or updating the {@link OAuth1User} check the existence of an {@link User} with {@code findByFieldName} field equal to the {@code findByFieldValue} parameter, 
 	 * creating a relationship between them if exists.
 	 * 
-	 * @param token
-	 * @param userId
+	 * @param token an instance of {@link AccessToken} containing user id, oauth token and oauth token secret.
 	 * @param findByFieldName
 	 * @param findByFieldValue
 	 */
-	public static void saveUser(String oauthToken, String oauthTokenSecret, String userId, String findByFieldName, String findByFieldValue)
+	public static void saveUser(AccessToken token, String findByFieldName, String findByFieldValue)
 	{
 		IMapper<String, OAuth1User> oauth1Mapper = new OAuth1UserMapper(); // TODO ver a possibilidade de usar o padrão factory.
 		
-		OAuth1User user = oauth1Mapper.findById(userId);
+		OAuth1User user = oauth1Mapper.findById(token.getUid());
 		if(user == null)
 		{
 			// if there's an user with the same email address...
@@ -39,9 +39,9 @@ public class PersistOAuth1User {
 			}
 			// Insert the new oauth1 user.
 			user = new OAuth1User();
-			user.setId(userId);
-			user.setOauthToken(oauthToken);
-			user.setOauthTokenSecret(oauthTokenSecret);
+			user.setId(token.getUid());
+			user.setOauthToken(token.getAccessToken());
+			user.setOauthTokenSecret(token.getRefreshToken());
 			// Create relationship
 			if(existingRecord != null) 
 			{
@@ -51,8 +51,8 @@ public class PersistOAuth1User {
 			}
 			oauth1Mapper.save(user);
 		} else {
-			// Update existing oauth2 user.
-			user.setOauthToken(oauthTokenSecret);
+			// Update existing oauth1 user.
+			user.setOauthToken(token.getAccessToken());
 			oauth1Mapper.update(user);
 		}
 	}

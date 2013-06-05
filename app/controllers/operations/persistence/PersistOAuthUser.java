@@ -1,8 +1,9 @@
 package controllers.operations.persistence;
 
+import play.i18n.Lang;
+import play.i18n.Messages;
+import controllers.operations.authentication.exceptions.OAuthException;
 import models.authentication.AccessToken;
-
-import com.google.api.client.auth.oauth2.TokenResponse;
 
 /**
  * TODO utilizar o padrão Singleton ou usar outra alternativa para, ao invés de chamar PersistOAuth1User ou PersistOAuth2User, sem obrigar, na sua implementação, a não existir
@@ -13,24 +14,23 @@ import com.google.api.client.auth.oauth2.TokenResponse;
 public class PersistOAuthUser {
 
 	/**
+	 * @throws OAuthException If the provider is inexistent.
 	 * 
 	 */
-	public static void saveUser(String provider, AccessToken accessToken, String findByFieldName, String findByFieldValue)
+	public static void saveUser(String provider, AccessToken accessToken, String findByFieldName, String findByFieldValue, Lang lang) throws OAuthException
 	{
 		switch (provider) {
 			case "dropbox":
-				PersistOAuth1User.saveUser(accessToken.getAccessToken(), accessToken.getRefreshToken(), accessToken.getUid(), findByFieldName, findByFieldValue);
+				PersistOAuth1User.saveUser(accessToken, findByFieldName, findByFieldValue);
 				return;
 				
 			case "soundcloud":
-				TokenResponse token = new TokenResponse();
-				token.setAccessToken(accessToken.getAccessToken()); token.setRefreshToken(accessToken.getRefreshToken());
-				PersistOAuth2User.saveUser(token, accessToken.getUid(), findByFieldName, findByFieldValue);
+				PersistOAuth2User.saveUser(accessToken, findByFieldName, findByFieldValue);
 				break;
 	
 			default:
 				// Throw Exception
-				break;
+				throw new OAuthException(Messages.get(lang, "authentication.errors.oauthFactoryProviderName"));
 		}
 	}
 }

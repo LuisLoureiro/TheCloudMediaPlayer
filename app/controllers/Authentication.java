@@ -188,7 +188,7 @@ public class Authentication extends Controller {
 			oauth2Object.validateToken(token, userId, lang);
 			
 			// save the access token and the refresh token
-			PersistOAuth2User.saveUser(token, userId, "email", userEmail);
+			PersistOAuth2User.saveUser(new AccessToken(userId, token.getAccessToken(), token.getRefreshToken()), "email", userEmail);
 			
 			// Save user info in the session
 			session(SESSION.USERNAME.toString(), userId);
@@ -295,9 +295,7 @@ public class Authentication extends Controller {
 			// MAPPER PART
 			// If the user doesn't exists, insert in the database and create relationship
 			// TODO save the expires in
-			PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.toString()));
-			
-			// TODO update session object
+			PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.toString()), lang);
 			
 			// Get resources
 			List<ServiceResources> listServiceResources = new LinkedList<ServiceResources>();

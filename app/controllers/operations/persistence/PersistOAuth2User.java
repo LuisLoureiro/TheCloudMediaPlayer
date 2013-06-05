@@ -1,12 +1,11 @@
 package controllers.operations.persistence;
 
+import models.authentication.AccessToken;
 import models.db.OAuth2User;
 import models.db.User;
 import models.mapper.IMapper;
 import models.mapper.OAuth2UserMapper;
 import models.mapper.UserMapper;
-
-import com.google.api.client.auth.oauth2.TokenResponse;
 
 public class PersistOAuth2User {
 
@@ -18,16 +17,15 @@ public class PersistOAuth2User {
 	 * Before saving or updating the {@link OAuth2User} check the existence of an {@link User} with email address equal to the {@code userEmail} parameter, 
 	 * creating a relationship between them if exists.
 	 * 
-	 * @param token
-	 * @param userId
+	 * @param token an instance of {@link AccessToken} containing user id, access token and refresh token.
 	 * @param findByFieldName
 	 * @param findByFieldValue
 	 */
-	public static void saveUser(TokenResponse token, String userId, String findByFieldName, String findByFieldValue)
+	public static void saveUser(AccessToken token, String findByFieldName, String findByFieldValue)
 	{
 		IMapper<String, OAuth2User> oauth2Mapper = new OAuth2UserMapper(); // TODO ver a possibilidade de usar o padrão factory.
 		
-		OAuth2User user = oauth2Mapper.findById(userId);
+		OAuth2User user = oauth2Mapper.findById(token.getUid());
 		if(user == null)
 		{
 			// if there's an user with the same email address...
@@ -41,13 +39,13 @@ public class PersistOAuth2User {
 			}
 			// Insert the new oauth2 user.
 			user = new OAuth2User();
-			user.setId(userId);
-			user.setEmail(existingRecord != null ? existingRecord.getEmail() : null);
+			user.setId(token.getUid());
 			user.setAccessToken(token.getAccessToken());
 			user.setRefreshToken(token.getRefreshToken());
 			// Create relationship
 			if(existingRecord != null) 
 			{
+				user.setEmail(existingRecord.getEmail());
 				user.setFirstAuth(existingRecord);
 				existingRecord.getRelatedAuth().add(user);
 			}
