@@ -11,9 +11,10 @@ import controllers.operations.authentication.exceptions.OAuthException;
 public interface IOAuth {
 
 	/**
+	 * @throws OAuthException if there was an error asking the OAuth provider for the authentication url.
 	 * 
 	 */
-	public String getRequestToken(String callbackUrl);
+	public String getRequestToken(String callbackUrl) throws OAuthException;
 	
 	/**
 	 * 
@@ -28,6 +29,7 @@ public interface IOAuth {
 	/**
 	 * 
 	 * @return The resources obtained from the oauth service.
+	 * @throws OAuthException if there was an error asking the OAuth provider for the protected resources.
 	 */
-	public ServiceResources getResources(AccessToken accessToken);
+	public ServiceResources getResources(AccessToken accessToken) throws OAuthException;
 }

@@ -2,6 +2,7 @@ package controllers.operations.authentication;
 
 import models.authentication.AccessToken;
 import controllers.operations.authentication.exceptions.OAuth1TokenException;
+import controllers.operations.authentication.exceptions.OAuthException;
 
 
 /**
@@ -35,8 +36,9 @@ public interface IOAuth1 extends IOAuth {
 	 *  
 	 *  @param callbackUrl the URL of the callback action to handle the authorisation process.
 	 *  @return the URL to redirect the user to. 
+	 * @throws OAuthException if there was an error asking the OAuth1 provider for the authentication url.
 	 */
-	public String getRequestToken(String callbackUrl);
+	public String getRequestToken(String callbackUrl) throws OAuthException;
 	
 	/**
 	 * Ask the user to authorise linking your app to their Dropbox account.<p>
