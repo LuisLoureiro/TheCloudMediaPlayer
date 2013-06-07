@@ -21,7 +21,7 @@ public class PersistOAuth2User {
 	 * @param findByFieldName
 	 * @param findByFieldValue
 	 */
-	public static void saveUser(AccessToken token, String findByFieldName, String findByFieldValue)
+	public static void saveUser(String provider, AccessToken token, String findByFieldName, String findByFieldValue)
 	{
 		IMapper<String, OAuth2User> oauth2Mapper = new OAuth2UserMapper(); // TODO ver a possibilidade de usar o padrão factory.
 		
@@ -40,6 +40,7 @@ public class PersistOAuth2User {
 			// Insert the new oauth2 user.
 			user = new OAuth2User();
 			user.setId(token.getUid());
+			user.setProviderName(provider);
 			user.setAccessToken(token.getAccessToken());
 			user.setRefreshToken(token.getRefreshToken());
 			user.setExpiresIn(token.getExpiresIn());
@@ -49,6 +50,10 @@ public class PersistOAuth2User {
 				user.setEmail(existingRecord.getEmail());
 				user.setFirstAuth(existingRecord);
 				existingRecord.getRelatedAuth().add(user);
+			}
+			else
+			{
+				user.setEmail(token.getEmail());
 			}
 			oauth2Mapper.save(user);
 		} else {
