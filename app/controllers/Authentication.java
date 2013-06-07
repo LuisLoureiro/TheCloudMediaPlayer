@@ -3,13 +3,10 @@ package controllers;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import models.authentication.AccessToken;
-import models.beans.ServiceResources;
 import models.form.OpenIDUser;
 
 import org.codehaus.jackson.node.ObjectNode;
@@ -188,7 +185,7 @@ public class Authentication extends Controller {
 			oauth2Object.validateToken(token, userId, lang);
 			
 			// save the access token and the refresh token
-			PersistOAuth2User.saveUser(new AccessToken(userId, token.getAccessToken(), token.getRefreshToken()), "email", userEmail);
+			PersistOAuth2User.saveUser(providerName, new AccessToken(userId, userEmail, token.getAccessToken(), token.getRefreshToken()), "email", userEmail);
 			
 			// Save user info in the session
 			session(SESSION.USERNAME.toString(), userId);
@@ -253,7 +250,7 @@ public class Authentication extends Controller {
 			
 			// Redirect to the authentication url
 			return redirect(redirectUrl);
-		} catch (InstantiationException ex) {
+		} catch (InstantiationException | OAuthException ex) {
 			flash("error", ex.getMessage());
 			return badRequest(views.html.user.index.render(null)); // TODO return json.
 		}
@@ -295,12 +292,9 @@ public class Authentication extends Controller {
 			// MAPPER PART
 			// If the user doesn't exists, insert in the database and create relationship
 			// TODO save the expires in
+			// TODO async!
 			PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.toString()), lang);
-			
-			// Get resources
-			List<ServiceResources> listServiceResources = new LinkedList<ServiceResources>();
-			listServiceResources.add(oauthObject.getResources(oauthToken));
-			return ok(views.html.user.index.render(listServiceResources));
+			return redirect(routes.User.index());
 		} catch (InstantiationException | OAuthException ex) {
 			flash("error", ex.getMessage());
 			return badRequest(views.html.user.index.render(null)); // TODO return json.
