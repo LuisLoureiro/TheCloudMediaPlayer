@@ -8,16 +8,19 @@ package models.authentication;
  */
 public class AccessToken
 {
-	private String uid,
-		accessToken,
-		refreshToken;
+	private String uid
+		, email
+		, accessToken
+		, refreshToken
+		;
 	private long expiresIn;
 
 	public AccessToken(){}
 	
-	public AccessToken(String uid, String accessToken, String refreshToken)
+	public AccessToken(String uid, String email, String accessToken, String refreshToken)
 	{
 		setUid(uid);
+		setEmail(email);
 		setAccessToken(accessToken);
 		setRefreshToken(refreshToken);
 	}
@@ -32,6 +35,18 @@ public class AccessToken
 
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	/**
+	 * 
+	 * @return the user email registered in the OAuth provider.
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	/**
