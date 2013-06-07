@@ -28,13 +28,14 @@ import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 
 import controllers.enums.OAUTH_SERVICE_PROVIDERS;
 import controllers.operations.authentication.exceptions.OAuth1TokenException;
+import controllers.operations.authentication.exceptions.OAuthException;
 
 
 public class DropboxOAuth1 implements IOAuth1 {
 	
 	private final String APP_KEY, APP_SECRET;
-	private final DropboxAPI<WebAuthSession> DROPBOX_API;
-//	private static final AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
+//	private final DropboxAPI<WebAuthSession> DROPBOX_API;
+	private static final AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
 
 	public DropboxOAuth1() throws InstantiationException
 	{
@@ -44,10 +45,10 @@ public class DropboxOAuth1 implements IOAuth1 {
 			this.APP_KEY = properties.getProperty("DROPBOX_APP_KEY");
 			this.APP_SECRET = properties.getProperty("DROPBOX_APP_SECRET");
 
-			this.DROPBOX_API = new DropboxAPI<WebAuthSession>(
-					new WebAuthSession(
-							new AppKeyPair(APP_KEY, APP_SECRET),
-							AccessType.APP_FOLDER));
+//			this.DROPBOX_API = new DropboxAPI<WebAuthSession>(
+//					new WebAuthSession(
+//							new AppKeyPair(APP_KEY, APP_SECRET),
+//							AccessType.APP_FOLDER));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			throw new InstantiationException(e.getMessage());
@@ -58,10 +59,13 @@ public class DropboxOAuth1 implements IOAuth1 {
 	}
 
 	@Override
-	public String getRequestToken(String callbackUrl) {
+	public String getRequestToken(String callbackUrl) throws OAuthException
+	{
 		try
 		{
-			WebAuthInfo authInfo = DROPBOX_API.getSession().getAuthInfo(callbackUrl);
+//			WebAuthInfo authInfo = DROPBOX_API.getSession().getAuthInfo(callbackUrl);
+			WebAuthInfo authInfo = new WebAuthSession(new AppKeyPair(APP_KEY, APP_SECRET),
+					ACCESS_TYPE).getAuthInfo(callbackUrl);
 			// Save key and secret in the database.
 			OAuth1Token token = new OAuth1Token();
 			token.setToken(authInfo.requestTokenPair.key);
@@ -73,8 +77,8 @@ public class DropboxOAuth1 implements IOAuth1 {
 			return authInfo.url;
 		} catch(DropboxException ex)
 		{
-			// TODO alterar!
-			return null;
+			ex.printStackTrace(); // TODO to remove
+			throw new OAuthException(ex.getMessage(), ex); // TODO better exception message!
 		}
 	}
 
@@ -90,27 +94,33 @@ public class DropboxOAuth1 implements IOAuth1 {
 			// Delete from database the request token pair. Are not necessary anymore.
 			oauth1TokenMapper.delete(token);
 			
-			String dropboxUID = DROPBOX_API.getSession().retrieveWebAccessToken(
-					new RequestTokenPair(token.getToken(), token.getSecret()));
+//			String dropboxUID = DROPBOX_API.getSession().retrieveWebAccessToken(
+			WebAuthSession session = new WebAuthSession(new AppKeyPair(APP_KEY, APP_SECRET), ACCESS_TYPE);
+			String dropboxUID = session.retrieveWebAccessToken(
+							new RequestTokenPair(token.getToken(), token.getSecret()));
 			
 			// Get oauth_token_secret and oauth_token
-			AccessTokenPair tokenPair = DROPBOX_API.getSession().getAccessTokenPair();
+			AccessTokenPair tokenPair = session.getAccessTokenPair();
 			
 			// Return the dropbox user id, OAuth token to be used when accessing protected resources and the oauth token secret.
-			return new AccessToken(dropboxUID, tokenPair.key, tokenPair.secret);
+			return new AccessToken(dropboxUID, null, tokenPair.key, tokenPair.secret);
 		} catch(DropboxException ex)
 		{
-			throw new OAuth1TokenException(ex.getMessage(), ex);
+			ex.printStackTrace(); // TODO to remove
+			throw new OAuth1TokenException(ex.getMessage(), ex); // TODO better exception message!
 		}
 	}
 
 	@Override
-	public ServiceResources getResources(AccessToken accessToken)
+	public ServiceResources getResources(AccessToken accessToken) throws OAuthException
 	{
 		List<Resource> resources = new LinkedList<Resource>();
 		ServiceResources serviceResources = new ServiceResources(OAUTH_SERVICE_PROVIDERS.DROPBOX.getBestCase(), resources);
 		try {
-			Entry metadata = DROPBOX_API.metadata("/", 10, null, true, null);
+//			Entry metadata = DROPBOX_API.metadata("/", 10, null, true, null);
+			Entry metadata = new DropboxAPI<WebAuthSession>(
+						new WebAuthSession(new AppKeyPair(APP_KEY, APP_SECRET), ACCESS_TYPE, new AccessTokenPair(accessToken.getAccessToken(), accessToken.getRefreshToken())))
+					.metadata("/", 10, null, true, null);
 			Iterator<Entry> filteredEntries = metadata.contents.iterator();
 			while(filteredEntries.hasNext()) {
 				Entry entry = filteredEntries.next();
@@ -122,7 +132,8 @@ public class DropboxOAuth1 implements IOAuth1 {
 				resources.add(new Resource(entry.path));
 			}
 		} catch (DropboxException e) {
-//			throws ??; TODO
+			e.printStackTrace(); // TODO remove!
+			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
 		}
 		return serviceResources;
 	}
