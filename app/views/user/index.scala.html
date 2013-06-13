@@ -1,6 +1,10 @@
 @(resources: List[models.beans.ServiceResources])
 @import play.i18n._, controllers.enums._
 
+@dispayListItem(value: String) = {
+    <li>@value</li>
+}
+
 @main("User Home Page") {
 	<section>
 	  <div class="navbar navbar-inverse">
@@ -26,9 +30,7 @@
 	            <li class="dropdown">
 	              <a href="#" class="dropdown-toggle" data-toggle="dropdown">@ctx.session.get(SESSION.FULL_NAME.toString) <b class="caret"></b></a>
 	              <ul class="dropdown-menu">
-	                @{val email = ctx.session.get(SESSION.EMAIL.toString); if(email != null && !email.isEmpty()) {
-		                <li>@email</li>
-		            }}
+	                @{val email = ctx.session.get(SESSION.EMAIL.toString); if(email != null && !email.isEmpty()) dispayListItem(email)}
 	                <li class="divider"></li>
 	                <li>@if("google".equals(ctx.session.get(SESSION.PROVIDER.toString))) {
     					<a class="btn btn-primary" href="#" id="googleSignOut">@Messages.get("authentication.signOut")</a>
