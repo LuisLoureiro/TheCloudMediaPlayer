@@ -19,20 +19,16 @@ import models.beans.dataBinding.UserId;
 
 import org.apache.http.HttpResponse;
 
-import play.i18n.Lang;
-
-import com.google.api.client.auth.oauth2.TokenResponse;
 import com.soundcloud.api.ApiWrapper;
 import com.soundcloud.api.Endpoints;
 import com.soundcloud.api.Request;
 import com.soundcloud.api.Token;
 
 import controllers.enums.OAUTH_SERVICE_PROVIDERS;
-import controllers.operations.authentication.exceptions.OAuth2ValidationException;
 import controllers.operations.authentication.exceptions.OAuthException;
 import controllers.operations.parsers.IParserStrategy;
 
-public class SoundcloudOAuth2 implements IOAuth2
+public class SoundcloudOAuth2 implements IOAuth
 {
 	private final String APP_KEY, APP_SECRET;
 	private final ApiWrapper WRAPPER;
@@ -100,11 +96,15 @@ public class SoundcloudOAuth2 implements IOAuth2
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_EXCLUSIVE_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
 			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_PLAYLISTS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
-			for(Playlist playlist : PARSER.parse(Playlist[].class, resp.getEntity().getContent()))
+			Playlist[] contents = PARSER.parse(Playlist[].class, resp.getEntity().getContent());
+			if(contents != null)
 			{
-				for(Track track : playlist.getTracks())
+				for(Playlist playlist : contents)
 				{
-					resourcesList.add(new Resource(track.getTitle()));
+					for(Track track : playlist.getTracks())
+					{
+						resourcesList.add(new Resource(track.getTitle()));
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -114,17 +114,5 @@ public class SoundcloudOAuth2 implements IOAuth2
 		}
 		
 		return resources;
-	}
-
-	@Override
-	public TokenResponse exchangeAuthCode(String authorizationCode) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void validateToken(TokenResponse token, String userId, Lang lang) throws OAuth2ValidationException, IOException {
-		// TODO Auto-generated method stub
-		
 	}
 }
