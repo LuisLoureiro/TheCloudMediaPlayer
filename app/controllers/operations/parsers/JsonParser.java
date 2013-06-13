@@ -20,7 +20,9 @@ public class JsonParser implements IParserStrategy
 			jsonParser = jsonFactory.createJsonParser(stream); // or URL, Reader, String, byte[]
 			// Read this: Also, if you happen to have an ObjectMapper, there is also ObjectMapper.getJsonFactory() that you can use to reuse factory it has
 			//  (since (re)using a JsonFactory instances is one Performance Best Practices).
-			value = jsonParser.readValueAs(typeToParse);
+			if (jsonParser.nextToken() != null) { // end-of-input
+				value = jsonParser.readValueAs(typeToParse);
+			}
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
