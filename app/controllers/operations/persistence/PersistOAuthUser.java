@@ -12,12 +12,6 @@ import play.i18n.Lang;
 import play.i18n.Messages;
 import controllers.operations.authentication.exceptions.OAuthException;
 
-/**
- * TODO utilizar o padrão Singleton ou usar outra alternativa para, ao invés de chamar PersistOAuth1User ou PersistOAuth2User, sem obrigar, na sua implementação, a não existir
- * a obrigatoriedade de criar o método saveUser. Tentar fazer com que esta classe implemente o padrão Template Method, mantendo o Singleton.
- * @author utilizador
- *
- */
 public class PersistOAuthUser
 {
 	/**
@@ -56,7 +50,6 @@ public class PersistOAuthUser
 				break;
 	
 			default:
-				// Throw Exception
 				throw new OAuthException(Messages.get(lang, "authentication.errors.oauthFactoryProviderName"));
 		}
 	}

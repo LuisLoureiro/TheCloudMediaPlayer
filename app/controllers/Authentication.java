@@ -291,7 +291,6 @@ public class Authentication extends Controller {
 			
 			// MAPPER PART
 			// If the user doesn't exists, insert in the database and create relationship
-			// TODO save the expires in
 			// TODO async!
 			PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.toString()), lang);
 			return redirect(routes.User.index());

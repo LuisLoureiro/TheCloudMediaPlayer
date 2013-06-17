@@ -115,7 +115,6 @@ public class DropboxOAuth1 implements IOAuth1 {
 	public ServiceResources getResources(AccessToken accessToken) throws OAuthException
 	{
 		List<Resource> resources = new LinkedList<Resource>();
-		ServiceResources serviceResources = new ServiceResources(OAUTH_SERVICE_PROVIDERS.DROPBOX.getBestCase(), resources);
 		try {
 //			Entry metadata = DROPBOX_API.metadata("/", 10, null, true, null);
 			Entry metadata = new DropboxAPI<WebAuthSession>(
@@ -135,6 +134,6 @@ public class DropboxOAuth1 implements IOAuth1 {
 			e.printStackTrace(); // TODO remove!
 			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
 		}
-		return serviceResources;
+		return new ServiceResources(OAUTH_SERVICE_PROVIDERS.DROPBOX.getBestCase(), resources);
 	}
 }
