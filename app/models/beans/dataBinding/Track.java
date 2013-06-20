@@ -7,7 +7,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class Track
 {
 	private long id;
-	private String title;
+	private String title
+		, stream_url
+		;
 
 	public long getId() {
 		return id;
@@ -20,5 +22,11 @@ public class Track
 	}
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	public String getStream_url() {
+		return stream_url;
+	}
+	public void setStream_url(String stream_url) {
+		this.stream_url = stream_url;
 	}
 }
