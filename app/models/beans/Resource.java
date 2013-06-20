@@ -2,13 +2,23 @@ package models.beans;
 
 public class Resource
 {
-	private String name;
+	private String id
+		, name;
 
-	public Resource(String name)
+	public Resource(String id, String name)
 	{
+		setId(id);
 		setName(name);
 	}
 
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	public String getName() {
 		return name;
 	}
