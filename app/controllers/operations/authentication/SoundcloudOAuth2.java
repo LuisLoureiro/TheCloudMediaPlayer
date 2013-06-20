@@ -13,6 +13,7 @@ import models.beans.Resource;
 import models.beans.ServiceResources;
 import models.beans.dataBinding.Playlist;
 import models.beans.dataBinding.Track;
+import models.beans.dataBinding.TrackStreamUrl;
 import models.beans.dataBinding.UserId;
 
 import org.apache.http.HttpResponse;
@@ -109,7 +110,8 @@ public class SoundcloudOAuth2 implements IOAuth
 				{
 					for(Track track : playlist.getTracks())
 					{
-						resourcesList.add(new Resource(track.getTitle()));
+						// TODO pass the stream url to the client. Pass this value when calling the track/streamurl instead of the trackId. This way we can avoid one API call!
+						resourcesList.add(new Resource(String.valueOf(track.getId()), track.getTitle()));
 					}
 				}
 			}
@@ -120,5 +122,28 @@ public class SoundcloudOAuth2 implements IOAuth
 		}
 		
 		return new ServiceResources(OAUTH_SERVICE_PROVIDERS.SOUNDCLOUD.toString(), resourcesList);
+	}
+
+	@Override
+	public String getResourceStreamUrl(AccessToken accessToken, String trackId) throws OAuthException
+	{
+		ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, redirectUrl, new Token(accessToken.getAccessToken(), accessToken.getRefreshToken()));
+		
+		try {
+			HttpResponse resp = wrapper.get(Request.to(Endpoints.TRACK_DETAILS+".json", Integer.parseInt(trackId))); // TODO consider the track streamable property!
+			Track trackDetails = PARSER.parse(Track.class, resp.getEntity().getContent());
+			if(trackDetails != null)
+			{
+				HttpResponse respStreamUrl = wrapper.get(Request.to(trackDetails.getStream_url()).with("allow_redirects", "False"));
+				TrackStreamUrl trackStreamUrl = PARSER.parse(TrackStreamUrl.class, respStreamUrl.getEntity().getContent());
+				if(trackStreamUrl != null)
+					return trackStreamUrl.getLocation();
+			}
+		} catch (IOException e) {
+			e.printStackTrace(); // TODO remove!
+			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
+		}
+		
+		return null;
 	}
 }

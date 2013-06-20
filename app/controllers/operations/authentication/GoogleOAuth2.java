@@ -98,4 +98,11 @@ public class GoogleOAuth2 extends AbstractOAuth2 {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String getResourceStreamUrl(AccessToken accessToken, String trackId)
+			throws OAuthException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -17,6 +17,7 @@ import models.mapper.OAuth1TokenMapper;
 import play.i18n.Messages;
 
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.DropboxLink;
 import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
@@ -128,12 +129,27 @@ public class DropboxOAuth1 implements IOAuth1 {
 					filteredEntries.remove();
 					continue;
 				}
-				resources.add(new Resource(entry.path));
+				resources.add(new Resource(entry.path, entry.path));
 			}
 		} catch (DropboxException e) {
 			e.printStackTrace(); // TODO remove!
 			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
 		}
 		return new ServiceResources(OAUTH_SERVICE_PROVIDERS.DROPBOX.getBestCase(), resources);
+	}
+
+	@Override
+	public String getResourceStreamUrl(AccessToken accessToken, String trackId) throws OAuthException
+	{
+		try {
+			DropboxLink link = new DropboxAPI<WebAuthSession>(
+					new WebAuthSession(new AppKeyPair(APP_KEY, APP_SECRET), ACCESS_TYPE, new AccessTokenPair(accessToken.getAccessToken(), accessToken.getRefreshToken())))
+					.media(trackId, false);
+			
+			return link.url;
+		} catch (DropboxException e) {
+			e.printStackTrace(); // TODO remove!
+			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
+		}
 	}
 }

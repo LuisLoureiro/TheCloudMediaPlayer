@@ -32,4 +32,12 @@ public interface IOAuth {
 	 * @throws OAuthException if there was an error asking the OAuth provider for the protected resources.
 	 */
 	public ServiceResources getResources(AccessToken accessToken) throws OAuthException;
+
+	/**
+	 * 
+	 * @param trackId The id of the track to get the stream url.
+	 * @return the stream url.
+	 * @throws OAuthException if there was an error asking the OAuth provider for the stream url.
+	 */
+	public String getResourceStreamUrl(AccessToken accessToken, String trackId) throws OAuthException;
 }
