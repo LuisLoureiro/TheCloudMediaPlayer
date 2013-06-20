@@ -29,7 +29,7 @@ public class PersistOAuthUser
 		
 		for(User relatedUser : user.getRelatedAuth())
 		{
-			tokens.add((OAuthUser)relatedUser);
+			tokens.add((OAuthUser)relatedUser); // TODO create generalisation in the database
 		}
 		
 		return tokens;
@@ -52,5 +52,22 @@ public class PersistOAuthUser
 			default:
 				throw new OAuthException(Messages.get(lang, "authentication.errors.oauthFactoryProviderName"));
 		}
+	}
+	
+	public static OAuthUser findByUserIdAndProviderName(String userId, String providerName)
+	{
+		IMapper<String, User> userMapper = new UserMapper();
+		
+		User user = userMapper.findById(userId);
+		if(user != null)
+		{
+			for(User relatedUser : user.getRelatedAuth())
+			{
+				OAuthUser relatedOAuthUser = (OAuthUser)relatedUser; // TODO create generalisation in the database
+				if(providerName.equals(relatedOAuthUser.getProviderName()))
+					return relatedOAuthUser;
+			}
+		}
+		return null;
 	}
 }
