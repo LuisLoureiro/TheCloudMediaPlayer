@@ -3,12 +3,14 @@ package models.beans;
 public class Resource
 {
 	private String id
-		, name;
+		, name
+		, mimeType;
 
-	public Resource(String id, String name)
+	public Resource(String id, String name, String mimeType)
 	{
 		setId(id);
 		setName(name);
+		setMimeType(mimeType);
 	}
 
 	public String getId() {
@@ -25,5 +27,13 @@ public class Resource
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getMimeType() {
+		return mimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
 	}
 }

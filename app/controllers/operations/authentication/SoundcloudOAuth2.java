@@ -111,7 +111,7 @@ public class SoundcloudOAuth2 implements IOAuth
 					for(Track track : playlist.getTracks())
 					{
 						// TODO pass the stream url to the client. Pass this value when calling the track/streamurl instead of the trackId. This way we can avoid one API call!
-						resourcesList.add(new Resource(String.valueOf(track.getId()), track.getTitle()));
+						resourcesList.add(new Resource(String.valueOf(track.getId()), track.getTitle(), "audio"/*TODO the subtype is missing.*/));
 					}
 				}
 			}

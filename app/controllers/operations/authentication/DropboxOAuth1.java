@@ -129,7 +129,7 @@ public class DropboxOAuth1 implements IOAuth1 {
 					filteredEntries.remove();
 					continue;
 				}
-				resources.add(new Resource(entry.path, entry.path));
+				resources.add(new Resource(entry.path, entry.path, entry.mimeType));
 			}
 		} catch (DropboxException e) {
 			e.printStackTrace(); // TODO remove!

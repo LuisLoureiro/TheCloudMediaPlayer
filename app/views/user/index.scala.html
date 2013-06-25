@@ -45,7 +45,7 @@
 	    </div><!-- /navbar-inner -->
 	  </div>
 	</section>
-    <span id="playing" class="badge badge-info"></span>
+<!--     <span id="playing" class="badge badge-info"></span> -->
     <div class="row-fluid">
 	    <div class="span4">
             <h3>Resources</h3>
@@ -55,7 +55,7 @@
 			        @for(listResources <- resources) {
 			              <li class="nav-header">@listResources.getServiceName</li>
 			                @for(resource <- listResources.getResources){
-			                    <li><a href="#" data-track-id="@resource.getId">@resource.getName</a></li>
+			                    <li><a href="#" data-track-id="@resource.getId" data-track-mimetype="@resource.getMimeType">@resource.getName</a></li>
 			                }
 			        }
 			    }
@@ -80,8 +80,6 @@
 	        <h3>Playing ...</h3>
 	        <div class="well" style="padding: 8px 0;">
 	            <div id="playing" class="span8 offset2">
-	                <audio autoplay="autoplay" controls="controls">
-	                </audio>
 	            </div>
 	        </div>
         </div>
