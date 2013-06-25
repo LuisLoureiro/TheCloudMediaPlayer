@@ -23,12 +23,15 @@ $(document).ready(function(){
 	$(document).on("click", "#resources-list>ul>li>a", function(){
 		var name=$(this).text();
 		var trackId=$(this).attr('data-track-id');
-		var providerName=$(this).parent().prevAll().filter('.nav-header').first().text();
-		$('#playlist-table>tbody').append('<tr><td><a class="playlist-resource" data-track-id="'+trackId+'" data-provider-name="'+providerName+'" href="#">'+name+'</a></td></tr>');
+		var mimeType=$(this).attr('data-track-mimetype');
+		var providerName=$(this).parent().prevAll().filter('.nav-header').first().text().toLowerCase();
+		$('#playlist-table>tbody').append('<tr><td><a class="playlist-resource" data-track-id="'+trackId+'" data-provider-name="'+providerName
+				+'" data-track-mimetype='+mimeType+' href="#">'+name+'</a></td></tr>');
 	});
 	// Play resource
 	$(document).on("click", ".playlist-resource", function(){
 		var trackId=$(this).attr('data-track-id');
+		var mimeType=$(this).attr('data-track-mimetype');
 		var providerName=$(this).attr('data-provider-name');
 		$.ajax({
 			type: 'GET',
@@ -39,7 +42,10 @@ $(document).ready(function(){
 			},
 			success: function(trackUrl) {
 				console.log(trackUrl);
-				$('#playing>audio').html('<source src="'+trackUrl.url+'"></source>');
+				console.log(mimeType);
+				var source = (mimeType.indexOf('audio') != -1) ? '<audio autoplay="autoplay" controls="controls"><source src="'+trackUrl.url+'"></source></audio>'
+						: '<video autoplay="autoplay" controls="controls"><source src="'+trackUrl.url+'" type="'+mimeType+'"></source></video>';
+				$('#playing').html(source);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				// Handle error
