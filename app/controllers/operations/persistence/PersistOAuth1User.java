@@ -58,6 +58,9 @@ public class PersistOAuth1User {
 		} else {
 			// Update existing oauth1 user.
 			user.setOauthToken(token.getAccessToken());
+			if(token.getRefreshToken() != null && !token.getRefreshToken().isEmpty())
+				user.setOauthTokenSecret(token.getRefreshToken());
+			
 			oauth1Mapper.update(user);
 		}
 	}

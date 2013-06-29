@@ -59,6 +59,9 @@ public class PersistOAuth2User {
 		} else {
 			// Update existing oauth2 user.
 			user.setAccessToken(token.getAccessToken());
+			if(token.getRefreshToken() != null && !token.getRefreshToken().isEmpty())
+				user.setRefreshToken(token.getRefreshToken());
+			
 			oauth2Mapper.update(user);
 		}
 	}
