@@ -234,7 +234,7 @@ public class Authentication extends Controller {
 	
 	@Authenticated
 	@Transactional
-	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is throw before reaching this action.
+	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is thrown before reaching this action.
 	public static Result connectTo(String provider)
 	{
 		// Client preferred language
@@ -258,7 +258,7 @@ public class Authentication extends Controller {
 	
 	@Authenticated
 	@Transactional
-	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is throw before reaching this action.
+	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is thrown before reaching this action.
 	public static Result connectToCallback(String provider)
 	{
 		// Check the service the user wants to connect to and grab the query string parameters.

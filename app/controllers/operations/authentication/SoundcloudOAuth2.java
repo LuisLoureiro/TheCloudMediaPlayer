@@ -30,7 +30,6 @@ import controllers.operations.parsers.IParserStrategy;
 public class SoundcloudOAuth2 implements IOAuth
 {
 	private final String APP_KEY, APP_SECRET;
-//	private final ApiWrapper WRAPPER;
 	private final URI redirectUrl;
 	
 	private final IParserStrategy PARSER;
@@ -44,7 +43,6 @@ public class SoundcloudOAuth2 implements IOAuth
 			this.APP_KEY = properties.getProperty("SOUNDCLOUD_CLIENT_ID");
 			this.APP_SECRET = properties.getProperty("SOUNDCLOUD_CLIENT_SECRET");
 			
-//			this.WRAPPER = new ApiWrapper(APP_KEY, APP_SECRET, new URI(redirectUrl), null);
 			this.redirectUrl = new URI(redirectUrl);
 			
 			this.PARSER = parser;
@@ -59,7 +57,6 @@ public class SoundcloudOAuth2 implements IOAuth
 	public String getRequestToken(String callbackUrl)
 	{
 		// TODO we should send a state value, confirming it in the callback.
-//		return this.WRAPPER.authorizationCodeUrl(Endpoints.CONNECT).toString();
 		return new ApiWrapper(APP_KEY, APP_SECRET, redirectUrl, null)
 				.authorizationCodeUrl(Endpoints.CONNECT)
 				.toString();
@@ -82,7 +79,6 @@ public class SoundcloudOAuth2 implements IOAuth
 			
 			// TODO think about the possibility to use the public uri to be the id. It's unique! Think about it for every service!
 			// TODO beware about the .json and the PARSER.
-//			HttpResponse response = this.WRAPPER.get(Request.to(Endpoints.MY_DETAILS+".json").usingToken(accessToken));
 			HttpResponse response = wrapper.get(Request.to(Endpoints.MY_DETAILS+".json"));
 			uidAccessRefreshToken.setUid(
 					PARSER.parse(UserId.class, response.getEntity().getContent())

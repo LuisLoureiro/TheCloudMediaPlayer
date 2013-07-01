@@ -43,15 +43,14 @@ $(document).ready(function(){
 			success: function(trackUrl) {
 				console.log(trackUrl);
 				console.log(mimeType);
-				var source = (mimeType.indexOf('audio') != -1) ? '<audio autoplay="autoplay" controls="controls"><source src="'+trackUrl.url+'"></source></audio>'
-						: '<video autoplay="autoplay" controls="controls"><source src="'+trackUrl.url+'" type="'+mimeType+'"></source></video>';
-				$('#playing').html(source);
+				$('#playing').html((mimeType.indexOf('audio') != -1) ? '<audio autoplay="autoplay" controls="controls"><source src="'+trackUrl.url+'"></source></audio>'
+						: '<video autoplay="autoplay" controls="controls"><source src="'+trackUrl.url+'" type="'+mimeType+'"></source></video>');
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				// Handle error
-				appendErrorAlert(jqXHR.responseText);
+				appendErrorAlert(errorThrown);
 				console.log(textStatus);
-				console.log(errorThrown);
+				console.log(jqXHR.responseText);
 			}
 		});
 	});
