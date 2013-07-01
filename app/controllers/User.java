@@ -24,7 +24,7 @@ import views.html.user.index;
 public class User extends Controller {
 
 	@Authenticated
-	@Transactional
+	@Transactional(readOnly=true)
 	public static Result index()
 	{
 		// Client preferred language
@@ -48,16 +48,21 @@ public class User extends Controller {
 								routes.Authentication.connectToCallback(oauthToken.getProviderName()).absoluteURL(request()), lang);
 					if(oauthToken instanceof OAuth1User)
 					{
-						listServiceResources.add(oauthObject.getResources(
-								new AccessToken(oauthToken.getId(), null, ((OAuth1User)oauthToken).getOauthToken(), ((OAuth1User)oauthToken).getOauthTokenSecret())));
+						listServiceResources.add(
+								oauthObject.getResources(
+										new AccessToken(oauthToken.getId(), null, ((OAuth1User)oauthToken).getOauthToken(), ((OAuth1User)oauthToken).getOauthTokenSecret())));
 					} else if(oauthToken instanceof OAuth2User)
 					{
-						listServiceResources.add(oauthObject.getResources(
-								new AccessToken(oauthToken.getId(), null, ((OAuth2User)oauthToken).getAccessToken(), ((OAuth2User)oauthToken).getRefreshToken())));
+						listServiceResources.add(
+								oauthObject.getResources(
+										new AccessToken(oauthToken.getId(), null, ((OAuth2User)oauthToken).getAccessToken(), ((OAuth2User)oauthToken).getRefreshToken())));
 					}
+					
+					// Save in the session cookie the information about the successful authentication with the resources provider.
+					session(oauthToken.getProviderName(), "authenticated");
 				} catch (InstantiationException | OAuthException e) {
 					flash("error", e.getMessage());
-					return badRequest(index.render(null));
+//					return badRequest(index.render(listServiceResources));
 				}
 			}
 		}

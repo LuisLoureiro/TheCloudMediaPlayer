@@ -22,7 +22,9 @@
 	              <a href="#" class="dropdown-toggle" data-toggle="dropdown">@Messages.get("connectTo") <b class="caret"></b></a>
 	              <ul class="dropdown-menu">
 	                @for(provider <- OAUTH_SERVICE_PROVIDERS.values) {
-	                   <li><a href="@routes.Authentication.connectTo(provider.toString)">@provider.getBestCase</a></li>
+	                   <li><a href="@routes.Authentication.connectTo(provider.toString)">@provider.getBestCase 
+	                       @if("authenticated".equals(ctx.session.get(provider.toString))) {<span class="badge badge-info">connected</span>}
+	                   </a></li>
 	                }
 	              </ul>
 	            </li>
@@ -53,7 +55,7 @@
                 <ul class="nav nav-list">
 			    @if(resources != null) {
 			        @for(listResources <- resources) {
-			              <li class="nav-header">@listResources.getServiceName</li>
+			              <li class="nav-header"><span class="label label-success">@listResources.getServiceName</span></li>
 			                @for(resource <- listResources.getResources){
 			                    <li><a href="#" data-track-id="@resource.getId" data-track-mimetype="@resource.getMimeType">@resource.getName</a></li>
 			                }
