@@ -1,0 +1,15 @@
+@(resources: List[models.beans.ServiceResources])
+
+<h3>Resources</h3>
+<div id="resources-list" class="well" style="padding: 8px 0;">
+    <ul class="nav nav-list">
+    @if(resources != null) {
+        @for(listResources <- resources) {
+              <li class="nav-header"><span class="label label-success">@listResources.getServiceName</span></li>
+                @for(resource <- listResources.getResources){
+                    <li><a href="#" data-track-id="@resource.getId" data-track-mimetype="@resource.getMimeType">@resource.getName</a></li>
+                }
+        }
+    }
+    </ul>
+</div>
