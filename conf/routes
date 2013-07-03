@@ -26,5 +26,14 @@ GET		/user						        controllers.User.index()
 # Get track stream url
 GET     /track/streamurl/:trackId           controllers.Track.getStreamUrl(trackId: String)
 
+# Play list actions
+PUT     /playlist/:name                     controllers.Playlist.save(name: String)
+
+GET     /playlist                           controllers.Playlist.load(id: Int = 0)
+
+GET     /playlist/:id                       controllers.Playlist.load(id: Int)
+
+DELETE  /playlist/:id                       controllers.Playlist.delete(id: Int)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                       controllers.Assets.at(path="/public", file)
