@@ -1,6 +1,7 @@
 @(resources: List[models.beans.ServiceResources])
+@import play.i18n._
 
-<h3>Resources</h3>
+<h3>@Messages.get("user.contents")</h3>
 <div id="resources-list" class="well" style="padding: 8px 0;">
     <ul class="nav nav-list">
     @if(resources != null) {
