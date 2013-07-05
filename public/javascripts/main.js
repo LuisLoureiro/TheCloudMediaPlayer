@@ -43,13 +43,53 @@ function playContent(elem){
 			$('#playing').html((mimeType.indexOf('audio') != -1) ? '<audio autoplay="autoplay" controls="controls"><source src="'+trackUrl.url+'"></source></audio>'
 					: '<video autoplay="autoplay" controls="controls"><source src="'+trackUrl.url+'" type="'+mimeType+'"></source></video>');
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			// Handle error
-			appendErrorAlert(errorThrown);
-			console.log(textStatus);
-			console.log(jqXHR.responseText);
-		}
+		error: defaultJsonErrorHandler
 	});
+}
+function savePlaylist(elem){
+	var func = function(contentsData){
+		$.ajax({
+			type: 'PUT',
+		    url: '/playlist',
+		    data: contentsData,
+		    dataType: 'json',
+		    success: function(data){
+		    	$('#playlist-name').text(data.name+" ");
+		    	appendSuccessAlert("The play list was successfully saved.");
+		    },
+		  	error: defaultJsonErrorHandler,
+			complete: function(jqXHR, textStatus){
+		    	$('#modalBox').modal('hide');
+			}
+		});
+	}
+	var name = $('#playlist-name').text().trim();
+	// Ask for the name of the new play list if the present one is the default play list.
+	if("default" == name){
+		setModalBoxContents("Guardar lista de reprodução", '<form id="playlist-saveForm" class="form-horizontal"><fieldset><legend>Indique o nome da nova lista</legend>'+
+				'<div class="control-group"><label class="control-label">Nome</label>'+
+				'<div class="controls"><input class="span3" type="text" name="name" placeholder="Ex: First playlist, Best tracks, ..." required="required"></input>'+
+				'<span class="help-inline">O nome tem que ser preenchido!</span></div></div>'+
+				'<div class="control-group"><div class="controls"><button class="btn btn-primary">Save</button></div></div></fieldset></form>');
+		$('#playlist-saveForm').submit(function(e){
+			e.preventDefault();
+			func($(this).serialize());
+		});
+		$('#modalBox').modal('show');
+	} else{
+		func('name='+name);
+	}
+}
+function defaultJsonErrorHandler(jqXHR, textStatus, errorThrown){
+	// Handle error
+	appendErrorAlert($.parseJSON(jqXHR.responseText).error);
+	console.log(textStatus);
+	console.log(errorThrown);
+	console.log(jqXHR.responseText);
+}
+function setModalBoxContents(header, body){
+	$('#modalBox>.modal-header>h3').text(header);
+	$('#modalBox>.modal-body').html(body);
 }
 $(document).ready(function(){
 	$(document).on("click", 'a.close', function(){slideUpAlert(this);});
@@ -57,4 +97,9 @@ $(document).ready(function(){
 	$(document).on("click", "#resources-list>ul>li>a", function(){appendSongToPlayList(this);});
 	// Play resource
 	$(document).on("click", ".playlist-resource", function(){playContent(this);});
+	// Save play list
+	$('#playlist-save').click(function(){savePlaylist(this);});
+	// Modal box events
+//	$('#modalBox').on('hidden', function(){});
+    $('#modalBox').on('shown', function(){$(this).find('input').focus();});
 });
