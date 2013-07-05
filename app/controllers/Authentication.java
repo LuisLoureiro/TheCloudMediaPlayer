@@ -84,6 +84,8 @@ public class Authentication extends Controller {
 					OpenID.redirectURL(user.getId(), routes.Authentication.openIDCallback().absoluteURL(request()), attributes)
 					.get());
 		} catch(Throwable ex) {
+			ex.printStackTrace();
+			
 			Throwable exCause = ex.getCause();
 			if(exCause != null && exCause.getClass().equals(URISyntaxException.class)) {
 				flash("error", Messages.get("authentication.errors.openIdUriSyntax"));
@@ -92,6 +94,10 @@ public class Authentication extends Controller {
 			if(ex instanceof Errors.NETWORK_ERROR$) {
 				flash("error", Messages.get("authentication.errors.openIdDiscovery"));
 				return badRequest(index.render(openIDUserForm));
+			}
+			if(ex.getClass().equals(TimeoutException.class)) {
+				flash("error", Messages.get("authentication.errors.openIdVerificationTimeout"));
+				return status(GATEWAY_TIMEOUT, index.render(openIDUserForm)); // TODO be sure that this is the correct error code!
 			}
 			flash("error", Messages.get("authentication.errors.openIdUnexpected"));
 			return internalServerError(index.render(openIDUserForm));
@@ -138,7 +144,6 @@ public class Authentication extends Controller {
 			flash("success", Messages.get("authentication.signedIn"));
 			return redirect(routes.User.index().absoluteURL(request()));
 		} catch(Throwable ex) {
-			// TODO remove
 			ex.printStackTrace();
 			
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
@@ -208,7 +213,6 @@ public class Authentication extends Controller {
 			}
 			return redirect(returnURL);
 		} catch(Exception ex) {
-			// TODO remove
 			ex.printStackTrace();
 			
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
