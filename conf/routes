@@ -27,7 +27,7 @@ GET		/user						        controllers.User.index()
 GET     /track/streamurl/:trackId           controllers.Track.getStreamUrl(trackId: String)
 
 # Play list actions
-PUT     /playlist/:name                     controllers.Playlist.save(name: String)
+PUT     /playlist                           controllers.Playlist.save()
 
 GET     /playlist                           controllers.Playlist.load(id: Int = 0)
 
