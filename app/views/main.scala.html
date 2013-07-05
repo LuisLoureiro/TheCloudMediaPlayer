@@ -1,4 +1,5 @@
 @(title: String = "The Cloud Media Player")(content: Html)
+@import tags._
 
 <!DOCTYPE html>
 
@@ -28,6 +29,7 @@
 		    @content
 		    </div>
     	</div>
+    	@modalWindow()
     @***** FACEBOOK SIGNIN
     	<div id="fb-root"></div>
 		<script src="@routes.Assets.at("javascripts/fb-functions.js")"></script>
