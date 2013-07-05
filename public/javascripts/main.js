@@ -80,6 +80,9 @@ function savePlaylist(elem){
 		func('name='+name);
 	}
 }
+function cleanPlaylist(){
+	$('#playlist-table tbody').empty();
+}
 function defaultJsonErrorHandler(jqXHR, textStatus, errorThrown){
 	// Handle error
 	appendErrorAlert($.parseJSON(jqXHR.responseText).error);
@@ -99,6 +102,9 @@ $(document).ready(function(){
 	$(document).on("click", ".playlist-resource", function(){playContent(this);});
 	// Save play list
 	$('#playlist-save').click(function(){savePlaylist(this);});
+	// Removing all the contents from the current play list.
+	$('#playlist-clean').click(function(){cleanPlaylist();});
+	
 	// Modal box events
 //	$('#modalBox').on('hidden', function(){});
     $('#modalBox').on('shown', function(){$(this).find('input').focus();});
