@@ -1,0 +1,8 @@
+input:invalid+span.help-inline,
+td:hover > a.playlist-resource + a.remove{
+	visibility: visible;
+}
+input:valid+span.help-inline,
+td > a.playlist-resource + a.remove{
+    visibility: hidden;
+}
