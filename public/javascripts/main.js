@@ -24,7 +24,7 @@ function appendSongToPlayList(elem){
 	var providerName=$(elem).parent().prevAll().filter('.nav-header').first().text().toLowerCase();
 	// TODO see if it's possible to just copy the anchor tag and add the class playlist-resource
 	$('#playlist-table>tbody').append('<tr><td><a class="playlist-resource" data-track-id="'+trackId+'" data-provider-name="'+providerName
-			+'" data-track-mimetype='+mimeType+' href="#">'+name+'</a></td></tr>');
+			+'" data-track-mimetype='+mimeType+' href="#">'+name+'</a><a href="#" class="remove pull-right">X</span></td></tr>');
 }
 function playContent(elem){
 	var trackId=$(elem).attr('data-track-id');
@@ -83,6 +83,9 @@ function savePlaylist(elem){
 function cleanPlaylist(){
 	$('#playlist-table tbody').empty();
 }
+function removeTrack(elem){
+	$(elem).remove();
+}
 function defaultJsonErrorHandler(jqXHR, textStatus, errorThrown){
 	// Handle error
 	appendErrorAlert($.parseJSON(jqXHR.responseText).error);
@@ -104,6 +107,8 @@ $(document).ready(function(){
 	$('#playlist-save').click(function(){savePlaylist(this);});
 	// Removing all the contents from the current play list.
 	$('#playlist-clean').click(function(){cleanPlaylist();});
+	// Remove the selected resource from the current play list.
+	$(document).on("click", "td > a.playlist-resource + a.remove", function(){removeTrack($(this).parent());});
 	
 	// Modal box events
 //	$('#modalBox').on('hidden', function(){});
