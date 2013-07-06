@@ -4,9 +4,10 @@ import static play.data.Form.form;
 
 import java.util.List;
 
+import models.beans.dataBinding.form.PlaylistForm;
+
 import org.codehaus.jackson.node.ObjectNode;
 
-import models.beans.dataBinding.form.PlaylistForm;
 import play.data.Form;
 import play.data.validation.ValidationError;
 import play.libs.Json;
@@ -27,17 +28,7 @@ public class Playlist extends Controller
 	    Form<PlaylistForm> playlistForm = form(PlaylistForm.class).bindFromRequest();
 	    if(playlistForm.hasErrors())
 	    {
-	    	StringBuilder errorString = new StringBuilder();
-	    	for(List<ValidationError> errors : playlistForm.errors().values())
-	    	{
-	    		for(ValidationError error : errors)
-	    		{
-	    			if(errorString.length() > 0)
-	    				errorString.append(", ");
-	    			errorString.append(error.message());
-	    		}
-	    	}
-	    	result.put("error", errorString.toString());
+	    	result.put("error", buildMessageFromValidationErrors(playlistForm));
 	    	return badRequest(result);
 	    }
 	    PlaylistForm playlist = playlistForm.get();
@@ -57,6 +48,25 @@ public class Playlist extends Controller
 	
 	public static Result delete(int id)
 	{
-		return status(NOT_IMPLEMENTED);
+	    // Return a json object with the result of the operation.
+		ObjectNode result = Json.newObject();
+
+		result.put("error", id);
+		return status(NOT_IMPLEMENTED, result);
+	}
+	
+	private static <T> String buildMessageFromValidationErrors(Form<T> form)
+	{
+		StringBuilder errorString = new StringBuilder();
+    	for(List<ValidationError> errors : form.errors().values())
+    	{
+    		for(ValidationError error : errors)
+    		{
+    			if(errorString.length() > 0)
+    				errorString.append(", ");
+    			errorString.append(error.message());
+    		}
+    	}
+    	return errorString.toString();
 	}
 }

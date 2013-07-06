@@ -86,6 +86,45 @@ function cleanPlaylist(){
 function removeTrack(elem){
 	$(elem).remove();
 }
+function deletePlaylist(elem){
+	var name = $('#playlist-name').text().trim();
+	var id = $('#playlist-name').attr('data-playlist-id');
+	var func = function(contentsData){
+		$.ajax({
+			type: 'DELETE',
+		    url: '/playlist/'+contentsData,
+		    dataType: 'json',
+		    success: function(){
+		    	// Clean play list contents
+		    	$('#playlist-clean').click();
+		    	$('#playlist-name').text("default ");
+		    	appendSuccessAlert("The play list was successfully deleted.");
+		    },
+		  	error: defaultJsonErrorHandler,
+			complete: function(jqXHR, textStatus){
+		    	$('#modalBox').modal('hide');
+			}
+		});
+	};
+	// Only enable the delete action if the current play list exists, ie. it has an id attribute.
+	if(id){
+		// Show a confirmation window before Ajax call
+		setModalBoxContents("Confirmação da eliminação da lista de reprodução",
+				'<p>Tem a certeza que deseja eliminar permanentemente a lista de reprodução "'+name+'"?</p>'+
+				'<p>Esta eliminação não poderá ser revogada mais tarde!</p>'+
+				'<form id="playlist-deleteForm" class="form-horizontal">'+
+				'<input type="hidden" name="id" value="'+id+'"></input>'+
+				'<div class="form-actions"><button type="submit" class="btn btn-primary">Confirm</button></div>'+
+				'</form>');
+		$('#playlist-deleteForm').submit(function(e){
+			e.preventDefault();
+			func(id);
+		});
+	} else{
+		setModalBoxContents("Erro", '<p>The default play list cannot be deleted!</p>');
+	}
+	$('#modalBox').modal('show');
+}
 function defaultJsonErrorHandler(jqXHR, textStatus, errorThrown){
 	// Handle error
 	appendErrorAlert($.parseJSON(jqXHR.responseText).error);
@@ -109,6 +148,8 @@ $(document).ready(function(){
 	$('#playlist-clean').click(function(){cleanPlaylist();});
 	// Remove the selected resource from the current play list.
 	$(document).on("click", "td > a.playlist-resource + a.remove", function(){removeTrack($(this).parent());});
+	// Delete the current play list.
+	$('#playlist-delete').click(function(){deletePlaylist(this);});
 	
 	// Modal box events
 //	$('#modalBox').on('hidden', function(){});
