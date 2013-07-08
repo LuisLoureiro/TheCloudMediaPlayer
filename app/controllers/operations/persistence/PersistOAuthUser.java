@@ -29,7 +29,19 @@ public class PersistOAuthUser
 		
 		for(User relatedUser : user.getRelatedAuth())
 		{
-			tokens.add((OAuthUser)relatedUser); // TODO create generalisation in the database
+			/**
+			 * TODO because of the possibility of relationship between different authentication users (with email address)
+			 * there could be relatedAuth that are not OAuthUser (could be openID) or could be Oauth but from a service
+			 * that we don't want to get contents from.
+			 * 
+			 * This workaround is not good!
+			 */
+			try{
+				tokens.add((OAuthUser)relatedUser); // TODO create generalisation in the database
+			} catch(ClassCastException e){
+				// Not OAuth user!
+				// TODO it's time to get the OAuth users related with this NotOAuthUser!
+			}
 		}
 		
 		return tokens;
