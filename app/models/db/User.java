@@ -19,13 +19,11 @@ import javax.persistence.OneToMany;
 @Inheritance(strategy=InheritanceType.JOINED)
 @DiscriminatorColumn(discriminatorType=DiscriminatorType.STRING, name="type")
 @DiscriminatorValue(value="other")
-//@DiscriminatorOptions(force=true)
-public class User {
-
+public class User
+{
 	@Id
 	private String id;
 	private String email;
-//	@NotNull
 	@Column(nullable=false)
 	private String type;
 	@ManyToOne(cascade={CascadeType.ALL})
@@ -33,44 +31,43 @@ public class User {
 	private User firstAuth;
 	@OneToMany(cascade={CascadeType.ALL}, mappedBy="firstAuth")
 	private List<User> relatedAuth;
+	@OneToMany(cascade={CascadeType.ALL}, mappedBy="user")
+	private List<Playlist> playlists;
 
 	public String getId() {
 		return id;
 	}
-
 	public void setId(String id) {
 		this.id = id;
 	}
-
 	public String getEmail() {
 		return email;
 	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
 	public String getType() {
 		return type;
 	}
-
 	public void setType(String type) {
 		this.type = type;
 	}
-
 	public User getFirstAuth() {
 		return firstAuth;
 	}
-
 	public void setFirstAuth(User firstAuth) {
 		this.firstAuth = firstAuth;
 	}
-
 	public List<User> getRelatedAuth() {
 		return relatedAuth;
 	}
-
 	public void setRelatedAuth(List<User> relatedAuth) {
 		this.relatedAuth = relatedAuth;
+	}
+	public List<Playlist> getPlaylists() {
+		return playlists;
+	}
+	public void setPlaylists(List<Playlist> playlists) {
+		this.playlists = playlists;
 	}
 }
