@@ -125,9 +125,36 @@ function deletePlaylist(elem){
 	}
 	$('#modalBox').modal('show');
 }
+function loadPlaylists(ulElem){
+	// Add a new item saying 'loading'.
+	$(ulElem).children().first().after('<li class="loading"><p>Loading...</p></li>');
+	$.ajax({
+		type: 'GET',
+	    url: '/playlist',
+	    dataType: 'json',
+	    success: function(data){
+	    	if(data.playlists && data.playlists.length != 0){
+		    	// Clean all the items after the first before adding the new items.
+		    	$(ulElem).children().not(':first').remove();
+		    	for(var playlist in data.playlists){
+		    		$(ulElem).append('<li><a class="playlist-load-item" href="#" data-playlist-id="'+
+		    				playlist.id+'">'+playlist.name+'</a></li>');
+		    	}
+	    	}
+	    },
+	  	error: defaultJsonErrorHandler,
+	  	complete: function(){
+	  		$(ulElem).children().filter('.loading').remove();
+	  	}
+	});
+}
 function defaultJsonErrorHandler(jqXHR, textStatus, errorThrown){
 	// Handle error
-	appendErrorAlert($.parseJSON(jqXHR.responseText).error);
+	try{
+		appendErrorAlert($.parseJSON(jqXHR.responseText).error);
+	}catch(err){
+		appendErrorAlert(errorThrown + ": " + jqXHR.responseText);
+	}
 	console.log(textStatus);
 	console.log(errorThrown);
 	console.log(jqXHR.responseText);
@@ -150,6 +177,11 @@ $(document).ready(function(){
 	$(document).on("click", "td > a.playlist-resource + a.remove", function(){removeTrack($(this).parent());});
 	// Delete the current play list.
 	$('#playlist-delete').click(function(){deletePlaylist(this);});
+	// Get the list of user's play lists.
+	$('#playlist-load').click(function(e){
+		e.preventDefault(); // prevent url change with href.
+		e.stopPropagation(); // to maintain visible the menu.
+		loadPlaylists($(this).parent().parent());});
 	
 	// Modal box events
 //	$('#modalBox').on('hidden', function(){});

@@ -10,6 +10,7 @@ import org.codehaus.jackson.node.ObjectNode;
 
 import play.data.Form;
 import play.data.validation.ValidationError;
+import play.db.jpa.Transactional;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -18,6 +19,7 @@ import play.mvc.Security.Authenticated;
 @Authenticated
 public class Playlist extends Controller
 {
+	@Transactional
 	public static Result save()
 	{
 	    // Return a json object with the result of the operation.
@@ -41,11 +43,17 @@ public class Playlist extends Controller
 		return status(NOT_IMPLEMENTED, result);
 	}
 	
+	@Transactional(readOnly=true)
 	public static Result load(int id)
 	{
-		return status(NOT_IMPLEMENTED);
+	    // Return a json object with the result of the operation.
+		ObjectNode result = Json.newObject();
+	    
+		result.put("error", id);
+		return status(NOT_IMPLEMENTED, result);
 	}
 	
+	@Transactional
 	public static Result delete(int id)
 	{
 	    // Return a json object with the result of the operation.
@@ -55,6 +63,7 @@ public class Playlist extends Controller
 		return status(NOT_IMPLEMENTED, result);
 	}
 	
+	// TODO move to an Utils class!
 	private static <T> String buildMessageFromValidationErrors(Form<T> form)
 	{
 		StringBuilder errorString = new StringBuilder();
