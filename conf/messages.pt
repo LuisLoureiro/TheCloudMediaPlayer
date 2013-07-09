@@ -31,6 +31,7 @@ user.playList.repeat=repetir
 user.playList.default=default
 user.playList.save=guardar
 user.playList.load=carregar
+user.playList.load.update=atualizar
 user.playList.load.empty=vazio
 user.playList.clean=limpar
 user.playList.delete=apagar
