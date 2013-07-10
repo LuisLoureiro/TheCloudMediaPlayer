@@ -54,7 +54,15 @@ function savePlaylist(elem){
 		    data: contentsData,
 		    dataType: 'json',
 		    success: function(data){
-		    	$('#playlist-name').text(data.name+" ");
+		    	$('#playlist-name').html(data.name+' <b class="caret"></b>');
+		    	// Register the play list id in a tag attribute!
+		    	$('#playlist-name').attr('data-playlist-id', data.id);
+		    	// Add list to load play lists.
+		    	$('#playlist-load').parent().parent()
+		    		.append('<li><a class="playlist-load-item" href="#" data-playlist-id="'+
+		    				data.id+'">'+data.name+'</a></li>');
+		    	// Hide the 'empty' item
+		    	$('.playlist-load-empty').parent().hide();
 		    	appendSuccessAlert("The play list was successfully saved.");
 		    },
 		  	error: defaultJsonErrorHandler,
@@ -97,7 +105,14 @@ function deletePlaylist(elem){
 		    success: function(){
 		    	// Clean play list contents
 		    	$('#playlist-clean').click();
-		    	$('#playlist-name').text("default ");
+		    	$('#playlist-name').html('default <b class="caret"></b>');
+		    	$('#playlist-name').attr('data-playlist-id', '');
+		    	// Remove from the list of play lists to load.
+		    	$('[data-playlist-id='+id+']').parent().remove();
+		    	// Show the 'empty' item if none is available!
+		    	if($('#playlist-load').parent().nextAll().length == 0) // TODO if necessary add a selector to the nextAll to avoid the hidden empty item!
+		    		$('.playlist-load-empty').parent().show();
+		    	
 		    	appendSuccessAlert("The play list was successfully deleted.");
 		    },
 		  	error: defaultJsonErrorHandler,
