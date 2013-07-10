@@ -8,6 +8,9 @@ import models.beans.dataBinding.form.PlaylistForm;
 
 import org.codehaus.jackson.node.ObjectNode;
 
+import controllers.enums.SESSION;
+import controllers.operations.persistence.PersistPlaylist;
+
 import play.data.Form;
 import play.data.validation.ValidationError;
 import play.db.jpa.Transactional;
@@ -27,6 +30,9 @@ public class Playlist extends Controller
 		
 		// Grab the play list name from the request body.
 	    // Using Form with Modal class. See: http://www.playframework.com/documentation/2.1.1/JavaForms
+	    // ... or using dynamic form:
+//	    DynamicForm requestData = form().bindFromRequest();
+//	    String playListName = requestData.get("name");
 	    Form<PlaylistForm> playlistForm = form(PlaylistForm.class).bindFromRequest();
 	    if(playlistForm.hasErrors())
 	    {
@@ -35,12 +41,11 @@ public class Playlist extends Controller
 	    }
 	    PlaylistForm playlist = playlistForm.get();
 	    
-	    // ... or using dynamic form:
-//	    DynamicForm requestData = form().bindFromRequest();
-//	    String playListName = requestData.get("name");
+	    int id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getName());
 	    
-		result.put("error", playlist.getName());
-		return status(NOT_IMPLEMENTED, result);
+		result.put("name", playlist.getName());
+		result.put("id", id);
+		return created(result);
 	}
 	
 	@Transactional(readOnly=true)
