@@ -5,7 +5,7 @@ import java.util.Collection;
 import models.db.OAuth1User;
 import play.db.jpa.JPA;
 
-public class OAuth1UserMapper implements IMapper<String, OAuth1User> {
+public class OAuth1UserMapper extends AbstractMapper<String, OAuth1User> {
 
 	@Override
 	public OAuth1User findById(String id) {
@@ -24,20 +24,4 @@ public class OAuth1UserMapper implements IMapper<String, OAuth1User> {
     	return JPA.em().createQuery("SELECT u FROM oauth1_users u", OAuth1User.class)
     			.getResultList();
 	}
-
-	@Override
-	public void update(OAuth1User object) {
-        JPA.em().merge(object);
-	}
-
-	@Override
-	public void save(OAuth1User object) {
-        JPA.em().persist(object);
-	}
-
-	@Override
-	public void delete(OAuth1User object) {
-        JPA.em().remove(object);
-	}
-
 }

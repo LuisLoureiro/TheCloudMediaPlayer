@@ -5,7 +5,7 @@ import java.util.Collection;
 import models.db.OAuth1Token;
 import play.db.jpa.JPA;
 
-public class OAuth1TokenMapper implements IMapper<String, OAuth1Token> {
+public class OAuth1TokenMapper extends AbstractMapper<String, OAuth1Token> {
 
 	@Override
 	public OAuth1Token findById(String id) {
@@ -24,20 +24,4 @@ public class OAuth1TokenMapper implements IMapper<String, OAuth1Token> {
     	return JPA.em().createQuery("SELECT u FROM oauth1_token u", OAuth1Token.class)
     			.getResultList();
 	}
-
-	@Override
-	public void update(OAuth1Token object) {
-        JPA.em().merge(object);
-	}
-
-	@Override
-	public void save(OAuth1Token object) {
-        JPA.em().persist(object);
-	}
-
-	@Override
-	public void delete(OAuth1Token object) {
-        JPA.em().remove(object);
-	}
-
 }

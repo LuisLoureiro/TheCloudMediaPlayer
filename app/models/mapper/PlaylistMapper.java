@@ -9,7 +9,7 @@ import javax.persistence.criteria.Root;
 import models.db.Playlist;
 import play.db.jpa.JPA;
 
-public class PlaylistMapper implements IMapper<Long, Playlist>
+public class PlaylistMapper extends AbstractMapper<Long, Playlist>
 {
 	@Override
 	public Playlist findById(Long id)
@@ -39,23 +39,5 @@ public class PlaylistMapper implements IMapper<Long, Playlist>
 		return JPA.em().createQuery(
 				cqPlaylist.select(cqPlaylist.from(Playlist.class))
 			).getResultList();
-	}
-
-	@Override
-	public void update(Playlist object)
-	{
-		JPA.em().merge(object);
-	}
-
-	@Override
-	public void save(Playlist object)
-	{
-		JPA.em().persist(object);
-	}
-
-	@Override
-	public void delete(Playlist object)
-	{
-		JPA.em().remove(object);
 	}
 }

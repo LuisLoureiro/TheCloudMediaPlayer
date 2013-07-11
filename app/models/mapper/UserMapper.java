@@ -5,7 +5,7 @@ import java.util.Collection;
 import models.db.User;
 import play.db.jpa.JPA;
 
-public class UserMapper implements IMapper<String, User> {
+public class UserMapper extends AbstractMapper<String, User> {
 
 	@Override
 	public User findById(String id) {
@@ -23,20 +23,5 @@ public class UserMapper implements IMapper<String, User> {
 	public Collection<User> getAll() {
     	return JPA.em().createQuery("SELECT u FROM users u", User.class)
     			.getResultList();
-	}
-
-	@Override
-	public void update(User object) {
-        JPA.em().merge(object);
-	}
-
-	@Override
-	public void save(User object) {
-        JPA.em().persist(object);
-	}
-
-	@Override
-	public void delete(User object) {
-        JPA.em().remove(object);
 	}
 }

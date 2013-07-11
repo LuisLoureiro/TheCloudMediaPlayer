@@ -42,4 +42,9 @@ public interface IMapper<T, V> {
 	 * @param object The object to be deleted.
 	 */
 	void delete(V object);
+	
+	/*
+	 * Forces a synchronization of the persistence context to the database.
+	 */
+	void sync();
 }
