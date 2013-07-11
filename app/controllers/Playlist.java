@@ -41,7 +41,7 @@ public class Playlist extends Controller
 	    }
 	    PlaylistForm playlist = playlistForm.get();
 	    
-	    int id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getName());
+	    long id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getName());
 	    
 		result.put("name", playlist.getName());
 		result.put("id", id);

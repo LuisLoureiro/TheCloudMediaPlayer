@@ -7,13 +7,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import models.db.Playlist;
-import models.db.compositeKeys.PlaylistPK;
 import play.db.jpa.JPA;
 
-public class PlaylistMapper implements IMapper<PlaylistPK, Playlist>
+public class PlaylistMapper implements IMapper<Long, Playlist>
 {
 	@Override
-	public Playlist findById(PlaylistPK id)
+	public Playlist findById(Long id)
 	{
 		return JPA.em().find(Playlist.class, id);
 	}
@@ -43,7 +42,8 @@ public class PlaylistMapper implements IMapper<PlaylistPK, Playlist>
 	}
 
 	@Override
-	public void update(Playlist object) {
+	public void update(Playlist object)
+	{
 		JPA.em().merge(object);
 	}
 

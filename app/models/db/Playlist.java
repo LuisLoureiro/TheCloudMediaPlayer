@@ -1,40 +1,36 @@
 package models.db;
 
-import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 
 import play.data.validation.Constraints.Required;
-
-import models.db.compositeKeys.PlaylistPK;
 
 @Entity(name="playlists")
 public class Playlist
 {
-	@AttributeOverride(name="userId", column=@Column(name="user_id",
-			nullable=false, insertable=false, updatable=false))
-	@EmbeddedId
-	private PlaylistPK key;
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private long id;
 	
 	@Column(nullable=false)
 	@Required(message="The name of the play list must be defined!")
 	private String name;
-
-	@MapsId("userId")
+	
 	@ManyToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name="user_id", referencedColumnName="id")
 	private User user;
 	
-	public PlaylistPK getKey() {
-		return key;
+	public long getId() {
+		return id;
 	}
-	public void setKey(PlaylistPK key) {
-		this.key = key;
+	public void setId(long id) {
+		this.id = id;
 	}
 	public String getName() {
 		return name;
