@@ -23,7 +23,7 @@ import play.mvc.Security.Authenticated;
 public class Playlist extends Controller
 {
 	@Transactional
-	public static Result save()
+	public static Result save() throws Exception
 	{
 	    // Return a json object with the result of the operation.
 		ObjectNode result = Json.newObject();
@@ -41,10 +41,12 @@ public class Playlist extends Controller
 	    }
 	    PlaylistForm playlist = playlistForm.get();
 	    
-	    long id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getName());
+	    long id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getId(), playlist.getName());
 	    
 		result.put("name", playlist.getName());
 		result.put("id", id);
+		result.put("successMessage", String.format("The play list was successfully %s.", 
+				playlist.getId() == 0 ? "saved" : "updated"));
 		return created(result);
 	}
 	
