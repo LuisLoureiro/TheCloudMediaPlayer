@@ -46,6 +46,27 @@ function playContent(elem){
 		error: defaultJsonErrorHandler
 	});
 }
+function newPlaylist(){
+	// Check the state of the current play list and if it's modified confirm if he wants to forget the changes
+	//  or if he wants to save the play list before creating a new one
+	
+	// TODO replace with implementation of previous comment.
+	setModalBoxContents("Criar nova lista de reprodução",
+			'<p>Qualquer alteração que tenha feito à lista de reprodução atual será esquecida.</p><p>Quer continuar?</p>'
+			+ '<form id="playlist-newForm" class="form-horizontal">'
+			+ '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">Sim</button></div></div>'
+			+ '</form>'
+			);
+	$('#playlist-newForm').submit(function(e){
+		e.preventDefault();
+    	// Clean play list contents
+    	$('#playlist-clean').click();
+    	$('#playlist-name').html('default <b class="caret"></b>');
+    	$('#playlist-name').attr('data-playlist-id', '');
+    	$('#modalBox').modal('hide');
+	});
+	$('#modalBox').modal('show');
+}
 function savePlaylist(){
 	var func = function(contentsData){
 		$.ajax({
@@ -75,11 +96,12 @@ function savePlaylist(){
 	var name = $('#playlist-name').text().trim();
 	// Ask for the name of the new play list if the present one is the default play list.
 	if(!id || id == "0"){//"default" == name){
-		setModalBoxContents("Guardar lista de reprodução", '<form id="playlist-saveForm" class="form-horizontal"><fieldset><legend>Indique o nome da nova lista</legend>'+
-				'<div class="control-group"><label class="control-label">Nome</label>'+
-				'<div class="controls"><input class="span3" type="text" name="name" placeholder="Ex: First playlist, Best tracks, ..." required="required"></input>'+
-				'<span class="help-inline">O nome tem que ser preenchido!</span></div></div>'+
-				'<div class="control-group"><div class="controls"><button class="btn btn-primary">Save</button></div></div></fieldset></form>');
+		setModalBoxContents("Guardar lista de reprodução",
+				'<form id="playlist-saveForm" class="form-horizontal"><fieldset><legend>Indique o nome da nova lista</legend>'
+				+ '<div class="control-group"><label class="control-label">Nome</label>'
+				+ '<div class="controls"><input class="span3" type="text" name="name" placeholder="Ex: First playlist, Best tracks, ..." required="required"></input>'
+				+ '<span class="help-inline">O nome tem que ser preenchido!</span></div></div>'
+				+ '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">Save</button></div></div></fieldset></form>');
 		$('#playlist-saveForm').submit(function(e){
 			e.preventDefault();
 			func($(this).serialize());
@@ -126,12 +148,12 @@ function deletePlaylist(elem){
 	if(id){
 		// Show a confirmation window before Ajax call
 		setModalBoxContents("Confirmação da eliminação da lista de reprodução",
-				'<p>Tem a certeza que deseja eliminar permanentemente a lista de reprodução "'+name+'"?</p>'+
-				'<p>Esta eliminação não poderá ser revogada mais tarde!</p>'+
-				'<form id="playlist-deleteForm" class="form-horizontal">'+
-				'<input type="hidden" name="id" value="'+id+'"></input>'+
-				'<div class="form-actions"><button type="submit" class="btn btn-primary">Confirm</button></div>'+
-				'</form>');
+				'<p>Tem a certeza que deseja eliminar permanentemente a lista de reprodução "'+name+'"?</p>'
+				+ '<p>Esta eliminação não poderá ser revogada mais tarde!</p>'
+				+ '<form id="playlist-deleteForm" class="form-horizontal">'
+				+ '<input type="hidden" name="id" value="'+id+'"></input>'
+				+ '<div class="form-actions"><button type="submit" class="btn btn-primary">Confirm</button></div>'
+				+ '</form>');
 		$('#playlist-deleteForm').submit(function(e){
 			e.preventDefault();
 			func(id);
@@ -185,6 +207,8 @@ $(document).ready(function(){
 	$(document).on("click", "#resources-list>ul>li>a", function(){appendSongToPlayList(this);});
 	// Play resource
 	$(document).on("click", ".playlist-resource", function(){playContent(this);});
+	// New empty play list
+	$('#playlist-new').click(function(){newPlaylist();});
 	// Save play list
 	$('#playlist-save').click(function(){savePlaylist();});
 	// Removing all the contents from the current play list.
