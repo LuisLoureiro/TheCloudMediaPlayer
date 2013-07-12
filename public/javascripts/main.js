@@ -46,7 +46,7 @@ function playContent(elem){
 		error: defaultJsonErrorHandler
 	});
 }
-function savePlaylist(elem){
+function savePlaylist(){
 	var func = function(contentsData){
 		$.ajax({
 			type: 'PUT',
@@ -63,7 +63,7 @@ function savePlaylist(elem){
 		    				data.id+'">'+data.name+'</a></li>');
 		    	// Hide the 'empty' item
 		    	$('.playlist-load-empty').parent().hide();
-		    	appendSuccessAlert("The play list was successfully saved.");
+		    	appendSuccessAlert(data.successMessage);
 		    },
 		  	error: defaultJsonErrorHandler,
 			complete: function(jqXHR, textStatus){
@@ -71,9 +71,10 @@ function savePlaylist(elem){
 			}
 		});
 	}
+	var id = $('#playlist-name').attr('data-playlist-id');
 	var name = $('#playlist-name').text().trim();
 	// Ask for the name of the new play list if the present one is the default play list.
-	if("default" == name){
+	if(!id || id == "0"){//"default" == name){
 		setModalBoxContents("Guardar lista de reprodução", '<form id="playlist-saveForm" class="form-horizontal"><fieldset><legend>Indique o nome da nova lista</legend>'+
 				'<div class="control-group"><label class="control-label">Nome</label>'+
 				'<div class="controls"><input class="span3" type="text" name="name" placeholder="Ex: First playlist, Best tracks, ..." required="required"></input>'+
@@ -85,7 +86,7 @@ function savePlaylist(elem){
 		});
 		$('#modalBox').modal('show');
 	} else{
-		func('name='+name);
+		func('name='+name+'&id='+id);
 	}
 }
 function cleanPlaylist(){
@@ -185,7 +186,7 @@ $(document).ready(function(){
 	// Play resource
 	$(document).on("click", ".playlist-resource", function(){playContent(this);});
 	// Save play list
-	$('#playlist-save').click(function(){savePlaylist(this);});
+	$('#playlist-save').click(function(){savePlaylist();});
 	// Removing all the contents from the current play list.
 	$('#playlist-clean').click(function(){cleanPlaylist();});
 	// Remove the selected resource from the current play list.
