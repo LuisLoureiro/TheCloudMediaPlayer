@@ -8,10 +8,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import play.data.validation.Constraints.Required;
 
 @Entity(name="playlists")
+@Table(uniqueConstraints=@UniqueConstraint(name="unique_name_user_id", columnNames={"name", "user_id"}))
 public class Playlist
 {
 	@Id
