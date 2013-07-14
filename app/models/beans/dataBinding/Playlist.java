@@ -6,12 +6,25 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Playlist
 {
+	private long id;
+	private String title;
 	private Track[] tracks;
 
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
 	public Track[] getTracks() {
 		return tracks;
 	}
-
 	public void setTracks(Track[] tracks) {
 		this.tracks = tracks;
 	}
