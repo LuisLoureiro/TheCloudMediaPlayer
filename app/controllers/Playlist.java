@@ -14,6 +14,7 @@ import controllers.operations.persistence.PersistPlaylist;
 import play.data.Form;
 import play.data.validation.ValidationError;
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -41,12 +42,11 @@ public class Playlist extends Controller
 	    }
 	    PlaylistForm playlist = playlistForm.get();
 	    
-	    long id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getId(), playlist.getName());
+	    long id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getId(), playlist.getName(), ctx().lang());
 	    
 		result.put("name", playlist.getName());
 		result.put("id", id);
-		result.put("successMessage", String.format("The play list was successfully %s.", 
-				playlist.getId() == 0 ? "saved" : "updated"));
+		result.put("successMessage", Messages.get(playlist.getId() == 0 ? "user.playList.save.createdSuccessfully" : "user.playList.save.updatedSuccessfully"));
 		return created(result);
 	}
 	
@@ -55,7 +55,7 @@ public class Playlist extends Controller
 	{
 	    // Return a json object with the result of the operation.
 		ObjectNode result = Json.newObject();
-	    
+		
 		result.put("error", id);
 		return status(NOT_IMPLEMENTED, result);
 	}

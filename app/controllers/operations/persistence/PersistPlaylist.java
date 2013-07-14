@@ -6,10 +6,12 @@ import models.db.Playlist;
 import models.mapper.IMapper;
 import models.mapper.PlaylistMapper;
 import models.mapper.UserMapper;
+import play.i18n.Lang;
+import play.i18n.Messages;
 
 public class PersistPlaylist
 {
-	public static long savePlaylist(String userId, long id, String name) throws Exception
+	public static long savePlaylist(String userId, long id, String name, Lang lang) throws Exception
 	{
 		IMapper<Long, Playlist> mapper = new PlaylistMapper();
 		
@@ -32,7 +34,7 @@ public class PersistPlaylist
 			{
 				if(e.getMessage().contains("unique constraint"))
 				{
-					throw new Exception("There's a play list with the exact same name. Please choose a diferent one.");
+					throw new Exception(Messages.get(lang, "user.playList.errors.uniqueConstraintViolation"));
 				}
 				else
 					throw new Exception(e);
