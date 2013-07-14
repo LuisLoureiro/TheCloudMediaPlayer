@@ -174,10 +174,10 @@ function loadPlaylists(ulElem){
 	    	if(data.playlists && data.playlists.length != 0){
 		    	// Clean all the items after the first before adding the new items.
 		    	$(ulElem).children().not(':first').remove();
-		    	for(var playlist in data.playlists){
+		    	$.each(data.playlists, function(idx, playlist){
 		    		$(ulElem).append('<li><a class="playlist-load-item" href="#" data-playlist-id="'+
-		    				playlist.id+'">'+playlist.name+'</a></li>');
-		    	}
+		    				playlist.id+'">'+playlist.title+'</a></li>');
+		    	});
 	    	}
 	    },
 	  	error: defaultJsonErrorHandler,
@@ -185,6 +185,36 @@ function loadPlaylists(ulElem){
 	  		$(ulElem).children().filter('.loading').remove();
 	  	}
 	});
+}
+function loadPlaylist(elem){
+	// Get the id of the selected play list.
+	var id = $(elem).attr('data-playlist-id');
+	if(id && id != '')
+	{
+		$.ajax({
+			type: 'GET',
+			url: '/playlist/'+id,
+			dataType: 'json',
+			success: function(data){
+				// Clean all the items of the current play list
+				// Update the play list name.
+				$('#playlist-clean').click();
+		    	$('#playlist-name').html(data.title + ' <b class="caret"></b>');
+		    	$('#playlist-name').attr('data-playlist-id', data.id);
+		    	// Place all the contents in the list.
+		    	appendLoadedContentsToPlayList($('#playlist-table>tbody'), data.contents);
+				// Show a success message.
+		    	appendSuccessAlert(data.message);
+			},
+			error: defaultJsonErrorHandler
+		});
+	}
+	else appendErrorAlert("The selected play list doesn't have the id attribute.");
+}
+function appendLoadedContentsToPlayList(playlistBody, contents){
+	if(contents){
+		console.log(contents);
+	}
 }
 function defaultJsonErrorHandler(jqXHR, textStatus, errorThrown){
 	// Handle error
@@ -222,6 +252,7 @@ $(document).ready(function(){
 		e.preventDefault(); // prevent url change with href.
 		e.stopPropagation(); // to maintain visible the menu.
 		loadPlaylists($(this).parent().parent());});
+	$(document).on("click", ".playlist-load-item", function(e){loadPlaylist(this);});
 	
 	// Modal box events
 //	$('#modalBox').on('hidden', function(){});

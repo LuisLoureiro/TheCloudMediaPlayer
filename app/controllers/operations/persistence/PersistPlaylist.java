@@ -1,5 +1,8 @@
 package controllers.operations.persistence;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.persistence.PersistenceException;
 
 import models.db.Playlist;
@@ -47,5 +50,40 @@ public class PersistPlaylist
 		}
 		
 		return playlist.getId();
+	}
+	
+	/**
+	 * 
+	 * @param userId
+	 * @return all the play lists of the specified user: id and name.
+	 */
+	public static List<models.beans.dataBinding.Playlist> loadPlaylists(String userId)
+	{
+		List<models.beans.dataBinding.Playlist> userPlayLists = new LinkedList<models.beans.dataBinding.Playlist>();
+		
+		for(Playlist playlist : new UserMapper().findById(userId).getPlaylists())
+		{
+			models.beans.dataBinding.Playlist returningPlaylist = new models.beans.dataBinding.Playlist();
+			returningPlaylist.setId(playlist.getId());
+			returningPlaylist.setTitle(playlist.getName());
+			
+			userPlayLists.add(returningPlaylist);
+		}
+		
+		return userPlayLists;
+	}
+	
+	public static models.beans.dataBinding.Playlist loadPlaylist(String userId, long playlistId, Lang lang) throws Exception
+	{
+		Playlist playlist = new PlaylistMapper().findById(playlistId);
+		if(playlist == null || !userId.equals(playlist.getUser().getId()))
+			throw new Exception(Messages.get(lang, "user.playList.errors.invalidIdOrUserId"));
+
+		models.beans.dataBinding.Playlist returnPlaylist = new models.beans.dataBinding.Playlist();
+		returnPlaylist.setId(playlist.getId());
+		returnPlaylist.setTitle(playlist.getName());
+		// TODO contents!
+		
+		return returnPlaylist;
 	}
 }

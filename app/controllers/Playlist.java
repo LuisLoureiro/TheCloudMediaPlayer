@@ -51,13 +51,30 @@ public class Playlist extends Controller
 	}
 	
 	@Transactional(readOnly=true)
-	public static Result load(int id)
+	public static Result load(int id) throws Exception
 	{
+		// Check the value of the id parameter to execute the correct operation:
+		// * if == 0, return the user play lists: name & id
+		// * if != 0, return the list of contents related to the user play list: name & contents (name & id & provider)
+		
 	    // Return a json object with the result of the operation.
 		ObjectNode result = Json.newObject();
 		
-		result.put("error", id);
-		return status(NOT_IMPLEMENTED, result);
+		if(id == 0)
+		{
+			List<models.beans.dataBinding.Playlist> playLists = PersistPlaylist.loadPlaylists(session(SESSION.USERNAME.toString()));
+			result.put("playlists", Json.toJson(playLists));
+		}
+		else
+		{
+			models.beans.dataBinding.Playlist playList = PersistPlaylist.loadPlaylist(session(SESSION.USERNAME.toString()), id, ctx().lang());
+			result.put("id", playList.getId());
+			result.put("title", playList.getTitle());
+			result.put("contents", Json.toJson(playList.getTracks()));
+			result.put("message", Messages.get(ctx().lang(), "user.playList.load.successMessage", playList.getTitle()));
+		}
+	    
+		return ok(result);
 	}
 	
 	@Transactional
