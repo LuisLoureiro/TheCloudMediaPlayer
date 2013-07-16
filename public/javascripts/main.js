@@ -81,7 +81,7 @@ function savePlaylist(){
 		    		.append('<li><a class="playlist-load-item" href="#" data-playlist-id="'+
 		    				data.id+'">'+data.name+'</a></li>');
 		    	// Hide the 'empty' item
-		    	$('.playlist-load-empty').parent().hide();
+		    	$('.playlist-load-empty').hide();
 		    	appendSuccessAlert(data.successMessage);
 		    },
 		  	error: defaultJsonErrorHandler,
@@ -130,9 +130,9 @@ function deletePlaylist(elem){
 		    	elem.html('default <b class="caret"></b>').attr('data-playlist-id', '');
 		    	// Remove from the list of play lists to load.
 		    	$('[data-playlist-id='+id+']').parent().remove();
-		    	// Show the 'empty' item if none is available!
-		    	if($('#playlist-load').parent().nextAll().length == 0)
-		    		$('.playlist-load-empty').parent().show();
+		    	// Show the 'empty' item if "none" is available!
+		    	if($('#playlist-load').parent().nextAll(':not(.playlist-loading,.playlist-load-empty)').length == 0)
+		    		$('.playlist-load-empty').show();
 		    	
 		    	appendSuccessAlert("The play list was successfully deleted.");
 		    },
@@ -162,8 +162,9 @@ function deletePlaylist(elem){
 	$('#modalBox').modal('show');
 }
 function loadPlaylists(ulElem){
-	// Add a new item saying 'loading'.
-	$(ulElem).children().first().after('<li class="loading"><p>Loading...</p></li>');
+	// Show the 'loading' item.
+	var loading = $('.playlist-loading');
+	loading.show();
 	$.ajax({
 		type: 'GET',
 	    url: '/playlist',
@@ -171,7 +172,8 @@ function loadPlaylists(ulElem){
 	    success: function(data){
 	    	if(data.playlists && data.playlists.length != 0){
 		    	// Clean all the items after the first before adding the new items.
-		    	$(ulElem).children().not(':first').remove();
+	    		$('.playlist-load-empty').hide();
+		    	$(ulElem).children().not(':first,.playlist-loading,.playlist-load-empty').remove();
 		    	$.each(data.playlists, function(idx, playlist){
 		    		$(ulElem).append('<li><a class="playlist-load-item" href="#" data-playlist-id="'+
 		    				playlist.id+'">'+playlist.title+'</a></li>');
@@ -180,7 +182,7 @@ function loadPlaylists(ulElem){
 	    },
 	  	error: defaultJsonErrorHandler,
 	  	complete: function(){
-	  		$(ulElem).children().filter('.loading').remove();
+	  		loading.hide();
 	  	}
 	});
 }
