@@ -61,8 +61,7 @@ function newPlaylist(){
 		e.preventDefault();
     	// Clean play list contents
     	$('#playlist-clean').click();
-    	$('#playlist-name').html('default <b class="caret"></b>');
-    	$('#playlist-name').attr('data-playlist-id', '');
+    	$('#playlist-name').html('default <b class="caret"></b>').attr('data-playlist-id', '');
     	$('#modalBox').modal('hide');
 	});
 	$('#modalBox').modal('show');
@@ -75,9 +74,8 @@ function savePlaylist(){
 		    data: contentsData,
 		    dataType: 'json',
 		    success: function(data){
-		    	$('#playlist-name').html(data.name+' <b class="caret"></b>');
 		    	// Register the play list id in a tag attribute!
-		    	$('#playlist-name').attr('data-playlist-id', data.id);
+		    	$('#playlist-name').html(data.name+' <b class="caret"></b>').attr('data-playlist-id', data.id);
 		    	// Add list to load play lists.
 		    	$('#playlist-load').parent().parent()
 		    		.append('<li><a class="playlist-load-item" href="#" data-playlist-id="'+
@@ -92,10 +90,10 @@ function savePlaylist(){
 			}
 		});
 	}
-	var id = $('#playlist-name').attr('data-playlist-id');
-	var name = $('#playlist-name').text().trim();
+	var elem = $('#playlist-name');
+	var id = elem.attr('data-playlist-id');
 	// Ask for the name of the new play list if the present one is the default play list.
-	if(!id || id == "0"){//"default" == name){
+	if(!id || id == "0"){
 		setModalBoxContents("Guardar lista de reprodução",
 				'<form id="playlist-saveForm" class="form-horizontal"><fieldset><legend>Indique o nome da nova lista</legend>'
 				+ '<div class="control-group"><label class="control-label">Nome</label>'
@@ -108,7 +106,7 @@ function savePlaylist(){
 		});
 		$('#modalBox').modal('show');
 	} else{
-		func('name='+name+'&id='+id);
+		func('name='+elem.text().trim()+'&id='+id);
 	}
 }
 function cleanPlaylist(){
@@ -118,8 +116,9 @@ function removeTrack(elem){
 	$(elem).remove();
 }
 function deletePlaylist(elem){
-	var name = $('#playlist-name').text().trim();
-	var id = $('#playlist-name').attr('data-playlist-id');
+	var elem = $('#playlist-name');
+	var name = elem.text().trim();
+	var id = elem.attr('data-playlist-id');
 	var func = function(contentsData){
 		$.ajax({
 			type: 'DELETE',
@@ -128,12 +127,11 @@ function deletePlaylist(elem){
 		    success: function(){
 		    	// Clean play list contents
 		    	$('#playlist-clean').click();
-		    	$('#playlist-name').html('default <b class="caret"></b>');
-		    	$('#playlist-name').attr('data-playlist-id', '');
+		    	elem.html('default <b class="caret"></b>').attr('data-playlist-id', '');
 		    	// Remove from the list of play lists to load.
 		    	$('[data-playlist-id='+id+']').parent().remove();
 		    	// Show the 'empty' item if none is available!
-		    	if($('#playlist-load').parent().nextAll().length == 0) // TODO if necessary add a selector to the nextAll to avoid the hidden empty item!
+		    	if($('#playlist-load').parent().nextAll().length == 0)
 		    		$('.playlist-load-empty').parent().show();
 		    	
 		    	appendSuccessAlert("The play list was successfully deleted.");
@@ -144,7 +142,7 @@ function deletePlaylist(elem){
 			}
 		});
 	};
-	// Only enable the delete action if the current play list exists, ie. it has an id attribute.
+	// Only enable the delete action if the current play list exists (it's not the default one), ie. it has an id attribute.
 	if(id){
 		// Show a confirmation window before Ajax call
 		setModalBoxContents("Confirmação da eliminação da lista de reprodução",
@@ -199,8 +197,7 @@ function loadPlaylist(elem){
 				// Clean all the items of the current play list
 				// Update the play list name.
 				$('#playlist-clean').click();
-		    	$('#playlist-name').html(data.title + ' <b class="caret"></b>');
-		    	$('#playlist-name').attr('data-playlist-id', data.id);
+		    	$('#playlist-name').html(data.title + ' <b class="caret"></b>').attr('data-playlist-id', data.id);
 		    	// Place all the contents in the list.
 		    	appendLoadedContentsToPlayList($('#playlist-table>tbody'), data.contents);
 				// Show a success message.
