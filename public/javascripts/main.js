@@ -82,7 +82,7 @@ function savePlaylist(){
 		    				data.id+'">'+data.name+'</a></li>');
 		    	// Hide the 'empty' item
 		    	$('.playlist-load-empty').hide();
-		    	appendSuccessAlert(data.successMessage);
+		    	appendSuccessAlert(data.message);
 		    },
 		  	error: defaultJsonErrorHandler,
 			complete: function(jqXHR, textStatus){
@@ -115,26 +115,25 @@ function cleanPlaylist(){
 function removeTrack(elem){
 	$(elem).remove();
 }
-function deletePlaylist(elem){
+function deletePlaylist(){
 	var elem = $('#playlist-name');
-	var name = elem.text().trim();
 	var id = elem.attr('data-playlist-id');
 	var func = function(contentsData){
 		$.ajax({
 			type: 'DELETE',
 		    url: '/playlist/'+contentsData,
 		    dataType: 'json',
-		    success: function(){
+		    success: function(data){
 		    	// Clean play list contents
 		    	$('#playlist-clean').click();
 		    	elem.html('default <b class="caret"></b>').attr('data-playlist-id', '');
-		    	// Remove from the list of play lists to load.
-		    	$('[data-playlist-id='+id+']').parent().remove();
+		    	// Remove it from the list of play lists to load.
+		    	$('[data-playlist-id='+id+']').not('#playlist-name').parent().remove();
 		    	// Show the 'empty' item if "none" is available!
 		    	if($('#playlist-load').parent().nextAll(':not(.playlist-loading,.playlist-load-empty)').length == 0)
 		    		$('.playlist-load-empty').show();
 		    	
-		    	appendSuccessAlert("The play list was successfully deleted.");
+		    	appendSuccessAlert(data.message);
 		    },
 		  	error: defaultJsonErrorHandler,
 			complete: function(jqXHR, textStatus){
@@ -146,7 +145,7 @@ function deletePlaylist(elem){
 	if(id){
 		// Show a confirmation window before Ajax call
 		setModalBoxContents("Confirmação da eliminação da lista de reprodução",
-				'<p>Tem a certeza que deseja eliminar permanentemente a lista de reprodução "'+name+'"?</p>'
+				'<p>Tem a certeza que deseja eliminar permanentemente a lista de reprodução "'+elem.text().trim()+'"?</p>'
 				+ '<p>Esta eliminação não poderá ser revogada mais tarde!</p>'
 				+ '<form id="playlist-deleteForm" class="form-horizontal">'
 				+ '<input type="hidden" name="id" value="'+id+'"></input>'
@@ -245,7 +244,7 @@ $(document).ready(function(){
 	// Remove the selected resource from the current play list.
 	$(document).on("click", "td > a.playlist-resource + a.remove", function(){removeTrack($(this).parent());});
 	// Delete the current play list.
-	$('#playlist-delete').click(function(){deletePlaylist(this);});
+	$('#playlist-delete').click(function(){deletePlaylist();});
 	// Get the list of user's play lists.
 	$('#playlist-load').click(function(e){
 		e.preventDefault(); // prevent url change with href.

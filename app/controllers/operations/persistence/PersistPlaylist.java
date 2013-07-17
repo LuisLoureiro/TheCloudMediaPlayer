@@ -76,8 +76,7 @@ public class PersistPlaylist
 	public static models.beans.dataBinding.Playlist loadPlaylist(String userId, long playlistId, Lang lang) throws Exception
 	{
 		Playlist playlist = new PlaylistMapper().findById(playlistId);
-		if(playlist == null || !userId.equals(playlist.getUser().getId()))
-			throw new Exception(Messages.get(lang, "user.playList.errors.invalidIdOrUserId"));
+		verifyPlaylist(playlist, userId, lang);
 
 		models.beans.dataBinding.Playlist returnPlaylist = new models.beans.dataBinding.Playlist();
 		returnPlaylist.setId(playlist.getId());
@@ -85,5 +84,23 @@ public class PersistPlaylist
 		// TODO contents!
 		
 		return returnPlaylist;
+	}
+	
+	public static String deletePlaylist(String userId, long playlistId, Lang lang) throws Exception
+	{
+		IMapper<Long, Playlist> mapper = new PlaylistMapper();
+		Playlist playlist = mapper.findById(playlistId);
+		verifyPlaylist(playlist, userId, lang);
+		
+		mapper.delete(playlist);
+		// TODO beware with the contents! Just delete the contents that don't belong to any play list.
+		
+		return playlist.getName();
+	}
+	
+	private static void verifyPlaylist(Playlist playlist, String userId, Lang lang) throws Exception
+	{
+		if(playlist == null || !userId.equals(playlist.getUser().getId()))
+			throw new Exception(Messages.get(lang, "user.playList.errors.invalidIdOrUserId"));
 	}
 }

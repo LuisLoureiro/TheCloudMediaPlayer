@@ -46,7 +46,7 @@ public class Playlist extends Controller
 	    
 		result.put("name", playlist.getName());
 		result.put("id", id);
-		result.put("successMessage", Messages.get(playlist.getId() == 0 ? "user.playList.save.createdSuccessfully" : "user.playList.save.updatedSuccessfully"));
+		result.put("message", Messages.get(playlist.getId() == 0 ? "user.playList.save.createdSuccessfully" : "user.playList.save.updatedSuccessfully"));
 		return created(result);
 	}
 	
@@ -71,20 +71,22 @@ public class Playlist extends Controller
 			result.put("id", playList.getId());
 			result.put("title", playList.getTitle());
 			result.put("contents", Json.toJson(playList.getTracks()));
-			result.put("message", Messages.get(ctx().lang(), "user.playList.load.successMessage", playList.getTitle()));
+			result.put("message", Messages.get("user.playList.load.successMessage", playList.getTitle()));
 		}
 	    
 		return ok(result);
 	}
 	
 	@Transactional
-	public static Result delete(int id)
+	public static Result delete(int id) throws Exception
 	{
 	    // Return a json object with the result of the operation.
 		ObjectNode result = Json.newObject();
+		
+		String name = PersistPlaylist.deletePlaylist(session(SESSION.USERNAME.toString()), id, ctx().lang());
 
-		result.put("error", id);
-		return status(NOT_IMPLEMENTED, result);
+		result.put("message", Messages.get("user.playList.delete.successMessage", name));
+		return ok(result);
 	}
 	
 	// TODO move to an Utils class!
