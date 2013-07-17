@@ -26,10 +26,10 @@ public class User
 	private String email;
 	@Column(nullable=false)
 	private String type;
-	@ManyToOne(cascade={CascadeType.ALL})
+	@ManyToOne
 	@JoinColumn(name="first_auth_id")
 	private User firstAuth;
-	@OneToMany(cascade={CascadeType.ALL}, mappedBy="firstAuth")
+	@OneToMany(mappedBy="firstAuth")
 	private List<User> relatedAuth;
 	@OneToMany(cascade={CascadeType.ALL}, mappedBy="user")
 	private List<Playlist> playlists;

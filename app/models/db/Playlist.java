@@ -1,6 +1,5 @@
 package models.db;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,7 +24,7 @@ public class Playlist
 	@Required(message="The name of the play list must be defined!")
 	private String name;
 	
-	@ManyToOne(cascade=CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name="user_id", referencedColumnName="id")
 	private User user;
 	
