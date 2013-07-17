@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.PersistenceException;
 
 import models.db.Playlist;
+import models.db.User;
 import models.mapper.IMapper;
 import models.mapper.PlaylistMapper;
 import models.mapper.UserMapper;
@@ -18,9 +19,12 @@ public class PersistPlaylist
 	{
 		IMapper<Long, Playlist> mapper = new PlaylistMapper();
 		
+		User user = new UserMapper().findById(userId);
+		
 		Playlist playlist = new Playlist();
 		playlist.setName(name);
-		playlist.setUser(new UserMapper().findById(userId));
+		playlist.setUser(user);
+		user.getPlaylists().add(playlist);
 		
 		if(id == 0)
 		{
@@ -92,6 +96,7 @@ public class PersistPlaylist
 		Playlist playlist = mapper.findById(playlistId);
 		verifyPlaylist(playlist, userId, lang);
 		
+		playlist.getUser().getPlaylists().remove(playlist);
 		mapper.delete(playlist);
 		// TODO beware with the contents! Just delete the contents that don't belong to any play list.
 		
