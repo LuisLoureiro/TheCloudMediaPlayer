@@ -67,21 +67,30 @@ function newPlaylist(){
 	$('#modalBox').modal('show');
 }
 function savePlaylist(){
-	var func = function(contentsData){
+	// Empty play lists aren't allowed to be saved..
+	var rows = $('#playlist-table>tbody>tr');
+	if(rows.length == 0){
+		appendErrorAlert("You cannot save an empty play list.");
+		return;
+	}
+	var func = function(update, contentsData){
 		$.ajax({
 			type: 'PUT',
 		    url: '/playlist',
-		    data: contentsData,
+		    data: contentsData+serializePlaylistContents(rows),
 		    dataType: 'json',
 		    success: function(data){
-		    	// Register the play list id in a tag attribute!
-		    	$('#playlist-name').html(data.name+' <b class="caret"></b>').attr('data-playlist-id', data.id);
-		    	// Add list to load play lists.
-		    	$('#playlist-load').parent().parent()
-		    		.append('<li><a class="playlist-load-item" href="#" data-playlist-id="'+
-		    				data.id+'">'+data.name+'</a></li>');
-		    	// Hide the 'empty' item
-		    	$('.playlist-load-empty').hide();
+		    	if(!update)
+		    	{
+		    		// Register the play list id in a tag attribute!
+			    	$('#playlist-name').html(data.name+' <b class="caret"></b>').attr('data-playlist-id', data.id);
+			    	// Add list to load play lists.
+			    	$('#playlist-load').parent().parent()
+			    		.append('<li><a class="playlist-load-item" href="#" data-playlist-id="'+
+			    				data.id+'">'+data.name+'</a></li>');
+			    	// Hide the 'empty' item
+			    	$('.playlist-load-empty').hide();
+		    	}
 		    	appendSuccessAlert(data.message);
 		    },
 		  	error: defaultJsonErrorHandler,
@@ -102,12 +111,23 @@ function savePlaylist(){
 				+ '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">Save</button></div></div></fieldset></form>');
 		$('#playlist-saveForm').submit(function(e){
 			e.preventDefault();
-			func($(this).serialize());
+			func(false, $(this).serialize());
 		});
 		$('#modalBox').modal('show');
 	} else{
-		func('name='+elem.text().trim()+'&id='+id);
+		func(true, 'name='+elem.text().trim()+'&id='+id);
 	}
+}
+function serializePlaylistContents(tableRows){
+	var serializedString = '';
+	tableRows.each(function(idx){
+		var elem = $(this).find('a:first');
+		serializedString += '&contents['+idx+'].id='+
+			encodeURIComponent(elem.attr('data-track-id'))+
+			'&contents['+idx+'].provider='+
+			encodeURIComponent(elem.attr('data-provider-name'));
+	});
+	return serializedString;
 }
 function cleanPlaylist(){
 	$('#playlist-table tbody').empty();
@@ -242,7 +262,7 @@ $(document).ready(function(){
 	// Removing all the contents from the current play list.
 	$('#playlist-clean').click(function(){cleanPlaylist();});
 	// Remove the selected resource from the current play list.
-	$(document).on("click", "td > a.playlist-resource + a.remove", function(){removeTrack($(this).parent());});
+	$(document).on("click", "td > a.playlist-resource + a.remove", function(){removeTrack($(this).parent().parent());});
 	// Delete the current play list.
 	$('#playlist-delete').click(function(){deletePlaylist();});
 	// Get the list of user's play lists.
