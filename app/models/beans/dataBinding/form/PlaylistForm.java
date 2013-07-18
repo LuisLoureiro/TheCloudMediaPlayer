@@ -5,7 +5,7 @@ import play.data.validation.Constraints.Required;
 public class PlaylistForm
 {
 	private long id;
-	@Required(message="The name of the playlist cannot be null.")
+	@Required(message="form.playlistForm.nameRequired")
 	private String name;
 
 	public long getId() {

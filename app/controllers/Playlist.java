@@ -8,17 +8,17 @@ import models.beans.dataBinding.form.PlaylistForm;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import controllers.enums.SESSION;
-import controllers.operations.persistence.PersistPlaylist;
-
 import play.data.Form;
 import play.data.validation.ValidationError;
 import play.db.jpa.Transactional;
+import play.i18n.Lang;
 import play.i18n.Messages;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security.Authenticated;
+import controllers.enums.SESSION;
+import controllers.operations.persistence.PersistPlaylist;
 
 @Authenticated
 public class Playlist extends Controller
@@ -37,7 +37,7 @@ public class Playlist extends Controller
 	    Form<PlaylistForm> playlistForm = form(PlaylistForm.class).bindFromRequest();
 	    if(playlistForm.hasErrors())
 	    {
-	    	result.put("error", buildMessageFromValidationErrors(playlistForm));
+	    	result.put("error", buildMessageFromValidationErrors(playlistForm, ctx().lang()));
 	    	return badRequest(result);
 	    }
 	    PlaylistForm playlist = playlistForm.get();
@@ -55,7 +55,7 @@ public class Playlist extends Controller
 	{
 		// Check the value of the id parameter to execute the correct operation:
 		// * if == 0, return the user play lists: name & id
-		// * if != 0, return the list of contents related to the user play list: name & contents (name & id & provider)
+		// * if != 0, return the list of contents related to the user play list: name & contents (id & title & provider)
 		
 	    // Return a json object with the result of the operation.
 		ObjectNode result = Json.newObject();
@@ -90,7 +90,7 @@ public class Playlist extends Controller
 	}
 	
 	// TODO move to an Utils class!
-	private static <T> String buildMessageFromValidationErrors(Form<T> form)
+	private static <T> String buildMessageFromValidationErrors(Form<T> form, Lang lang)
 	{
 		StringBuilder errorString = new StringBuilder();
     	for(List<ValidationError> errors : form.errors().values())
@@ -99,7 +99,7 @@ public class Playlist extends Controller
     		{
     			if(errorString.length() > 0)
     				errorString.append(", ");
-    			errorString.append(error.message());
+    			errorString.append(Messages.get(lang, error.message()));
     		}
     	}
     	return errorString.toString();
