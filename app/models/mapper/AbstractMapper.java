@@ -1,9 +1,44 @@
 package models.mapper;
 
+import java.util.Collection;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import play.db.jpa.JPA;
 
 public abstract class AbstractMapper<K, V> implements IMapper<K, V>
 {
+	public abstract Class<V> getClazz();
+	
+	public V findById(K id)
+	{
+		return JPA.em().find(getClazz(), id);
+	}
+	
+	public Collection<V> findBy(String field, Object data)
+	{
+		CriteriaBuilder cbPlaylist = JPA.em().getCriteriaBuilder();
+		CriteriaQuery<V> cqPlaylist = cbPlaylist.createQuery(getClazz());
+		Root<V> playlist = cqPlaylist.from(getClazz());
+		return JPA.em().createQuery(
+				cqPlaylist.select(playlist)
+					.where(
+						cbPlaylist.equal(playlist.get(field), data)
+					)
+			).getResultList();
+	}
+	
+	public Collection<V> getAll()
+	{
+		CriteriaBuilder cbPlaylist = JPA.em().getCriteriaBuilder();
+		CriteriaQuery<V> cqPlaylist = cbPlaylist.createQuery(getClazz());
+		return JPA.em().createQuery(
+				cqPlaylist.select(cqPlaylist.from(getClazz()))
+			).getResultList();
+	}
+	
 	public void save(V object)
 	{
 		JPA.em().persist(object);

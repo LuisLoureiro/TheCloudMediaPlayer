@@ -17,7 +17,7 @@ public interface IMapper<T, V> {
 	 * @param data The value of the field used to search for.
 	 * @return All the objects that have the field equal to the value.
 	 */
-	Collection<V> findBy(String field, String data);
+	Collection<V> findBy(String field, Object data);
 	
 	/**
 	 * 
