@@ -230,8 +230,29 @@ function loadPlaylist(elem){
 	else appendErrorAlert("The selected play list doesn't have the id attribute.");
 }
 function appendLoadedContentsToPlayList(playlistBody, contents){
-	if(contents){
-		console.log(contents);
+	var notConnectedProviders = [];
+	$.each(contents, function(idx, elem){
+		// find the element in the user contents.
+		// Don't show if not present, i.e. user is not connected to Soundcloud and playlist has soundcloud tracks.
+		var htmlStringArray = $('#resources-list').find('li.nav-header').filter(
+				function(){return $(this).text().toLowerCase() == elem.provider;})
+			.nextUntil('.nav-header').find('[data-track-id="'+elem.id+'"]').each(
+				function(){
+					var $this=$(this);
+					playlistBody.append('<tr><td><a class="playlist-resource" data-track-id="'+$this.attr('data-track-id')+
+						'" data-provider-name="'+elem.provider+'" data-track-mimetype="'+$this.attr('data-track-mimetype')+
+						'" href="#">'+$this.text()+'</a><a href="#" class="remove pull-right">X</a></td></tr>')});
+		// Show a warning message to the user.
+		if(htmlStringArray.length == 0){
+			notConnectedProviders.push(elem.provider);
+		}
+	});
+	if(notConnectedProviders.length != 0){
+		// TODO Show the contents associating the provided.
+		// "Ensure that these contents are still present in their services or if they were not removed or renamed."
+		// Show a Modal window!
+		appendInfoAlert("Some contents weren't successfully loaded because you're not connected to the correspondent service provider. " +
+				"Connect to "+notConnectedProviders.join(', ')+' and refresh the play list contents.');
 	}
 }
 function defaultJsonErrorHandler(jqXHR, textStatus, errorThrown){
