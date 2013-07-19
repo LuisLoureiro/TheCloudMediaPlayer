@@ -2,21 +2,23 @@ package controllers;
 
 import static play.data.Form.form;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Map.Entry;
 
 import models.beans.dataBinding.form.PlaylistForm;
+import models.beans.dataBinding.form.PlaylistForm.Content;
 
 import org.codehaus.jackson.node.ObjectNode;
 
 import play.data.Form;
-import play.data.validation.ValidationError;
 import play.db.jpa.Transactional;
-import play.i18n.Lang;
 import play.i18n.Messages;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security.Authenticated;
+import utils.Utils;
 import controllers.enums.SESSION;
 import controllers.operations.persistence.PersistPlaylist;
 
@@ -37,12 +39,22 @@ public class Playlist extends Controller
 	    Form<PlaylistForm> playlistForm = form(PlaylistForm.class).bindFromRequest();
 	    if(playlistForm.hasErrors())
 	    {
-	    	result.put("error", buildMessageFromValidationErrors(playlistForm, ctx().lang()));
+	    	result.put("error", Utils.buildMessageFromValidationErrors(playlistForm, ctx().lang()));
 	    	return badRequest(result);
 	    }
 	    PlaylistForm playlist = playlistForm.get();
 	    
-	    long id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getId(), playlist.getName(), ctx().lang());
+	    long id = PersistPlaylist.savePlaylist(
+	    		session(SESSION.USERNAME.toString()), playlist.getId(), playlist.getName(),
+	    		Utils.transform(playlist.getContents(), new Utils.ITransform<PlaylistForm.Content, Entry<String, String>>()
+	    				{
+							@Override
+							public Entry<String, String> transform(Content elem)
+							{
+								return new SimpleEntry<String, String>(elem.getId(), elem.getProvider());
+							}
+						}
+	    		), ctx().lang());
 	    
 		result.put("name", playlist.getName());
 		result.put("id", id);
@@ -62,15 +74,15 @@ public class Playlist extends Controller
 		
 		if(id == 0)
 		{
-			List<models.beans.dataBinding.Playlist> playLists = PersistPlaylist.loadPlaylists(session(SESSION.USERNAME.toString()));
+			List<models.beans.dataObject.Playlist> playLists = PersistPlaylist.loadPlaylists(session(SESSION.USERNAME.toString()));
 			result.put("playlists", Json.toJson(playLists));
 		}
 		else
 		{
-			models.beans.dataBinding.Playlist playList = PersistPlaylist.loadPlaylist(session(SESSION.USERNAME.toString()), id, ctx().lang());
+			models.beans.dataObject.Playlist playList = PersistPlaylist.loadPlaylist(session(SESSION.USERNAME.toString()), id, ctx().lang());
 			result.put("id", playList.getId());
 			result.put("title", playList.getTitle());
-			result.put("contents", Json.toJson(playList.getTracks()));
+			result.put("contents", Json.toJson(playList.getContents()));
 			result.put("message", Messages.get("user.playList.load.successMessage", playList.getTitle()));
 		}
 	    
@@ -87,21 +99,5 @@ public class Playlist extends Controller
 
 		result.put("message", Messages.get("user.playList.delete.successMessage", name));
 		return ok(result);
-	}
-	
-	// TODO move to an Utils class!
-	private static <T> String buildMessageFromValidationErrors(Form<T> form, Lang lang)
-	{
-		StringBuilder errorString = new StringBuilder();
-    	for(List<ValidationError> errors : form.errors().values())
-    	{
-    		for(ValidationError error : errors)
-    		{
-    			if(errorString.length() > 0)
-    				errorString.append(", ");
-    			errorString.append(Messages.get(lang, error.message()));
-    		}
-    	}
-    	return errorString.toString();
 	}
 }

@@ -2,34 +2,42 @@ package controllers.operations.persistence;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.persistence.PersistenceException;
 
+import models.db.Content;
 import models.db.Playlist;
+import models.db.PlaylistContent;
 import models.db.User;
+import models.db.compositeKeys.ContentKey;
+import models.mapper.ContentMapper;
 import models.mapper.IMapper;
 import models.mapper.PlaylistMapper;
 import models.mapper.UserMapper;
 import play.i18n.Lang;
 import play.i18n.Messages;
+import utils.Utils;
 
 public class PersistPlaylist
 {
-	public static long savePlaylist(String userId, long id, String name, Lang lang) throws Exception
+	public static long savePlaylist(String userId, long id, String name, List<Entry<String,String>> contents, Lang lang) throws Exception
 	{
 		IMapper<Long, Playlist> mapper = new PlaylistMapper();
-		
-		User user = new UserMapper().findById(userId);
-		
-		Playlist playlist = new Playlist();
-		playlist.setName(name);
-		playlist.setUser(user);
-		user.getPlaylists().add(playlist);
+		Playlist playlist = null;
 		
 		if(id == 0)
 		{
 			try
 			{
+				playlist = new Playlist();
+				playlist.setName(name);
+				playlist.setContents(getPlaylistContents(playlist, contents));
+
+				User user = new UserMapper().findById(userId);
+				playlist.setUser(user);
+				user.getPlaylists().add(playlist);
+				
 				mapper.save(playlist);
 				/* Java EE 6 tutorial : "The state of persistent entities is synchronized to the database
 				 *  when the transaction with which the entity is associated commits."
@@ -49,7 +57,10 @@ public class PersistPlaylist
 		}
 		else
 		{
-			playlist.setId(id);
+			playlist = mapper.findById(id);
+			playlist.setName(name);
+			playlist.setContents(getPlaylistContents(playlist, contents));
+			
 			mapper.update(playlist);
 		}
 		
@@ -61,13 +72,13 @@ public class PersistPlaylist
 	 * @param userId
 	 * @return all the play lists of the specified user: id and name.
 	 */
-	public static List<models.beans.dataBinding.Playlist> loadPlaylists(String userId)
+	public static List<models.beans.dataObject.Playlist> loadPlaylists(String userId)
 	{
-		List<models.beans.dataBinding.Playlist> userPlayLists = new LinkedList<models.beans.dataBinding.Playlist>();
+		List<models.beans.dataObject.Playlist> userPlayLists = new LinkedList<models.beans.dataObject.Playlist>();
 		
 		for(Playlist playlist : new UserMapper().findById(userId).getPlaylists())
 		{
-			models.beans.dataBinding.Playlist returningPlaylist = new models.beans.dataBinding.Playlist();
+			models.beans.dataObject.Playlist returningPlaylist = new models.beans.dataObject.Playlist();
 			returningPlaylist.setId(playlist.getId());
 			returningPlaylist.setTitle(playlist.getName());
 			
@@ -77,15 +88,28 @@ public class PersistPlaylist
 		return userPlayLists;
 	}
 	
-	public static models.beans.dataBinding.Playlist loadPlaylist(String userId, long playlistId, Lang lang) throws Exception
+	public static models.beans.dataObject.Playlist loadPlaylist(String userId, long playlistId, Lang lang) throws Exception
 	{
 		Playlist playlist = new PlaylistMapper().findById(playlistId);
 		verifyPlaylist(playlist, userId, lang);
 
-		models.beans.dataBinding.Playlist returnPlaylist = new models.beans.dataBinding.Playlist();
+		models.beans.dataObject.Playlist returnPlaylist = new models.beans.dataObject.Playlist();
 		returnPlaylist.setId(playlist.getId());
 		returnPlaylist.setTitle(playlist.getName());
-		// TODO contents!
+		returnPlaylist.setContents(Utils.transform(playlist.getContents(),
+				new Utils.ITransform<PlaylistContent, models.beans.dataObject.Content>()
+				{
+					@Override
+					public models.beans.dataObject.Content transform(PlaylistContent elem)
+					{
+						models.beans.dataObject.Content content = new models.beans.dataObject.Content();
+						ContentKey contentKey = elem.getContent().getKey();
+						content.setId(contentKey.getId());
+						content.setProvider(contentKey.getProvider());
+						return content;
+					}
+				}
+			));
 		
 		return returnPlaylist;
 	}
@@ -99,6 +123,7 @@ public class PersistPlaylist
 		playlist.getUser().getPlaylists().remove(playlist);
 		mapper.delete(playlist);
 		// TODO beware with the contents! Just delete the contents that don't belong to any play list.
+		// See http://docs.oracle.com/javaee/6/tutorial/doc/bnbqa.html#giqxy
 		
 		return playlist.getName();
 	}
@@ -107,5 +132,27 @@ public class PersistPlaylist
 	{
 		if(playlist == null || !userId.equals(playlist.getUser().getId()))
 			throw new Exception(Messages.get(lang, "user.playList.errors.invalidIdOrUserId"));
+	}
+	
+	private static List<PlaylistContent> getPlaylistContents(Playlist playlist, List<Entry<String,String>> contents)
+	{
+		List<PlaylistContent> playlistContents = new LinkedList<PlaylistContent>();
+		for (int i = 0; i < contents.size(); i++)
+		{
+			// Find content in the database.
+			ContentKey key = new ContentKey(contents.get(i).getKey(), contents.get(i).getValue());
+			Content content = new ContentMapper().findById(key);
+			if(content == null)
+			{
+				content = new Content(key, new LinkedList<PlaylistContent>());
+			}
+			
+			PlaylistContent playlistContent = new PlaylistContent(i+1, content, playlist);
+			playlistContents.add(playlistContent);
+			// TODO add the playlistcontent to the content list!
+//			content.getPlaylists().add(playlistContent);
+		}
+		
+		return playlistContents;
 	}
 }
