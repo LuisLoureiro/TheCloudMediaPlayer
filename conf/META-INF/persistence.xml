@@ -10,6 +10,8 @@
         <class>models.db.OAuth1User</class>
 		<class>models.db.OAuth1Token</class>
 		<class>models.db.Playlist</class>
+		<class>models.db.Content</class>
+		<class>models.db.PlaylistContent</class>
         <properties>
 			<property name="eclipselink.target-database" value="PostgreSQL"/>
 			<property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
