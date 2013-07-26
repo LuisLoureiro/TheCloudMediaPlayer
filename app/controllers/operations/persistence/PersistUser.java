@@ -33,11 +33,8 @@ public class PersistUser {
 			user = new User();
 			user.setId(userId);
 			user.setEmail(userEmail);
-			if(existingRecord != null) 
-			{
-				user.setFirstAuth(existingRecord);
-				existingRecord.getRelatedAuth().add(user);
-			}
+			user.setFirstAuth(existingRecord);
+			
 			mapper.save(user);
 		}
 	}

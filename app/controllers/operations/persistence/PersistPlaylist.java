@@ -9,7 +9,6 @@ import javax.persistence.PersistenceException;
 import models.db.Content;
 import models.db.Playlist;
 import models.db.PlaylistContent;
-import models.db.User;
 import models.db.compositeKeys.ContentKey;
 import models.mapper.ContentMapper;
 import models.mapper.IMapper;
@@ -21,7 +20,8 @@ import utils.Utils;
 
 public class PersistPlaylist
 {
-	public static long savePlaylist(String userId, long id, String name, List<Entry<String,String>> contents, Lang lang) throws Exception
+	public static long savePlaylist(long id, String userId, String name, List<Entry<String, String>> contents, Lang lang)
+			throws Exception
 	{
 		IMapper<Long, Playlist> mapper = new PlaylistMapper();
 		Playlist playlist = null;
@@ -30,22 +30,19 @@ public class PersistPlaylist
 		{
 			try
 			{
-				playlist = new Playlist();
-				playlist.setName(name);
-				playlist.setContents(getPlaylistContents(playlist, contents));
-
-				User user = new UserMapper().findById(userId);
-				playlist.setUser(user);
-				user.getPlaylists().add(playlist);
-				
+				playlist = new Playlist(0, name, new UserMapper().findById(userId), getPlaylistContents(playlist,
+						contents));
 				mapper.save(playlist);
-				/* Java EE 6 tutorial : "The state of persistent entities is synchronized to the database
-				 *  when the transaction with which the entity is associated commits."
-				 *  
+				/*
+				 * Java EE 6 tutorial : "The state of persistent entities is
+				 * synchronized to the database when the transaction with which
+				 * the entity is associated commits."
+				 * 
 				 * We need to force synchronization to get the play list id.
 				 */
 				mapper.sync();
-			} catch(PersistenceException e)
+			}
+			catch(PersistenceException e)
 			{
 				if(e.getMessage().contains("unique constraint"))
 				{
@@ -88,11 +85,12 @@ public class PersistPlaylist
 		return userPlayLists;
 	}
 	
-	public static models.beans.dataObject.Playlist loadPlaylist(String userId, long playlistId, Lang lang) throws Exception
+	public static models.beans.dataObject.Playlist loadPlaylist(String userId, long playlistId, Lang lang)
+			throws Exception
 	{
 		Playlist playlist = new PlaylistMapper().findById(playlistId);
 		verifyPlaylist(playlist, userId, lang);
-
+		
 		models.beans.dataObject.Playlist returnPlaylist = new models.beans.dataObject.Playlist();
 		returnPlaylist.setId(playlist.getId());
 		returnPlaylist.setTitle(playlist.getName());
@@ -108,8 +106,7 @@ public class PersistPlaylist
 						content.setProvider(contentKey.getProvider());
 						return content;
 					}
-				}
-			));
+				}));
 		
 		return returnPlaylist;
 	}
@@ -122,7 +119,8 @@ public class PersistPlaylist
 		
 		playlist.getUser().getPlaylists().remove(playlist);
 		mapper.delete(playlist);
-		// TODO beware with the contents! Just delete the contents that don't belong to any play list.
+		// TODO beware with the contents! Just delete the contents that don't
+		// belong to any play list.
 		// See http://docs.oracle.com/javaee/6/tutorial/doc/bnbqa.html#giqxy
 		
 		return playlist.getName();
@@ -134,23 +132,26 @@ public class PersistPlaylist
 			throw new Exception(Messages.get(lang, "user.playList.errors.invalidIdOrUserId"));
 	}
 	
-	private static List<PlaylistContent> getPlaylistContents(Playlist playlist, List<Entry<String,String>> contents)
+	private static List<PlaylistContent> getPlaylistContents(Playlist playlist, List<Entry<String, String>> contents)
 	{
 		List<PlaylistContent> playlistContents = new LinkedList<PlaylistContent>();
-		for (int i = 0; i < contents.size(); i++)
+		if(contents != null)
 		{
-			// Find content in the database.
-			ContentKey key = new ContentKey(contents.get(i).getKey(), contents.get(i).getValue());
-			Content content = new ContentMapper().findById(key);
-			if(content == null)
+			for(int i = 0; i < contents.size(); i++)
 			{
-				content = new Content(key, new LinkedList<PlaylistContent>());
+				// Find content in the database.
+				ContentKey key = new ContentKey(contents.get(i).getKey(), contents.get(i).getValue());
+				Content content = new ContentMapper().findById(key);
+				if(content == null)
+				{
+					content = new Content(key, new LinkedList<PlaylistContent>());
+				}
+				//
+				// PlaylistContent playlistContent = new PlaylistContent(i + 1,
+				// content, playlist);
+				// playlistContents.add(playlistContent);
+				playlistContents.add(new PlaylistContent(i + 1, content, playlist));
 			}
-			
-			PlaylistContent playlistContent = new PlaylistContent(i+1, content, playlist);
-			playlistContents.add(playlistContent);
-			// TODO add the playlistcontent to the content list!
-//			content.getPlaylists().add(playlistContent);
 		}
 		
 		return playlistContents;
