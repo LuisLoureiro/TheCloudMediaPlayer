@@ -16,6 +16,24 @@
 			<property name="eclipselink.target-database" value="PostgreSQL"/>
 			<property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
 			<property name="eclipselink.ddl-generation.output-mode" value="database"/>
+			<property name="eclipselink.logging.level" value="WARNING"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="persistenceUnitTest" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <non-jta-data-source>DefaultDS</non-jta-data-source>
+        <class>models.db.User</class>
+        <class>models.db.OAuth2User</class>
+        <class>models.db.OAuth1User</class>
+        <class>models.db.OAuth1Token</class>
+        <class>models.db.Playlist</class>
+        <class>models.db.Content</class>
+        <class>models.db.PlaylistContent</class>
+        <properties>
+            <property name="eclipselink.target-database" value="PostgreSQL"/>
+            <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+            <property name="eclipselink.ddl-generation.output-mode" value="database"/>
+            <property name="eclipselink.logging.level" value="WARNING"/>
         </properties>
     </persistence-unit>
 </persistence>
