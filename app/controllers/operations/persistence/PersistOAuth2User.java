@@ -45,16 +45,9 @@ public class PersistOAuth2User {
 			user.setRefreshToken(token.getRefreshToken());
 			user.setExpiresIn(token.getExpiresIn());
 			// Create relationship
-			if(existingRecord != null) 
-			{
-				user.setEmail(existingRecord.getEmail());
-				user.setFirstAuth(existingRecord);
-				existingRecord.getRelatedAuth().add(user);
-			}
-			else
-			{
-				user.setEmail(token.getEmail());
-			}
+			user.setFirstAuth(existingRecord);
+			user.setEmail(token.getEmail());
+			
 			oauth2Mapper.save(user);
 		} else {
 			// Update existing oauth2 user.

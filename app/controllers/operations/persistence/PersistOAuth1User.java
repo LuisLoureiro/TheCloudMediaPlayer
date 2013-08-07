@@ -44,16 +44,9 @@ public class PersistOAuth1User {
 			user.setOauthToken(token.getAccessToken());
 			user.setOauthTokenSecret(token.getRefreshToken());
 			// Create relationship
-			if(existingRecord != null) 
-			{
-				user.setEmail(existingRecord.getEmail());
-				user.setFirstAuth(existingRecord);
-				existingRecord.getRelatedAuth().add(user);
-			}
-			else
-			{
-				user.setEmail(token.getEmail());
-			}
+			user.setFirstAuth(existingRecord);
+			user.setEmail(token.getEmail());
+			
 			oauth1Mapper.save(user);
 		} else {
 			// Update existing oauth1 user.
