@@ -19,23 +19,33 @@ public abstract class AbstractMapper<K, V> implements IMapper<K, V>
 	
 	public Collection<V> findBy(String field, Object data)
 	{
-		CriteriaBuilder cbPlaylist = JPA.em().getCriteriaBuilder();
-		CriteriaQuery<V> cqPlaylist = cbPlaylist.createQuery(getClazz());
-		Root<V> playlist = cqPlaylist.from(getClazz());
+		CriteriaBuilder cBuilder = JPA.em().getCriteriaBuilder();
+		CriteriaQuery<V> cQuery = cBuilder.createQuery(getClazz());
+		Root<V> root = cQuery.from(getClazz());
 		return JPA.em().createQuery(
-				cqPlaylist.select(playlist)
+				cQuery.select(root)
 					.where(
-						cbPlaylist.equal(playlist.get(field), data)
+						cBuilder.equal(root.get(field), data)
 					)
 			).getResultList();
 	}
 	
+	public CriteriaBuilder getQueryBuilder()
+	{
+		return JPA.em().getCriteriaBuilder();
+	}
+	
+	public Collection<V> executeQuery(CriteriaQuery<V> query)
+	{
+		return JPA.em().createQuery(query).getResultList();
+	}
+	
 	public Collection<V> getAll()
 	{
-		CriteriaBuilder cbPlaylist = JPA.em().getCriteriaBuilder();
-		CriteriaQuery<V> cqPlaylist = cbPlaylist.createQuery(getClazz());
+		CriteriaBuilder cBuilder = JPA.em().getCriteriaBuilder();
+		CriteriaQuery<V> cQuery = cBuilder.createQuery(getClazz());
 		return JPA.em().createQuery(
-				cqPlaylist.select(cqPlaylist.from(getClazz()))
+				cQuery.select(cQuery.from(getClazz()))
 			).getResultList();
 	}
 	

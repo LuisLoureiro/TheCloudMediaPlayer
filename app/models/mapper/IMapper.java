@@ -2,6 +2,9 @@ package models.mapper;
 
 import java.util.Collection;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+
 public interface IMapper<T, V> {
 
 	/**
@@ -19,6 +22,18 @@ public interface IMapper<T, V> {
 	 */
 	Collection<V> findBy(String field, Object data);
 	
+	/**
+	 * 
+	 * @return An object to use for the creation of Criteria API queries.
+	 */
+	CriteriaBuilder getQueryBuilder();
+	
+	/**
+	 * 
+	 * @param query Criteria API query to execute in the database.
+	 * @return The result of the query execution.
+	 */
+	Collection<V> executeQuery(CriteriaQuery<V> query);
 	/**
 	 * 
 	 * @return All the existing objects.
