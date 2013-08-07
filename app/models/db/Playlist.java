@@ -1,12 +1,14 @@
 package models.db;
 
+import static javax.persistence.CascadeType.ALL;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,27 +17,32 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 
+import models.db.listeners.PlaylistListener;
 import play.data.validation.Constraints.Required;
 
 @Entity(name = "playlists")
 @Table(uniqueConstraints = @UniqueConstraint(name = "unique_name_user_id", columnNames = { "name", "user_id" }))
+@EntityListeners({PlaylistListener.class})
 public class Playlist
 {
+	@Version
+	private long version;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long					id;
 	
 	@Column(nullable = false)
-	@Required(message = "The name of the play list must be defined!")
+	@Required(message = "playlist.nameRequired")
 	private String					name;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User					user;
 	
-	@OneToMany(cascade = { CascadeType.ALL }, mappedBy = "playlist", orphanRemoval = true)
-	@Required(message = "user.playList.notNull")
+	@OneToMany(cascade = { ALL }, mappedBy = "playlist")
 	private List<PlaylistContent>	contents;
 	
 	public Playlist()
@@ -49,6 +56,11 @@ public class Playlist
 		setName(name);
 		setUser(user);
 		setContents(contents);
+	}
+	
+	public long getVersion()
+	{
+		return version;
 	}
 	
 	public long getId()
@@ -102,9 +114,11 @@ public class Playlist
 			{
 				for(Iterator<PlaylistContent> itr = this.contents.iterator(); itr.hasNext();)
 				{
-					PlaylistContent playlistContent = itr.next();
+					PlaylistContent playlistContent = 
+							itr.next();
 					itr.remove();
-					playlistContent.setPlaylist(null);
+//					// Delete relationship
+					playlistContent.getContent().removePlaylist(playlistContent);
 				}
 			}
 			if(contents != null)
@@ -134,7 +148,8 @@ public class Playlist
 		if(content != null && this.contents.contains(content))
 		{
 			this.contents.remove(content);
-			content.setPlaylist(null);
+			// Delete relationship
+			content.getContent().removePlaylist(content);
 		}
 	}
 }

@@ -1,27 +1,33 @@
 package models.db;
 
+import static javax.persistence.CascadeType.ALL;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 import models.db.compositeKeys.ContentKey;
-import play.data.validation.Constraints.Required;
+import models.db.listeners.ContentListener;
 
-@Entity(name="contents")
+@Entity(name = "contents")
+@EntityListeners({ContentListener.class})
 public class Content
 {
-	@EmbeddedId
-	private ContentKey key;
+	@Version
+	private long version;
 	
-	@OneToMany(cascade={CascadeType.ALL}, mappedBy="content")
-	@Required(message="user.playList.notNull")
-	private List<PlaylistContent> playlists;
-
+	@EmbeddedId
+	private ContentKey				key;
+	
+	@OneToMany(cascade = { ALL }, mappedBy = "content", orphanRemoval=true)
+	private List<PlaylistContent>	playlists;
+	
 	public Content()
 	{
 		this(null, new LinkedList<PlaylistContent>());
@@ -33,18 +39,26 @@ public class Content
 		setPlaylists(playlists);
 	}
 	
+	public long getVersion()
+	{
+		return version;
+	}
+	
 	public ContentKey getKey()
 	{
 		return key;
 	}
+	
 	public void setKey(ContentKey key)
 	{
 		this.key = key;
 	}
+	
 	public List<PlaylistContent> getPlaylists()
 	{
 		return playlists;
 	}
+	
 	public void setPlaylists(List<PlaylistContent> playlists)
 	{
 		if(this.playlists != playlists)
@@ -53,9 +67,11 @@ public class Content
 			{
 				for(Iterator<PlaylistContent> itr = this.playlists.iterator(); itr.hasNext();)
 				{
-					PlaylistContent playlistContent = itr.next();
+					PlaylistContent playlistContent = 
+							itr.next();
 					itr.remove();
-					playlistContent.setPlaylist(null);
+//					// Delete relationship
+					playlistContent.getPlaylist().removeContent(playlistContent);
 				}
 			}
 			if(playlists != null)
@@ -85,7 +101,8 @@ public class Content
 		if(playlist != null && this.playlists.contains(playlist))
 		{
 			this.playlists.remove(playlist);
-			playlist.setContent(null);
+			// Delete relationship
+			playlist.getPlaylist().removeContent(playlist);
 		}
 	}
 }
