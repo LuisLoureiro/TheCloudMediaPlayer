@@ -44,21 +44,28 @@ public class Playlist extends Controller
 	    }
 	    PlaylistForm playlist = playlistForm.get();
 	    
-	    long id = PersistPlaylist.savePlaylist(
-	    		session(SESSION.USERNAME.toString()), playlist.getId(), playlist.getName(),
-	    		Utils.transform(playlist.getContents(), new Utils.ITransform<PlaylistForm.Content, Entry<String, String>>()
-	    				{
-							@Override
-							public Entry<String, String> transform(Content elem)
-							{
-								return new SimpleEntry<String, String>(elem.getId(), elem.getProvider());
-							}
-						}
-	    		), ctx().lang());
+	    long id = playlist.getId();
+	    Utils.ITransform<PlaylistForm.Content, Entry<String, String>> transform = new Utils.ITransform<PlaylistForm.Content, Entry<String, String>>()
+		{
+			@Override
+			public Entry<String, String> transform(Content elem)
+			{
+				return new SimpleEntry<String, String>(elem.getId(), elem.getProvider());
+			}
+		};
+	    if(id == 0)
+	    {
+	    	id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getName(),
+		    		Utils.transform(playlist.getContents(), transform), ctx().lang());
+	    	result.put("message", Messages.get("user.playList.save.createdSuccessfully"));
+	    }
+	    else {
+	    	PersistPlaylist.updatePlaylist(id, Utils.transform(playlist.getContents(), transform), ctx().lang());
+	    	result.put("message", Messages.get("user.playList.save.updatedSuccessfully"));
+	    }
 	    
 		result.put("name", playlist.getName());
 		result.put("id", id);
-		result.put("message", Messages.get(playlist.getId() == 0 ? "user.playList.save.createdSuccessfully" : "user.playList.save.updatedSuccessfully"));
 		return created(result);
 	}
 	
