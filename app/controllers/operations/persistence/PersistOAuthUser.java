@@ -27,7 +27,7 @@ public class PersistOAuthUser
 		if(user == null)
 			return null;
 		
-		for(User relatedUser : user.getRelatedAuth())
+		for(User relatedUser : user.getRelatedUsers())
 		{
 			/**
 			 * TODO because of the possibility of relationship between different authentication users (with email address)
@@ -73,7 +73,7 @@ public class PersistOAuthUser
 		User user = userMapper.findById(userId);
 		if(user != null)
 		{
-			for(User relatedUser : user.getRelatedAuth())
+			for(User relatedUser : user.getRelatedUsers())
 			{
 				OAuthUser relatedOAuthUser = (OAuthUser)relatedUser; // TODO create generalisation in the database
 				if(providerName.equals(relatedOAuthUser.getProviderName()))
