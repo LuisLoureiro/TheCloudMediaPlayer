@@ -20,48 +20,48 @@ import utils.Utils;
 
 public class PersistPlaylist
 {
-	public static long savePlaylist(long id, String userId, String name, List<Entry<String, String>> contents, Lang lang)
+	public static long savePlaylist(String userId, String name, List<Entry<String, String>> contents, Lang lang)
 			throws Exception
 	{
 		IMapper<Long, Playlist> mapper = new PlaylistMapper();
 		Playlist playlist = null;
 		
-		if(id == 0)
+		try
 		{
-			try
-			{
-				playlist = new Playlist(0, name, new UserMapper().findById(userId), getPlaylistContents(playlist,
-						contents));
-				mapper.save(playlist);
-				/*
-				 * Java EE 6 tutorial : "The state of persistent entities is
-				 * synchronized to the database when the transaction with which
-				 * the entity is associated commits."
-				 * 
-				 * We need to force synchronization to get the play list id.
-				 */
-				mapper.sync();
-			}
-			catch(PersistenceException e)
-			{
-				if(e.getMessage().contains("unique constraint"))
-				{
-					throw new Exception(Messages.get(lang, "user.playList.errors.uniqueConstraintViolation"));
-				}
-				else
-					throw new Exception(e);
-			}
+			playlist = new Playlist(0, name, new UserMapper().findById(userId), null);
+			updatePlaylistContents(playlist, contents);
+			mapper.save(playlist);
+			/*
+			 * Java EE 6 tutorial : "The state of persistent entities is
+			 * synchronized to the database when the transaction with which
+			 * the entity is associated commits."
+			 * 
+			 * We need to force synchronization to get the play list id.
+			 */
+			mapper.sync();
 		}
-		else
+		catch(PersistenceException e)
 		{
-			playlist = mapper.findById(id);
-			playlist.setName(name);
-			playlist.setContents(getPlaylistContents(playlist, contents));
-			
-			mapper.update(playlist);
+			if(e.getMessage().toLowerCase().contains("unique"))
+			{
+				throw new Exception(Messages.get(lang, "user.playList.errors.uniqueConstraintViolation"));
+			}
+			else
+				throw new Exception(e);
 		}
 		
 		return playlist.getId();
+	}
+	
+	public static void updatePlaylist(long id, List<Entry<String, String>> contents, Lang lang)
+	{
+		IMapper<Long, Playlist> mapper = new PlaylistMapper(); // TODO class Static field
+		
+		Playlist playlist = mapper.findById(id);
+		updatePlaylistContents(playlist, contents);
+		mapper.update(playlist);
+		
+		PersistContent.deleteOrphanContents();
 	}
 	
 	/**
@@ -117,11 +117,11 @@ public class PersistPlaylist
 		Playlist playlist = mapper.findById(playlistId);
 		verifyPlaylist(playlist, userId, lang);
 		
-		playlist.getUser().getPlaylists().remove(playlist);
+		playlist.setUser(null);
+		playlist.setContents(null);
 		mapper.delete(playlist);
-		// TODO beware with the contents! Just delete the contents that don't
-		// belong to any play list.
-		// See http://docs.oracle.com/javaee/6/tutorial/doc/bnbqa.html#giqxy
+		
+		PersistContent.deleteOrphanContents();
 		
 		return playlist.getName();
 	}
@@ -132,28 +132,25 @@ public class PersistPlaylist
 			throw new Exception(Messages.get(lang, "user.playList.errors.invalidIdOrUserId"));
 	}
 	
-	private static List<PlaylistContent> getPlaylistContents(Playlist playlist, List<Entry<String, String>> contents)
+	private static void updatePlaylistContents(Playlist playlist, List<Entry<String, String>> contents)
 	{
 		List<PlaylistContent> playlistContents = new LinkedList<PlaylistContent>();
 		if(contents != null)
 		{
+			IMapper<ContentKey, Content> mapper =  new ContentMapper();
 			for(int i = 0; i < contents.size(); i++)
 			{
 				// Find content in the database.
 				ContentKey key = new ContentKey(contents.get(i).getKey(), contents.get(i).getValue());
-				Content content = new ContentMapper().findById(key);
+				Content content = mapper.findById(key);
 				if(content == null)
 				{
 					content = new Content(key, new LinkedList<PlaylistContent>());
+					mapper.save(content);
 				}
-				//
-				// PlaylistContent playlistContent = new PlaylistContent(i + 1,
-				// content, playlist);
-				// playlistContents.add(playlistContent);
 				playlistContents.add(new PlaylistContent(i + 1, content, playlist));
 			}
 		}
-		
-		return playlistContents;
+		playlist.setContents(playlistContents);
 	}
 }
