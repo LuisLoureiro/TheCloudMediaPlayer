@@ -45,5 +45,7 @@ user.playList.header.name=Name
 user.playList.errors.uniqueConstraintViolation=There''s a play list with the exact same name. Please choose a different one.
 user.playList.errors.invalidIdOrUserId=The supplied play list ID doesn''t exists or doesn''t match the indicated user.
 
+playlist.nameRequired=The name of the play list must be defined!
+
 form.playlistForm.nameRequired=The name of the play list cannot be null.
 form.playlistForm.contentsRequired=The play list cannot be empty.
