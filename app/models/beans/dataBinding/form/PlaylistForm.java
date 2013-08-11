@@ -9,8 +9,9 @@ public class PlaylistForm
 	private long id;
 	@Required(message="form.playlistForm.nameRequired")
 	private String name;
-	@Required(message="form.playlistForm.contentsRequired")
-	private List<Content> contents;
+//	@Required(message="form.playlistForm.contentsRequired")
+	private List<Content> contentsToAdd;
+	private List<Content> contentsToRemove;
 
 	public long getId() {
 		return id;
@@ -24,18 +25,35 @@ public class PlaylistForm
 	public void setName(String name) {
 		this.name = name;
 	}
-	public List<Content> getContents() {
-		return contents;
+	public List<Content> getContentsToAdd() {
+		return contentsToAdd;
 	}
-	public void setContents(List<Content> contents) {
-		this.contents = contents;
+	public void setContentsToAdd(List<Content> contentsToAdd) {
+		this.contentsToAdd = contentsToAdd;
 	}
-	
+	public List<Content> getContentsToRemove()
+	{
+		return contentsToRemove;
+	}
+	public void setContentsToRemove(List<Content> contentsToRemove)
+	{
+		this.contentsToRemove = contentsToRemove;
+	}
+
 	public static class Content
 	{
-		private String id;
-		private String provider;
-		
+		private int idx;
+		private String id
+				, provider;
+
+		public int getIdx()
+		{
+			return idx;
+		}
+		public void setIdx(int idx)
+		{
+			this.idx = idx;
+		}
 		public String getId() {
 			return id;
 		}

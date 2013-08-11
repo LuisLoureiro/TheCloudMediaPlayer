@@ -54,11 +54,12 @@ public class Playlist extends Controller
 	    if(id == 0)
 	    {
 	    	id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getName(),
-		    		Utils.transform(playlist.getContents(), transform), ctx().lang());
+		    		Utils.transform(playlist.getContentsToAdd(), transform), ctx().lang());
 	    	result.put("message", Messages.get("user.playList.save.createdSuccessfully"));
 	    }
 	    else {
-	    	PersistPlaylist.updatePlaylist(id, Utils.transform(playlist.getContents(), transform), ctx().lang());
+	    	PersistPlaylist.updatePlaylist(id, Utils.transform(playlist.getContentsToAdd(), transform)
+	    			, Utils.transform(playlist.getContentsToRemove(), transform), ctx().lang());
 	    	result.put("message", Messages.get("user.playList.save.updatedSuccessfully"));
 	    }
 	    
