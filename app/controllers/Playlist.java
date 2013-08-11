@@ -2,9 +2,7 @@ package controllers;
 
 import static play.data.Form.form;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
-import java.util.Map.Entry;
 
 import models.beans.dataBinding.form.PlaylistForm;
 import models.beans.dataBinding.form.PlaylistForm.Content;
@@ -45,12 +43,12 @@ public class Playlist extends Controller
 	    PlaylistForm playlist = playlistForm.get();
 	    
 	    long id = playlist.getId();
-	    Utils.ITransform<PlaylistForm.Content, Entry<String, String>> transform = new Utils.ITransform<PlaylistForm.Content, Entry<String, String>>()
+		Utils.ITransform<PlaylistForm.Content, controllers.operations.persistence.dataObjects.Content> transform = new Utils.ITransform<PlaylistForm.Content, controllers.operations.persistence.dataObjects.Content>()
 		{
 			@Override
-			public Entry<String, String> transform(Content elem)
+			public controllers.operations.persistence.dataObjects.Content transform(Content elem)
 			{
-				return new SimpleEntry<String, String>(elem.getId(), elem.getProvider());
+				return new controllers.operations.persistence.dataObjects.Content(elem.getIdx(), elem.getId(), elem.getProvider());
 			}
 		};
 	    if(id == 0)
