@@ -1,8 +1,9 @@
 package controllers.operations.persistence;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.persistence.PersistenceException;
 
@@ -10,27 +11,38 @@ import models.db.Content;
 import models.db.Playlist;
 import models.db.PlaylistContent;
 import models.db.compositeKeys.ContentKey;
-import models.mapper.ContentMapper;
+import models.db.compositeKeys.PlaylistContentKey;
 import models.mapper.IMapper;
+import models.mapper.PlaylistContentMapper;
 import models.mapper.PlaylistMapper;
 import models.mapper.UserMapper;
 import play.i18n.Lang;
 import play.i18n.Messages;
 import utils.Utils;
+import utils.Utils.IPredicate;
+import utils.Utils.ITransform;
 
 public class PersistPlaylist
 {
-	public static long savePlaylist(String userId, String name, List<Entry<String, String>> contents, Lang lang)
+	private static final IMapper<Long, Playlist> MAPPER = new PlaylistMapper();
+	
+	public static long savePlaylist(String userId, String name, List<controllers.operations.persistence.dataObjects.Content> contents, Lang lang)
 			throws Exception
 	{
-		IMapper<Long, Playlist> mapper = new PlaylistMapper();
-		Playlist playlist = null;
-		
 		try
 		{
-			playlist = new Playlist(0, name, new UserMapper().findById(userId), null);
-			updatePlaylistContents(playlist, contents);
-			mapper.save(playlist);
+			final Playlist playlist = new Playlist(0, name, new UserMapper().findById(userId), null);
+			updatePlaylistContents(playlist
+					, Utils.transform(contents, new ITransform<controllers.operations.persistence.dataObjects.Content, PlaylistContent>()
+					{
+						@Override
+						public PlaylistContent transform(controllers.operations.persistence.dataObjects.Content elem)
+						{
+							Content content = PersistContent.findIfNullSave(elem.getId(), elem.getProvider());
+							return new PlaylistContent(elem.getIdx(), content, playlist);
+						}
+					}), null);
+			MAPPER.save(playlist);
 			/*
 			 * Java EE 6 tutorial : "The state of persistent entities is
 			 * synchronized to the database when the transaction with which
@@ -38,7 +50,9 @@ public class PersistPlaylist
 			 * 
 			 * We need to force synchronization to get the play list id.
 			 */
-			mapper.sync();
+			MAPPER.sync();
+			
+			return playlist.getId();
 		}
 		catch(PersistenceException e)
 		{
@@ -49,19 +63,43 @@ public class PersistPlaylist
 			else
 				throw new Exception(e);
 		}
-		
-		return playlist.getId();
 	}
 	
-	public static void updatePlaylist(long id, List<Entry<String, String>> contents, Lang lang)
+	public static void updatePlaylist(long id,
+			List<controllers.operations.persistence.dataObjects.Content> contentsToAdd,
+			List<controllers.operations.persistence.dataObjects.Content> contentsToRemove, Lang lang)
 	{
-		IMapper<Long, Playlist> mapper = new PlaylistMapper(); // TODO class Static field
+		final Playlist playlist = MAPPER.findById(id);
 		
-		Playlist playlist = mapper.findById(id);
-		updatePlaylistContents(playlist, contents);
-		mapper.update(playlist);
-		
-		PersistContent.deleteOrphanContents();
+		updatePlaylistContents(playlist
+				, Utils.transform(contentsToAdd, new Utils.ITransform<controllers.operations.persistence.dataObjects.Content, PlaylistContent>()
+					{
+						@Override
+						public PlaylistContent transform(controllers.operations.persistence.dataObjects.Content elem)
+						{
+							Content content = PersistContent.findIfNullSave(elem.getId(), elem.getProvider());
+							return new PlaylistContent(elem.getIdx(), content, playlist);
+						}
+					})
+				, Utils.transformWithPredicate(contentsToRemove, new ITransform<controllers.operations.persistence.dataObjects.Content, PlaylistContent>()
+					{
+						private final IMapper<PlaylistContentKey, PlaylistContent> MAPPER = new PlaylistContentMapper();
+						
+						@Override
+						public PlaylistContent transform(controllers.operations.persistence.dataObjects.Content elem)
+						{
+							return MAPPER.findById(new PlaylistContentKey(playlist.getId(), elem.getId(), elem.getProvider(), elem.getIdx()));
+						}
+					}, new IPredicate<PlaylistContent>()
+						{
+							@Override
+							public boolean evaluate(PlaylistContent elem)
+							{
+								return elem != null;
+							}
+							
+						}));
+		MAPPER.update(playlist);
 	}
 	
 	/**
@@ -88,14 +126,14 @@ public class PersistPlaylist
 	public static models.beans.dataObject.Playlist loadPlaylist(String userId, long playlistId, Lang lang)
 			throws Exception
 	{
-		Playlist playlist = new PlaylistMapper().findById(playlistId);
+		Playlist playlist = MAPPER.findById(playlistId);
 		verifyPlaylist(playlist, userId, lang);
 		
 		models.beans.dataObject.Playlist returnPlaylist = new models.beans.dataObject.Playlist();
 		returnPlaylist.setId(playlist.getId());
 		returnPlaylist.setTitle(playlist.getName());
 		returnPlaylist.setContents(Utils.transform(playlist.getContents(),
-				new Utils.ITransform<PlaylistContent, models.beans.dataObject.Content>()
+				new ITransform<PlaylistContent, models.beans.dataObject.Content>()
 				{
 					@Override
 					public models.beans.dataObject.Content transform(PlaylistContent elem)
@@ -113,15 +151,16 @@ public class PersistPlaylist
 	
 	public static String deletePlaylist(String userId, long playlistId, Lang lang) throws Exception
 	{
-		IMapper<Long, Playlist> mapper = new PlaylistMapper();
-		Playlist playlist = mapper.findById(playlistId);
+		Playlist playlist = MAPPER.findById(playlistId);
 		verifyPlaylist(playlist, userId, lang);
 		
 		playlist.setUser(null);
-		playlist.setContents(null);
-		mapper.delete(playlist);
 		
-		PersistContent.deleteOrphanContents();
+		List<PlaylistContent> contents = new ArrayList<PlaylistContent>(playlist.getContents().size());
+		Collections.copy(contents, playlist.getContents());
+		
+		updatePlaylistContents(playlist, null, contents);
+		MAPPER.delete(playlist);
 		
 		return playlist.getName();
 	}
@@ -132,25 +171,23 @@ public class PersistPlaylist
 			throw new Exception(Messages.get(lang, "user.playList.errors.invalidIdOrUserId"));
 	}
 	
-	private static void updatePlaylistContents(Playlist playlist, List<Entry<String, String>> contents)
+	private static void updatePlaylistContents(Playlist playlist,
+			List<PlaylistContent> contentsToAdd, List<PlaylistContent> contentsToRemove)
 	{
-		List<PlaylistContent> playlistContents = new LinkedList<PlaylistContent>();
-		if(contents != null)
+		if(contentsToAdd != null && !contentsToAdd.isEmpty())
 		{
-			IMapper<ContentKey, Content> mapper =  new ContentMapper();
-			for(int i = 0; i < contents.size(); i++)
+			for(PlaylistContent contentToAdd : contentsToAdd)
 			{
-				// Find content in the database.
-				ContentKey key = new ContentKey(contents.get(i).getKey(), contents.get(i).getValue());
-				Content content = mapper.findById(key);
-				if(content == null)
-				{
-					content = new Content(key, new LinkedList<PlaylistContent>());
-					mapper.save(content);
-				}
-				playlistContents.add(new PlaylistContent(i + 1, content, playlist));
+				playlist.addContent(contentToAdd);
 			}
 		}
-		playlist.setContents(playlistContents);
+		if(contentsToRemove != null && !contentsToRemove.isEmpty())
+		{
+			for(PlaylistContent contentToRemove : contentsToRemove)
+			{
+				playlist.removeContent(contentToRemove);
+			}
+			PersistContent.deleteContentsWithoutPlaylist(contentsToRemove);
+		}
 	}
 }
