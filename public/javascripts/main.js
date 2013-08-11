@@ -1,3 +1,60 @@
+var theCloudMediaPlayer = (function(){
+	var currentPlaylist = undefined;
+	function Content(idx, id, provider)
+	{
+		// Fields
+		var idx = idx;
+		var id = id;
+		var provider = provider;
+		// Getters and Setters
+		this.getIdx = getIdx;
+		this.getId = getId;
+		this.getProvider = getProvider;
+		this.setIdx = setIdx;
+		this.setId = setId;
+		this.setProvider = setProvider;
+		
+		function setIdx(arg) { idx = arg; }
+		function setId(arg) { id = arg; }
+		function setProvider(arg) { provider = arg; }
+		function getIdx() { return idx; }
+		function getId() { return id; }
+		function getProvider() { return provider; }
+	}
+	return {
+		playlistFuncs :
+		{
+			getDifferences : function(tableRows)
+			{
+				var diffs = {toAdd : [], toRemove : []};
+				tableRows.each(function(idx){
+					var $playlistContent = $(this).find('a:first');
+					var playlistContentId = $playlistContent.attr('data-track-id');
+					var playlistContentProvider = $playlistContent.attr('data-provider-name');
+					
+					if(theCloudMediaPlayer.currentPlaylist)
+					{
+						var currentPlaylistContent = theCloudMediaPlayer.currentPlaylist.contents[idx];
+						if(!currentPlaylistContent)
+							diffs.toAdd.push(new Content(idx, playlistContentId, playlistContentProvider));
+						else if(playlistContentId != currentPlaylistContent.id || playlistContentProvider != currentPlaylistContent.provider)
+						{
+							diffs.toRemove.push(new Content(idx, currentPlaylistContent.id, currentPlaylistContent.provider));
+							diffs.toAdd.push(new Content(idx, playlistContentId, playlistContentProvider));
+						}
+					}
+					else
+					{
+						diffs.toAdd.push(new Content(idx, playlistContentId, playlistContentProvider));
+					}
+				});
+				
+				return diffs;
+			}
+		}
+	}
+})();
+
 function appendAlert(errorType, message) {
 	$('#alerts').prepend('<div class="row-fluid"><div class="span12"><div class="alert alert-'+errorType+'"><a class="close">x</a>'+message+'</div></div></div>');
 }
@@ -63,6 +120,7 @@ function newPlaylist(){
     	$('#playlist-clean').click();
     	$('#playlist-name').html('default <b class="caret"></b>').attr('data-playlist-id', '');
     	$('#modalBox').modal('hide');
+    	theCloudMediaPlayer.currentPlaylist = undefined;
 	});
 	$('#modalBox').modal('show');
 }
@@ -77,7 +135,7 @@ function savePlaylist(){
 		$.ajax({
 			type: 'PUT',
 		    url: '/playlist',
-		    data: contentsData+serializePlaylistContents(rows),
+		    data: contentsData,
 		    dataType: 'json',
 		    success: function(data){
 		    	if(!update)
@@ -111,21 +169,33 @@ function savePlaylist(){
 				+ '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">Save</button></div></div></fieldset></form>');
 		$('#playlist-saveForm').submit(function(e){
 			e.preventDefault();
-			func(false, $(this).serialize());
+			func(false, $(this).serialize()+serializePlaylistContents(rows));
 		});
 		$('#modalBox').modal('show');
 	} else{
-		func(true, 'name='+elem.text().trim()+'&id='+id);
+		var serializedPlaylistContents = serializePlaylistContents(rows);
+		if(serializedPlaylistContents.length != 0)
+			func(true, 'name='+elem.text().trim()+'&id='+id+serializedPlaylistContents);
+		else
+			appendErrorAlert('The current play list has no changes to save.');
 	}
 }
 function serializePlaylistContents(tableRows){
 	var serializedString = '';
-	tableRows.each(function(idx){
-		var elem = $(this).find('a:first');
-		serializedString += '&contents['+idx+'].id='+
-			encodeURIComponent(elem.attr('data-track-id'))+
-			'&contents['+idx+'].provider='+
-			encodeURIComponent(elem.attr('data-provider-name'));
+	var differences = theCloudMediaPlayer.playlistFuncs.getDifferences(tableRows);
+	$.each(differences.toRemove, function(idx, elem){
+		serializedString += '&contentsToRemove['+idx+'].idx='+elem.getIdx()+
+			'&contentsToRemove['+idx+'].id='+
+			encodeURIComponent(elem.getId())+
+			'&contentsToRemove['+idx+'].provider='+
+			encodeURIComponent(elem.getProvider());
+	});
+	$.each(differences.toAdd, function(idx, elem){
+		serializedString += '&contentsToAdd['+idx+'].idx='+elem.getIdx()+
+			'&contentsToAdd['+idx+'].id='+
+			encodeURIComponent(elem.getId())+
+			'&contentsToAdd['+idx+'].provider='+
+			encodeURIComponent(elem.getProvider());
 	});
 	return serializedString;
 }
@@ -219,10 +289,14 @@ function loadPlaylist(elem){
 				// Update the play list name.
 				$('#playlist-clean').click();
 		    	$('#playlist-name').html(data.title + ' <b class="caret"></b>').attr('data-playlist-id', data.id);
+		    	theCloudMediaPlayer.currentPlaylist = data;
 		    	// Place all the contents in the list.
-		    	appendLoadedContentsToPlayList($('#playlist-table>tbody'), data.contents);
-				// Show a success message.
-		    	appendSuccessAlert(data.message);
+		    	var notConnectedProvidersInfoMessage = appendLoadedContentsToPlayList($('#playlist-table>tbody'), data.contents);
+		    	if(notConnectedProvidersInfoMessage)
+		    		appendInfoAlert(notConnectedProvidersInfoMessage);
+		    	else
+					// Show a success message.
+			    	appendSuccessAlert(data.message);
 			},
 			error: defaultJsonErrorHandler
 		});
@@ -251,8 +325,8 @@ function appendLoadedContentsToPlayList(playlistBody, contents){
 		// TODO Show the contents associating the provided.
 		// "Ensure that these contents are still present in their services or if they were not removed or renamed."
 		// Show a Modal window!
-		appendInfoAlert("Some contents weren't successfully loaded because you're not connected to the correspondent service provider. " +
-				"Connect to "+notConnectedProviders.join(', ')+' and refresh the play list contents.');
+		return "Some contents weren't successfully loaded because you're not connected to the correspondent service provider. " +
+				"Connect to "+notConnectedProviders.join(', ')+' and refresh the play list contents.';
 	}
 }
 function defaultJsonErrorHandler(jqXHR, textStatus, errorThrown){
