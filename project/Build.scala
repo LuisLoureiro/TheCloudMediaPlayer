@@ -27,6 +27,7 @@ object ApplicationBuild extends Build {
   val main = play.Project(appName, appVersion, appDependencies).settings(
       ebeanEnabled := false,
     // Add your own project settings here
+      Keys.fork in (Test) := false,
       resolvers += (
           "Google api services" at "http://google-api-client-libraries.appspot.com/mavenrepo"
       ),
