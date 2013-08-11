@@ -42,7 +42,7 @@ public class Playlist
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User					user;
 	
-	@OneToMany(cascade = { ALL }, mappedBy = "playlist")
+	@OneToMany(cascade = { ALL }, mappedBy = "playlist", orphanRemoval=true)
 	private List<PlaylistContent>	contents;
 	
 	public Playlist()
