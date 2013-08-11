@@ -7,11 +7,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map.Entry;
 
 import models.db.Content;
 import models.db.Playlist;
@@ -35,7 +33,7 @@ import controllers.operations.persistence.PersistPlaylist;
 public class PersistencePlaylistTest extends BaseTest
 {
 	@Rule
-	public ExpectedException exception = ExpectedException.none();
+	public ExpectedException	exception	= ExpectedException.none();
 	
 	@Test
 	public final void testLoadTestData()
@@ -140,8 +138,7 @@ public class PersistencePlaylistTest extends BaseTest
 			@Override
 			public Void apply() throws Throwable
 			{
-				List<models.beans.dataObject.Playlist> firstUserPlaylists = PersistPlaylist
-						.loadPlaylists(firstUserId);
+				List<models.beans.dataObject.Playlist> firstUserPlaylists = PersistPlaylist.loadPlaylists(firstUserId);
 				assertEquals(1, firstUserPlaylists.size());
 				
 				models.beans.dataObject.Playlist firstUserPlaylist = firstUserPlaylists.iterator().next();
@@ -171,7 +168,8 @@ public class PersistencePlaylistTest extends BaseTest
 			@Override
 			public Void apply() throws Throwable
 			{
-				models.beans.dataObject.Playlist playlist = PersistPlaylist.loadPlaylist(secondUserId, 2, Lang.preferred(Lang.availables()));
+				models.beans.dataObject.Playlist playlist = PersistPlaylist.loadPlaylist(secondUserId, 2,
+						Lang.preferred(Lang.availables()));
 				assertNotNull(playlist);
 				assertEquals(secondPlaylistId, playlist.getId());
 				assertEquals(secondPlaylistName, playlist.getTitle());
@@ -199,7 +197,7 @@ public class PersistencePlaylistTest extends BaseTest
 				try
 				{
 					PersistPlaylist.savePlaylist(firstUserId, firstPlaylistName, Arrays
-							.asList((Entry<String, String>) new SimpleEntry<String, String>(firstContentId,
+							.asList(new controllers.operations.persistence.dataObjects.Content(2, firstContentId,
 									firstContentProvider)), Lang.preferred(Lang.availables()));
 					fail("Expected an UniqueConstraintException to be thrown.");
 				}
@@ -219,23 +217,57 @@ public class PersistencePlaylistTest extends BaseTest
 			@Override
 			public void invoke() throws Throwable
 			{
-				long id = PersistPlaylist.savePlaylist(firstUserId, secondPlaylistName, Arrays
-						.asList((Entry<String, String>) new SimpleEntry<String, String>(firstUserId,
+				String newPlaylistName = "thirdPlaylist";
+				long id = PersistPlaylist.savePlaylist(firstUserId, newPlaylistName, Arrays
+						.asList(new controllers.operations.persistence.dataObjects.Content(1, firstContentId,
 								firstContentProvider)), null);
 				assertEquals(3, id);
 				
 				// Check that every relationship was correctly created.
-				models.beans.dataObject.Playlist loadPlaylist = PersistPlaylist
-						.loadPlaylist(firstUserId, id, null);
+				models.beans.dataObject.Playlist loadPlaylist = PersistPlaylist.loadPlaylist(firstUserId, id, null);
 				
 				assertEquals(id, loadPlaylist.getId());
-				assertEquals(secondPlaylistName, loadPlaylist.getTitle());
+				assertEquals(newPlaylistName, loadPlaylist.getTitle());
 				assertNotNull(loadPlaylist.getContents());
 				assertEquals(1, loadPlaylist.getContents().size());
 				
 				models.beans.dataObject.Content content = loadPlaylist.getContents().iterator().next();
-				assertEquals(firstUserId, content.getId());
+				assertEquals(firstContentId, content.getId());
 				assertEquals(firstContentProvider, content.getProvider());
+			}
+		});
+	}
+	
+	@Test
+	public final void testUpdatePlaylist()
+	{
+		runFakeAppWithTransaction(new Callback0()
+		{
+			@Override
+			public void invoke() throws Throwable
+			{
+				Lang lang = Lang.preferred(Lang.availables());
+				String newContentId = "thirdContent", newContentProvider = "youtube";
+				
+				PersistPlaylist.updatePlaylist(firstPlaylistId, Arrays
+						.asList(new controllers.operations.persistence.dataObjects.Content(1, newContentId,
+								newContentProvider)), Arrays
+						.asList(new controllers.operations.persistence.dataObjects.Content(1, secondContentId,
+								secondContentProvider)), lang);
+				
+				models.beans.dataObject.Playlist loadPlaylist = PersistPlaylist.loadPlaylist(firstUserId,
+						firstPlaylistId, lang);
+				
+				assertNotNull(loadPlaylist.getContents());
+				assertEquals(2, loadPlaylist.getContents().size());
+				
+				models.beans.dataObject.Content firstContent = loadPlaylist.getContents().iterator().next();
+				assertEquals(newContentId, firstContent.getId());
+				assertEquals(newContentProvider, firstContent.getProvider());
+				
+				models.beans.dataObject.Content secondContent = loadPlaylist.getContents().iterator().next();
+				assertEquals(firstContentId, secondContent.getId());
+				assertEquals(firstContentProvider, secondContent.getProvider());
 			}
 		});
 	}
@@ -248,8 +280,7 @@ public class PersistencePlaylistTest extends BaseTest
 			@Override
 			public void invoke() throws Throwable
 			{
-				String name = PersistPlaylist.deletePlaylist(firstUserId, 1,
-						Lang.preferred(Lang.availables()));
+				String name = PersistPlaylist.deletePlaylist(firstUserId, 1, Lang.preferred(Lang.availables()));
 				assertEquals(firstPlaylistName, name);
 				
 				Collection<PlaylistContent> playlistsContents = new PlaylistContentMapper().getAll();
@@ -287,7 +318,7 @@ public class PersistencePlaylistTest extends BaseTest
 					else
 						fail("Inexistent userId.");
 				}
-
+				
 				Playlist playlist = playlists.iterator().next();
 				Content content = contents.iterator().next();
 				assertSame(secondPlaylist, playlist);
