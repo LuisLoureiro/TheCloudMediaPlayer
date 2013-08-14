@@ -81,7 +81,7 @@ public class Authentication extends Controller {
 //			attributes.put(OPENID_ATTRIBUTES.LAST_NAME_AX.getName(), OPENID_ATTRIBUTES.LAST_NAME_AX.getUri());
 //			attributes.put(OPENID_ATTRIBUTES.LAST_NAME_OP.getName(), OPENID_ATTRIBUTES.LAST_NAME_OP.getUri());
 			return redirect(
-					OpenID.redirectURL(user.getId(), routes.Authentication.openIDCallback().absoluteURL(request()), attributes)
+					OpenID.redirectURL(user.getOpenid_identifier(), routes.Authentication.openIDCallback().absoluteURL(request()), attributes)
 					.get());
 		} catch(Throwable ex) {
 			ex.printStackTrace();

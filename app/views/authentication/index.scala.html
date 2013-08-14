@@ -4,7 +4,7 @@
 @main() {
     <h2>@Messages.get("authentication.title")</h2>
     @helper.form(action = routes.Authentication.openID(), 'id -> "openIDForm") {
-    	@helper.inputText(openIDForm("id"), 'id -> "openID", 'autofocus -> "autofocus", '_label -> "OpenID", '_showConstraints -> false)
+    	@helper.inputText(openIDForm("openid_identifier"), 'id -> "openID", 'autofocus -> "autofocus", '_label -> "OpenID", '_showConstraints -> false)
     	<input type="submit" name="Sign in"/>
     }<br/>
 	<div id="signinButton">
