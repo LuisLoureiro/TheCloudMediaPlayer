@@ -2,7 +2,6 @@ package models.db;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
@@ -11,11 +10,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 
 import models.db.compositeKeys.PlaylistContentKey;
-import models.db.listeners.PlaylistContentListener;
 
 @Entity(name="playlists_contents")
 @IdClass(PlaylistContentKey.class)
-@EntityListeners({PlaylistContentListener.class})
 public class PlaylistContent
 {
 	@Version

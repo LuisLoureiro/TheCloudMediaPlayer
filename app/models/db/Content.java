@@ -8,15 +8,12 @@ import java.util.List;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
 import models.db.compositeKeys.ContentKey;
-import models.db.listeners.ContentListener;
 
 @Entity(name = "contents")
-@EntityListeners({ContentListener.class})
 public class Content
 {
 	@Version
