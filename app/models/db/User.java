@@ -24,7 +24,6 @@ import models.db.listeners.UserListener;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "type")
 @DiscriminatorValue(value = "other")
-@EntityListeners({UserListener.class})
 public class User
 {
 	@Version

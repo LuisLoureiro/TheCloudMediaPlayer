@@ -15,7 +15,6 @@ import models.db.listeners.PlaylistContentListener;
 
 @Entity(name="playlists_contents")
 @IdClass(PlaylistContentKey.class)
-@EntityListeners({PlaylistContentListener.class})
 public class PlaylistContent
 {
 	@Version

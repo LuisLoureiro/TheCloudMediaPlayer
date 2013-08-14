@@ -16,7 +16,6 @@ import models.db.compositeKeys.ContentKey;
 import models.db.listeners.ContentListener;
 
 @Entity(name = "contents")
-@EntityListeners({ContentListener.class})
 public class Content
 {
 	@Version

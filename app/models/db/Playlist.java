@@ -24,7 +24,6 @@ import play.data.validation.Constraints.Required;
 
 @Entity(name = "playlists")
 @Table(uniqueConstraints = @UniqueConstraint(name = "unique_name_user_id", columnNames = { "name", "user_id" }))
-@EntityListeners({PlaylistListener.class})
 public class Playlist
 {
 	@Version
