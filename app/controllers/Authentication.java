@@ -27,12 +27,11 @@ import views.html.authentication.index;
 import com.google.api.client.auth.oauth2.TokenResponse;
 
 import controllers.enums.SESSION;
+import controllers.operations.authentication.GoogleOAuth2;
 import controllers.operations.authentication.IOAuth;
-import controllers.operations.authentication.IOAuth2;
 import controllers.operations.authentication.enums.OPENID_ATTRIBUTES;
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
 import controllers.operations.authentication.exceptions.OAuthException;
-import controllers.operations.authentication.factory.OAuth2Factory;
 import controllers.operations.authentication.factory.OAuthFactory;
 import controllers.operations.persistence.PersistOAuth2User;
 import controllers.operations.persistence.PersistOAuthUser;
@@ -183,7 +182,7 @@ public class Authentication extends Controller {
 			Lang lang = Lang.preferred(request().acceptLanguages());
 
 			// Create an OAuth2 object based on the OAuth2 authentication provider used by the user using the factory method pattern.
-			IOAuth2 oauth2Object = OAuth2Factory.getInstanceFromProviderName(providerName, lang);
+			GoogleOAuth2 oauth2Object = new GoogleOAuth2();
 			// exchange the code with an access token
 			TokenResponse token = oauth2Object.exchangeAuthCode(body.get("code")[0]);
 			// validate token

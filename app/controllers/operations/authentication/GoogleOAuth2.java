@@ -5,8 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import models.authentication.AccessToken;
-import models.beans.ServiceResources;
+import play.i18n.Lang;
+import play.i18n.Messages;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
@@ -20,9 +20,8 @@ import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Tokeninfo;
 
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
-import controllers.operations.authentication.exceptions.OAuthException;
 
-public class GoogleOAuth2 extends AbstractOAuth2 {
+public class GoogleOAuth2 /*extends AbstractOAuth2 */{
 
 	private final String CLIENT_ID, CLIENT_SECRET;
 	/**
@@ -49,13 +48,36 @@ public class GoogleOAuth2 extends AbstractOAuth2 {
 		}
 	}
 	
-	@Override
+	/**
+	 * Exchange the authorisation code for an access token and a refresh token.
+	 * @throws IOException 
+	 */
+	/*@Override*/
 	public TokenResponse exchangeAuthCode(String authorizationCode) throws IOException {
 		return new GoogleAuthorizationCodeTokenRequest(
 				TRANSPORT, JSON_FACTORY, CLIENT_ID, CLIENT_SECRET, authorizationCode, "postmessage").execute();
 	}
 
-	@Override
+	/**
+	 * Check that the token is valid.
+	 * <p>
+	 * Make sure the token we got is for the intended user.
+	 * <p>
+	 * Make sure the token we got is for our app.
+	 * <p>
+	 * If the validation has errors an OAuth2ValidationException is thrown.
+	 * @param token
+	 * @param userId
+	 * @throws OAuth2ValidationException
+	 * @throws IOException 
+	 */
+	public void validateToken(TokenResponse token, String userId, Lang lang) throws OAuth2ValidationException, IOException {
+		Tokeninfo tokenInfo = isTokenValid(token);
+		if(!isTokenForTheIntendedUser(tokenInfo, userId)) throw new OAuth2ValidationException(Messages.get(lang, "authentication.errors.oauthTokenIntendedUser"));
+		if(!isTokenForOurApp(tokenInfo)) throw new OAuth2ValidationException(Messages.get(lang, "authentication.errors.oauthTokenIntendedApp"));
+	}
+
+	/*@Override*/
 	public Tokeninfo isTokenValid(TokenResponse tokenResponse) throws IOException, OAuth2ValidationException {
 		// Create a credential representation of the token data.
 	    Credential credential = new GoogleCredential.Builder()
@@ -71,38 +93,13 @@ public class GoogleOAuth2 extends AbstractOAuth2 {
 		return tokenInfo;
 	}
 
-	@Override
+	/*@Override*/
 	public boolean isTokenForTheIntendedUser(Tokeninfo tokenInfo, String userId) {
 	    return tokenInfo.getUserId().equals(userId);
 	}
 
-	@Override
+	/*@Override*/
 	public boolean isTokenForOurApp(Tokeninfo tokenInfo) {
 	    return tokenInfo.getIssuedTo().equals(CLIENT_ID);
-	}
-
-	@Override
-	public String getRequestToken(String callbackUrl) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AccessToken exchangeRequestTokenForAnAccessToken(String requestToken) throws OAuthException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ServiceResources getResources(AccessToken accessToken) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getResourceStreamUrl(AccessToken accessToken, String trackId)
-			throws OAuthException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
