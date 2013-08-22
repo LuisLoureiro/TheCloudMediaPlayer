@@ -1,26 +1,34 @@
 package controllers.operations.authentication;
 
-import java.io.IOException;
+import java.util.Map;
 
-import play.i18n.Lang;
-import play.i18n.Messages;
+import controllers.enums.OAUTH2_ERROR_CODES;
+import controllers.enums.OAUTH2_ERROR_PARAMETERS;
+import controllers.operations.authentication.exceptions.OAuthException;
+import controllers.operations.authentication.exceptions.OAuthMissingRequiredParametersException;
 
-import com.google.api.client.auth.oauth2.TokenResponse;
-import com.google.api.services.oauth2.model.Tokeninfo;
 
-import controllers.operations.authentication.exceptions.OAuth2ValidationException;
-
-public abstract class AbstractOAuth2 implements IOAuth2 {
-
+public abstract class AbstractOAuth2 implements IOAuth
+{
+	
 	@Override
-	public void validateToken(TokenResponse token, String userId, Lang lang) throws OAuth2ValidationException, IOException {
-		Tokeninfo tokenInfo = isTokenValid(token);
-		if(!isTokenForTheIntendedUser(tokenInfo, userId)) throw new OAuth2ValidationException(Messages.get(lang, "authentication.errors.oauthTokenIntendedUser"));
-		if(!isTokenForOurApp(tokenInfo)) throw new OAuth2ValidationException(Messages.get(lang, "authentication.errors.oauthTokenIntendedApp"));
+	public String verifyCallbackRequest(Map<String, String[]> queryString) throws OAuthException
+	{
+		// Implementing http://tools.ietf.org/html/rfc6749#section-4.1.2.1
+		if(!queryString.containsKey(OAUTH2_ERROR_PARAMETERS.error.name()))
+		{
+			if(!queryString.containsKey("code"))
+				throw new OAuthMissingRequiredParametersException("authentication.errors.oauthMissingRequiredParam");
+			
+			return queryString.get("code")[0];
+		}
+		
+		String errorCode = queryString.get(OAUTH2_ERROR_PARAMETERS.error.name())[0];
+		System.out.println(String.format("%s: %s; %s.",
+				errorCode,
+				queryString.containsKey(OAUTH2_ERROR_PARAMETERS.error_description.name()) ? queryString.get(OAUTH2_ERROR_PARAMETERS.error_description.name())[0] : null,
+				queryString.containsKey(OAUTH2_ERROR_PARAMETERS.error_uri.name()) ? queryString.get(OAUTH2_ERROR_PARAMETERS.error_uri.name()) : null));
+		
+		throw new OAuthException(OAUTH2_ERROR_CODES.valueOf(errorCode).getMessage());
 	}
-
-	// ABSTRACT METHODS
-	public abstract Tokeninfo isTokenValid(TokenResponse tokenResponse) throws OAuth2ValidationException, IOException;
-	public abstract boolean isTokenForTheIntendedUser(Tokeninfo tokenInfo, String userId);
-	public abstract boolean isTokenForOurApp(Tokeninfo tokenInfo);
 }

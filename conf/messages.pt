@@ -16,6 +16,13 @@ authentication.errors.oauthTokenIntendedApp=O ID da aplicação não corresponde
 authentication.errors.oauthFactoryProviderName=Não existe correspondência para o nome do fornecedor de autenticação recebido.
 authentication.errors.oauthTokenInexistent=O token não existe.
 authentication.errors.oauthProcessCanceled=O processo de autenticação foi interrompido pelo utilizador.
+authentication.errors.oauthInvalidRequest=O pedido está em falta com um parâmetro obrigatório, inclui um valor inválido para um parâmetro, inclui um parâmetro em falta ou está mal construído.
+authentication.errors.oauthUnauthorizedClient=A aplicação não está autorizada a solicitar um código de autorização usando este método.
+authentication.errors.oauthAccessDenied=O pedido foi rejeitado pelo utilizador dos recursos ou pelo servidor de autorização.
+authentication.errors.oauthUnsupportedResponseType=O servidor de autorização não suporta a obtenção do código de autorização usando este método.
+authentication.errors.oauthInvalidScope=O scope do pedido é inválido, desconhecido ou mal construído.
+authentication.errors.oauthServerError=O servidor de autorização encontrou uma condição inesperada que o impede de cumprir o pedido.
+authentication.errors.oauthTemporarilyUnavailable=O servidor de autorização não consegue, de momento, processar o pedido devido a uma manutenção ou uma temporária sobrecarga no servidor.
 
 errors.parametersMissing=Alguns parâmetros obrigatórios estão em falta: [{0}].
 

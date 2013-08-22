@@ -264,31 +264,18 @@ public class Authentication extends Controller {
 	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is thrown before reaching this action.
 	public static Result connectToCallback(String provider)
 	{
-		// Check the service the user wants to connect to and grab the query string parameters.
-		String requestToken = request().getQueryString("oauth_token") == null ? request().getQueryString("code") : request().getQueryString("oauth_token")
-				,notApproved = request().getQueryString("not_approved");
-		String error = request().getQueryString("error"),
-				errorDescription = request().getQueryString("error_description");
-		
-		if(notApproved != null && Boolean.parseBoolean(notApproved))
+		try
 		{
-			flash(Messages.get("authentication.errors.oauthProcessCanceled"));
-			return badRequest(views.html.user.index.render(null)); // TODO return json.
-		}
-		if(requestToken == null || requestToken.isEmpty())
-		{
-			flash("The request token is missing!"); // TODO
-			return badRequest(views.html.user.index.render(null)); // TODO return json.
-		}
+			// Client preferred language
+			// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
+			Lang lang = Lang.preferred(request().acceptLanguages());
 		
-		// Client preferred language
-		// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
-		Lang lang = Lang.preferred(request().acceptLanguages());
-		
-		try {
 			// Create the object that represents the service
 			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()), lang);
-
+			
+			// Verify parameters
+			String requestToken = oauthObject.verifyCallbackRequest(request().queryString());
+			
 			// Get oauth_token_secret and oauth_token
 			AccessToken oauthToken = oauthObject.exchangeRequestTokenForAnAccessToken(requestToken);
 			

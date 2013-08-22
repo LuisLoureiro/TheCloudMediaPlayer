@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import models.authentication.AccessToken;
@@ -29,9 +30,11 @@ import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 import controllers.enums.OAUTH_SERVICE_PROVIDERS;
 import controllers.operations.authentication.exceptions.OAuth1TokenException;
 import controllers.operations.authentication.exceptions.OAuthException;
+import controllers.operations.authentication.exceptions.OAuthMissingRequiredParametersException;
+import controllers.operations.authentication.exceptions.OAuthProcessCanceledException;
 
 
-public class DropboxOAuth1 implements IOAuth1
+public class DropboxOAuth1 implements IOAuth
 {
 	private final String APP_KEY, APP_SECRET;
 	private static final AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
@@ -116,7 +119,10 @@ public class DropboxOAuth1 implements IOAuth1
 			{
 				if(entry.mimeType.startsWith("audio/") || entry.mimeType.startsWith("video/"))
 				{
-					resources.add(new Resource(entry.path, entry.path, entry.mimeType));
+					resources.add(new Resource(
+							entry.path
+							, entry.path.startsWith("/") ? entry.path.substring(1) : entry.path
+							, entry.mimeType));
 				}
 			}
 		} catch (DropboxException e) {
@@ -139,5 +145,18 @@ public class DropboxOAuth1 implements IOAuth1
 			e.printStackTrace(); // TODO remove!
 			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
 		}
+	}
+
+	@Override
+	public String verifyCallbackRequest(Map<String, String[]> queryString) throws OAuthException
+	{
+		// Following this: https://www.dropbox.com/developers/core/docs#authorize
+		if(queryString.containsKey("not_approved"))
+			throw new OAuthProcessCanceledException();
+		
+		if(!queryString.containsKey("oauth_token"))
+			throw new OAuthMissingRequiredParametersException("authentication.errors.oauthMissingRequiredParam");
+		
+		return queryString.get("oauth_token")[0];
 	}
 }

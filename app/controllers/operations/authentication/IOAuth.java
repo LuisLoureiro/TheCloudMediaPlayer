@@ -1,5 +1,7 @@
 package controllers.operations.authentication;
 
+import java.util.Map;
+
 import models.authentication.AccessToken;
 import models.beans.ServiceResources;
 import controllers.operations.authentication.exceptions.OAuthException;
@@ -17,9 +19,16 @@ public interface IOAuth {
 	public String getRequestToken(String callbackUrl) throws OAuthException;
 	
 	/**
+	 * Verifies the HTTP request made as a response to the request token.<br/>
+	 * This verification tries to find some information about a failed request token operation:<br/>
+	 * <li>If the resource owner denied the access request or
+	 * <li>if the request failed for reasons other than a missing or invalid redirection URI.
 	 * 
+	 * @param queryString the queryString to check for errors occurred during the request token operation.
+	 * @return the expected request token if there're no errors in the queryString.
+	 * @throws OAuthException if there's was an error during the request token operation.
 	 */
-//	public void askUserAuthorisation();
+	public String verifyCallbackRequest(Map<String, String[]> queryString) throws OAuthException;
 	
 	/**
 	 * 

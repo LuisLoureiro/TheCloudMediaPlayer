@@ -16,6 +16,13 @@ authentication.errors.oauthTokenIntendedApp=Token''s client ID does not match ap
 authentication.errors.oauthFactoryProviderName=There''s no match for the given provider name.
 authentication.errors.oauthTokenInexistent=The request token does not exist.
 authentication.errors.oauthProcessCanceled=The authentication process was interrupted by the user.
+authentication.errors.oauthInvalidRequest=The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.
+authentication.errors.oauthUnauthorizedClient=The client is not authorized to request an authorization code using this method.
+authentication.errors.oauthAccessDenied=The resource owner or authorization server denied the request.
+authentication.errors.oauthUnsupportedResponseType=The authorization server does not support obtaining an authorization code using this method.
+authentication.errors.oauthInvalidScope=The requested scope is invalid, unknown, or malformed.
+authentication.errors.oauthServerError=The authorization server encountered an unexpected condition that prevented it from fulfilling the request.
+authentication.errors.oauthTemporarilyUnavailable=The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.
 
 errors.parametersMissing=Some parameters are required and are missing: [{0}].
 
