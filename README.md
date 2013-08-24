@@ -16,13 +16,16 @@ Para que se possa executar a aplicação em ambiente de desenvolvimento numa má
 * Ter instalada a versão 7 do [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html), ou superior;
 * Instalar a versão 2.1 da _framework Play_, seguindo os passos indicados na [documentação](http://www.playframework.com/documentation/2.1.1/Installing);
 * Fazer `git clone` deste repositório para uma diretoria à escolha, no sistema de ficheiros do sistema operativo;
-* Ter instalada uma instância do SGBD _[PostgreSQL](http://www.postgresql.org/download/)_, versão 9.1, com uma base de dados intitulada "thecloudmediaplayerdb". O servidor de base de dados deve estar à escuta no porto 5432;
+* Instalar a versão 9.1 do SGBD _[PostgreSQL](http://www.postgresql.org/download/)_, versão 9.1, com uma base de dados intitulada "thecloudmediaplayerdb". Para mais informações sobre a instalação do SGBD PostgreSQL. ler [este](http://www.postgresql.org/docs/9.1/static/installation.html) artigo;
 * Configurar as seguintes variáveis de ambiente no sistema operativo:
+    1. PGDATA - Diretoria onde serão guardados os dados do _cluster_ da base de dados. Em sistemas Linux, `/var/lib/pgsql/data` é uma localização comum;
     1. PGUSER - Utilizador da base de dados;
 	1. PGPASSWORD - _Password_ do utilizador da base de dados;
 	1. THE_CLOUD_MEDIA_PLAYER_APP_SECRET - Chave secreta da aplicação. Utilizada na segurança criptográfica da aplicação.
 	
 > As configurações da aplicação estão descritas no ficheiro `./conf/application.conf`.
+
+> É aconselhada a leitura [desta informação](http://www.postgresql.org/docs/9.1/static/creating-cluster.html), afim de conseguir configurar corretamente o SGBD PostgreSQL. Se ocurrer algum erro ao iniciar o servidor de base de dados, que apresente uma mensagem que contenha a frase **"could not bind IPv4 socket: Address already in use"**, terá que ser removido o serviço que inicia automaticamente com o iniciar do sistema. Para isso, é aconselhado seguir esta [ligação](http://www.aboutlinux.info/2006/04/enabling-and-disabling-services-during_01.html), usando, como nome do serviço, **"postgresql"**. Será necessário criar a diretoria **"/var/run/postgresql"** com permissões de escrita para o utilizador **"postgres"**. Aconselha-se o reinicio do sistema para que todas as alterações possam surtir o efeito desejado.
 
 ## Iniciar
 Através da linha de comandos, aceder à diretoria onde se encontra a aplicação e executar o comando `play run` para executar a aplicação recorrendo à consola de desenvolvimento providenciada pela _framework Play_.
