@@ -8,8 +8,6 @@ import models.db.User;
 import models.db.notEntity.OAuthUser;
 import models.mapper.IMapper;
 import models.mapper.UserMapper;
-import play.i18n.Lang;
-import play.i18n.Messages;
 import controllers.operations.authentication.exceptions.OAuthException;
 
 public class PersistOAuthUser
@@ -50,7 +48,7 @@ public class PersistOAuthUser
 	 * @throws OAuthException If the provider is inexistent.
 	 * 
 	 */
-	public static void saveUser(String provider, AccessToken accessToken, String findByFieldName, String findByFieldValue, Lang lang) throws OAuthException
+	public static void saveUser(String provider, AccessToken accessToken, String findByFieldName, String findByFieldValue) throws OAuthException
 	{
 		switch (provider) {
 			case "dropbox":
@@ -62,7 +60,7 @@ public class PersistOAuthUser
 				break;
 	
 			default:
-				throw new OAuthException(Messages.get(lang, "authentication.errors.oauthFactoryProviderName"));
+				throw new OAuthException("authentication.errors.oauthFactoryProviderName");
 		}
 	}
 	

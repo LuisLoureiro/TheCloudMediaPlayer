@@ -1,6 +1,8 @@
 package controllers.operations.authentication.exceptions;
 
-public class OAuthException extends Exception {
+import controllers.operations.exceptions.ApplicationOperationException;
+
+public class OAuthException extends ApplicationOperationException {
 
 	/**
 	 * 

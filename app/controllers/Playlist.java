@@ -51,21 +51,23 @@ public class Playlist extends Controller
 				return new controllers.operations.persistence.dataObjects.Content(elem.getIdx(), elem.getId(), elem.getProvider());
 			}
 		};
+		
+		result.put("name", playlist.getName());
 	    if(id == 0)
 	    {
 	    	id = PersistPlaylist.savePlaylist(session(SESSION.USERNAME.toString()), playlist.getName(),
-		    		Utils.transform(playlist.getContentsToAdd(), transform), ctx().lang());
+		    		Utils.transform(playlist.getContentsToAdd(), transform));
 	    	result.put("message", Messages.get("user.playList.save.createdSuccessfully"));
+			result.put("id", id);
+			return created(result);
 	    }
 	    else {
 	    	PersistPlaylist.updatePlaylist(id, Utils.transform(playlist.getContentsToAdd(), transform)
-	    			, Utils.transform(playlist.getContentsToRemove(), transform), ctx().lang());
+	    			, Utils.transform(playlist.getContentsToRemove(), transform));
 	    	result.put("message", Messages.get("user.playList.save.updatedSuccessfully"));
+			result.put("id", id);
+			return ok(result);
 	    }
-	    
-		result.put("name", playlist.getName());
-		result.put("id", id);
-		return created(result);
 	}
 	
 	@Transactional(readOnly=true)
@@ -85,7 +87,7 @@ public class Playlist extends Controller
 		}
 		else
 		{
-			models.beans.dataObject.Playlist playList = PersistPlaylist.loadPlaylist(session(SESSION.USERNAME.toString()), id, ctx().lang());
+			models.beans.dataObject.Playlist playList = PersistPlaylist.loadPlaylist(session(SESSION.USERNAME.toString()), id);
 			result.put("id", playList.getId());
 			result.put("title", playList.getTitle());
 			result.put("contents", Json.toJson(playList.getContents()));
@@ -101,7 +103,7 @@ public class Playlist extends Controller
 	    // Return a json object with the result of the operation.
 		ObjectNode result = Json.newObject();
 		
-		String name = PersistPlaylist.deletePlaylist(session(SESSION.USERNAME.toString()), id, ctx().lang());
+		String name = PersistPlaylist.deletePlaylist(session(SESSION.USERNAME.toString()), id);
 
 		result.put("message", Messages.get("user.playList.delete.successMessage", name));
 		return ok(result);

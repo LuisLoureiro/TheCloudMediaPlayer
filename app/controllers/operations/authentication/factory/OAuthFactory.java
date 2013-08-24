@@ -1,7 +1,5 @@
 package controllers.operations.authentication.factory;
 
-import play.i18n.Lang;
-import play.i18n.Messages;
 import controllers.operations.authentication.DropboxOAuth1;
 import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.SoundcloudOAuth2;
@@ -11,8 +9,7 @@ public class OAuthFactory // TODO think about the use of the singleton pattern. 
 {
 	private static JsonParser jsonParser;
 	
-	// TODO think about the possibility of receiving the request as a parameter, collecting the actual parameters from the request object.
-	public static IOAuth getInstanceFromProviderName(String name, String redirectUri, Lang lang) throws InstantiationException
+	public static IOAuth getInstanceFromProviderName(String name, String redirectUri) throws InstantiationException
 	{
 		switch (name) {
 			case "dropbox":
@@ -22,7 +19,7 @@ public class OAuthFactory // TODO think about the use of the singleton pattern. 
 				return new SoundcloudOAuth2(getJsonParser(), redirectUri);
 				
 			default:
-				throw new InstantiationException(Messages.get(lang, "authentication.errors.oauthFactoryProviderName"));
+				throw new InstantiationException("authentication.errors.oauthFactoryProviderName");
 		}
 	}
 	

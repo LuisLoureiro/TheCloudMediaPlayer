@@ -7,15 +7,18 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 
 import models.db.Content;
-import models.db.Playlist;
-import models.db.PlaylistContent;
 import models.db.User;
 
 import org.codehaus.jackson.node.ObjectNode;
 
+import controllers.operations.authentication.exceptions.OAuthException;
+import controllers.operations.authentication.exceptions.OpenIDException;
+import controllers.operations.exceptions.ApplicationOperationException;
 import play.Application;
 import play.GlobalSettings;
 import play.db.jpa.JPA;
+import play.i18n.Lang;
+import play.i18n.Messages;
 import play.libs.F.Callback0;
 import play.libs.Json;
 import play.libs.Yaml;
@@ -82,21 +85,27 @@ public class Global extends GlobalSettings
 		Throwable innerT = t.getCause();
 		if(innerT != null)
 		{
-			Throwable innerInnerT = innerT.getCause();
-			errorMessage = innerInnerT != null ? innerInnerT.getMessage() : innerT.getMessage();
+			try
+			{
+				throw innerT.getCause();
+			}
+			catch(ApplicationOperationException | InstantiationException e)
+			{
+				errorMessage = Messages.get(Lang.preferred(request.acceptLanguages()), e.getMessage());
+			}
+			catch(NullPointerException e)
+			{
+				errorMessage = innerT.getMessage();
+			}
+			catch(Throwable e)
+			{
+				errorMessage = e.getMessage();
+			}
 		}
 		else
 		{
 			errorMessage = t.getMessage();
 		}
-		// TODO catch ConstraintViolationExceptions
-//		catch (ConstraintViolationException e)
-//		{
-//			Set<ConstraintViolation<?>> constraints = e.getConstraintViolations();
-//			for(ConstraintViolation<?> constraint : constraints)
-//				...
-//			assertEquals(constraints.iterator().next().getMessage(), "user.playList.notNull");
-//	    }
 		
 		// Content negotiation
 		if(request.accepts("application/json") || request.accepts("text/json"))
@@ -150,10 +159,10 @@ public class Global extends GlobalSettings
 	// way to intercept requests and execute business logic before a request is
 	// dispatched to an action.
 	@Override
-	public Action onRequest(Request request, Method actionMethod)
+	public Action<?> onRequest(Request request, Method actionMethod)
 	{
 		System.out.println("before each request..." + request.toString());
-		Action action = super.onRequest(request, actionMethod);
+		Action<?> action = super.onRequest(request, actionMethod);
 		System.out.println("after each request..." + request.toString());
 		return action;
 	}

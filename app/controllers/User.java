@@ -3,23 +3,21 @@ package controllers;
 import java.util.LinkedList;
 import java.util.List;
 
-import controllers.enums.SESSION;
-import controllers.operations.authentication.IOAuth;
-import controllers.operations.authentication.exceptions.OAuthException;
-import controllers.operations.authentication.factory.OAuthFactory;
-import controllers.operations.persistence.PersistOAuthUser;
-
 import models.authentication.AccessToken;
 import models.beans.ServiceResources;
 import models.db.OAuth1User;
 import models.db.OAuth2User;
 import models.db.notEntity.OAuthUser;
 import play.db.jpa.Transactional;
-import play.i18n.Lang;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security.Authenticated;
 import views.html.user.index;
+import controllers.enums.SESSION;
+import controllers.operations.authentication.IOAuth;
+import controllers.operations.authentication.exceptions.OAuthException;
+import controllers.operations.authentication.factory.OAuthFactory;
+import controllers.operations.persistence.PersistOAuthUser;
 
 public class User extends Controller {
 
@@ -27,10 +25,6 @@ public class User extends Controller {
 	@Transactional(readOnly=true)
 	public static Result index()
 	{
-		// Client preferred language
-		// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
-		Lang lang = Lang.preferred(request().acceptLanguages());
-		
 		// Get the username from the session object.
 		// Ask the data access layer for all the access tokens for this user.
 		// Refresh some, if necessary.
@@ -45,7 +39,7 @@ public class User extends Controller {
 				try
 				{
 					IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(oauthToken.getProviderName(),
-								routes.Authentication.connectToCallback(oauthToken.getProviderName()).absoluteURL(request()), lang);
+								routes.Authentication.connectToCallback(oauthToken.getProviderName()).absoluteURL(request()));
 					if(oauthToken instanceof OAuth1User)
 					{
 						listServiceResources.add(

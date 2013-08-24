@@ -16,17 +16,16 @@ import models.mapper.IMapper;
 import models.mapper.PlaylistContentMapper;
 import models.mapper.PlaylistMapper;
 import models.mapper.UserMapper;
-import play.i18n.Lang;
-import play.i18n.Messages;
 import utils.Utils;
 import utils.Utils.IPredicate;
 import utils.Utils.ITransform;
+import controllers.operations.persistence.exceptions.UserPlaylistException;
 
 public class PersistPlaylist
 {
 	private static final IMapper<Long, Playlist> MAPPER = new PlaylistMapper();
 	
-	public static long savePlaylist(String userId, String name, List<controllers.operations.persistence.dataObjects.Content> contents, Lang lang)
+	public static long savePlaylist(String userId, String name, List<controllers.operations.persistence.dataObjects.Content> contents)
 			throws Exception
 	{
 		try
@@ -58,7 +57,7 @@ public class PersistPlaylist
 		{
 			if(e.getMessage().toLowerCase().contains("unique"))
 			{
-				throw new Exception(Messages.get(lang, "user.playList.errors.uniqueConstraintViolation"));
+				throw new UserPlaylistException("user.playList.errors.uniqueConstraintViolation");
 			}
 			else
 				throw new Exception(e);
@@ -67,7 +66,7 @@ public class PersistPlaylist
 	
 	public static void updatePlaylist(long id,
 			List<controllers.operations.persistence.dataObjects.Content> contentsToAdd,
-			List<controllers.operations.persistence.dataObjects.Content> contentsToRemove, Lang lang)
+			List<controllers.operations.persistence.dataObjects.Content> contentsToRemove)
 	{
 		final Playlist playlist = MAPPER.findById(id);
 		
@@ -123,11 +122,11 @@ public class PersistPlaylist
 		return userPlayLists;
 	}
 	
-	public static models.beans.dataObject.Playlist loadPlaylist(String userId, long playlistId, Lang lang)
-			throws Exception
+	public static models.beans.dataObject.Playlist loadPlaylist(String userId, long playlistId)
+			throws UserPlaylistException
 	{
 		Playlist playlist = MAPPER.findById(playlistId);
-		verifyPlaylist(playlist, userId, lang);
+		verifyPlaylist(playlist, userId);
 		
 		models.beans.dataObject.Playlist returnPlaylist = new models.beans.dataObject.Playlist();
 		returnPlaylist.setId(playlist.getId());
@@ -149,10 +148,10 @@ public class PersistPlaylist
 		return returnPlaylist;
 	}
 	
-	public static String deletePlaylist(String userId, long playlistId, Lang lang) throws Exception
+	public static String deletePlaylist(String userId, long playlistId) throws UserPlaylistException
 	{
 		Playlist playlist = MAPPER.findById(playlistId);
-		verifyPlaylist(playlist, userId, lang);
+		verifyPlaylist(playlist, userId);
 		
 		playlist.setUser(null);
 		
@@ -165,10 +164,10 @@ public class PersistPlaylist
 		return playlist.getName();
 	}
 	
-	private static void verifyPlaylist(Playlist playlist, String userId, Lang lang) throws Exception
+	private static void verifyPlaylist(Playlist playlist, String userId) throws UserPlaylistException
 	{
 		if(playlist == null || !userId.equals(playlist.getUser().getId()))
-			throw new Exception(Messages.get(lang, "user.playList.errors.invalidIdOrUserId"));
+			throw new UserPlaylistException("user.playList.errors.invalidIdOrUserId");
 	}
 	
 	private static void updatePlaylistContents(Playlist playlist,

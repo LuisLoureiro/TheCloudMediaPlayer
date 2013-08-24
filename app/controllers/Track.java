@@ -1,28 +1,28 @@
 package controllers;
 
-import org.codehaus.jackson.node.ObjectNode;
-
 import models.authentication.AccessToken;
 import models.db.OAuth1User;
 import models.db.OAuth2User;
 import models.db.notEntity.OAuthUser;
+
+import org.codehaus.jackson.node.ObjectNode;
+
+import play.db.jpa.Transactional;
+import play.libs.Json;
+import play.mvc.Controller;
+import play.mvc.Result;
+import play.mvc.Security.Authenticated;
 import controllers.enums.SESSION;
 import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.exceptions.OAuthException;
 import controllers.operations.authentication.factory.OAuthFactory;
 import controllers.operations.persistence.PersistOAuthUser;
-import play.db.jpa.Transactional;
-import play.i18n.Lang;
-import play.libs.Json;
-import play.mvc.Controller;
-import play.mvc.Result;
-import play.mvc.Security.Authenticated;
 
 public class Track extends Controller
 {
 	@Authenticated
 	@Transactional
-	public static Result getStreamUrl(String trackId)
+	public static Result getStreamUrl(String trackId) throws InstantiationException, OAuthException
 	{
 		// TODO check if the provider name exists in the providers enum.
 		// TODO Use annotations
@@ -30,17 +30,13 @@ public class Track extends Controller
 		if(providerName == null)
 			return badRequest("The query string parameter 'providerName' is missing.");
 		
-		// Client preferred language
-		// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
-		Lang lang = Lang.preferred(request().acceptLanguages());
-		
 		// Find access token
 		OAuthUser token = PersistOAuthUser.findByUserIdAndProviderName(session(SESSION.USERNAME.toString()), providerName);
 		if(token == null)
 			return badRequest("There's no access token matching the track service the current user.");
 		
-		try {
-			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(providerName, routes.Authentication.connectToCallback(providerName).absoluteURL(request()), lang);
+//		try {
+			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(providerName, routes.Authentication.connectToCallback(providerName).absoluteURL(request()));
 			
 			AccessToken accessToken = new AccessToken(token.getId(), token.getEmail(), null, null);
 			if(token instanceof OAuth1User)
@@ -61,14 +57,14 @@ public class Track extends Controller
 			ObjectNode result = Json.newObject();
 			result.put("url", location);
 			return ok(result);
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return internalServerError("Some unexpected error has occurred.");
-		} catch (OAuthException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return internalServerError(e.getMessage());
-		}
+//		} catch (InstantiationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return internalServerError("Some unexpected error has occurred.");
+//		} catch (OAuthException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return internalServerError(e.getMessage());
+//		}
 	}
 }

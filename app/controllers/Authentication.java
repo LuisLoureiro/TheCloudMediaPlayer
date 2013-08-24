@@ -32,6 +32,7 @@ import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.enums.OPENID_ATTRIBUTES;
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
 import controllers.operations.authentication.exceptions.OAuthException;
+import controllers.operations.authentication.exceptions.OpenIDException;
 import controllers.operations.authentication.factory.OAuthFactory;
 import controllers.operations.persistence.PersistOAuth2User;
 import controllers.operations.persistence.PersistOAuthUser;
@@ -45,7 +46,7 @@ public class Authentication extends Controller {
         return ok(index.render(openIDForm));
 	}
 
-	public static Result openID()
+	public static Result openID() throws OpenIDException
 	{
     	Form<OpenIDUser> openIDUserForm = Form.form(OpenIDUser.class).bindFromRequest();
     	if(openIDUserForm.hasErrors()) {
@@ -98,13 +99,14 @@ public class Authentication extends Controller {
 				flash("error", Messages.get("authentication.errors.openIdVerificationTimeout"));
 				return status(GATEWAY_TIMEOUT, index.render(openIDUserForm)); // TODO be sure that this is the correct error code!
 			}
-			flash("error", Messages.get("authentication.errors.openIdUnexpected"));
-			return internalServerError(index.render(openIDUserForm));
+			throw new OpenIDException("authentication.errors.openIdUnexpected");
+//			flash("error", Messages.get("authentication.errors.openIdUnexpected"));
+//			return internalServerError(index.render(openIDUserForm));
 		}
 	}
 
 	@Transactional
-	public static Result openIDCallback() {
+	public static Result openIDCallback() throws OpenIDException {
 		// If the information is not correct or if the server check is false (for example if the redirect URL has been forged), the returned Promise will be a Thrown.
 		try {
 //			OpenID.verifiedId().onRedeem(new Callback<OpenID.UserInfo>() {
@@ -154,13 +156,14 @@ public class Authentication extends Controller {
 				flash("error", Messages.get("authentication.errors.openIdProcessCanceled"));
 				return badRequest(index.render(form));
 			}
-			flash("error", Messages.get("authentication.errors.openIdVerificationUnexpected"));
-			return internalServerError(index.render(form));
+			throw new OpenIDException("authentication.errors.openIdVerificationUnexpected");
+//			flash("error", Messages.get("authentication.errors.openIdVerificationUnexpected"));
+//			return internalServerError(index.render(form));
 		}
 	}
 
 	@Transactional
-	public static Result exchangeCodeWithAccessToken()
+	public static Result exchangeCodeWithAccessToken() throws OAuthException
 	{
 		try {
 			// if code == null throw exception
@@ -230,64 +233,56 @@ public class Authentication extends Controller {
 				flash("error", ex.getMessage());
 				return badRequest(index.render(form));
 			}
-			flash("error", Messages.get("authentication.errors.oauthExchangeCodeUnexpected"));
-			return internalServerError(index.render(form));
+			throw new OAuthException("authentication.errors.oauthExchangeCodeUnexpected", ex);
+//			flash("error", Messages.get("authentication.errors.oauthExchangeCodeUnexpected"));
+//			return internalServerError(index.render(form));
 		}
 	}
 	
 	@Authenticated
 	@Transactional
 	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is thrown before reaching this action.
-	public static Result connectTo(String provider)
+	public static Result connectTo(String provider) throws InstantiationException, OAuthException
 	{
-		// Client preferred language
-		// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
-		Lang lang = Lang.preferred(request().acceptLanguages());
-		
-		try {
+//		try {
 			// Create the object that represents the service
-			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()), lang);
+			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()));
 			
 			// Get request token
 			String redirectUrl = oauthObject.getRequestToken(routes.Authentication.connectToCallback(provider).absoluteURL(request()));
 			
 			// Redirect to the authentication url
 			return redirect(redirectUrl);
-		} catch (InstantiationException | OAuthException ex) {
-			flash("error", ex.getMessage());
-			return badRequest(views.html.user.index.render(null)); // TODO return json.
-		}
+//		} catch (InstantiationException | OAuthException ex) {
+//			flash("error", ex.getMessage());
+//			return badRequest(views.html.user.index.render(null)); // TODO return json.
+//		}
 	}
 	
 	@Authenticated
 	@Transactional
 	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is thrown before reaching this action.
-	public static Result connectToCallback(String provider)
+	public static Result connectToCallback(String provider) throws InstantiationException, OAuthException
 	{
-		try
-		{
-			// Client preferred language
-			// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
-			Lang lang = Lang.preferred(request().acceptLanguages());
+//		try
+//		{
+		// Create the object that represents the service
+		IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()));
 		
-			// Create the object that represents the service
-			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()), lang);
-			
-			// Verify parameters
-			String requestToken = oauthObject.verifyCallbackRequest(request().queryString());
-			
-			// Get oauth_token_secret and oauth_token
-			AccessToken oauthToken = oauthObject.exchangeRequestTokenForAnAccessToken(requestToken);
-			
-			// MAPPER PART
-			// If the user doesn't exists, insert in the database and create relationship
-			// TODO async!
-			PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.toString()), lang);
-			return redirect(routes.User.index());
-		} catch (InstantiationException | OAuthException ex) {
-			flash("error", ex.getMessage());
-			return badRequest(views.html.user.index.render(null)); // TODO return json.
-		}
+		// Verify parameters
+		String requestToken = oauthObject.verifyCallbackRequest(request().queryString());
+		
+		// Get oauth_token_secret and oauth_token
+		AccessToken oauthToken = oauthObject.exchangeRequestTokenForAnAccessToken(requestToken);
+		
+		// If the user doesn't exists, insert in the database and create relationship
+		PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.toString()));
+		
+		return redirect(routes.User.index());
+//		} catch (InstantiationException | OAuthException ex) {
+//			flash("error", ex.getMessage());
+//			return badRequest(views.html.user.index.render(null)); // TODO return json.
+//		}
 	}
 	
 	@Authenticated
