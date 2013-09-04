@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import models.authentication.AccessToken;
-import models.form.OpenIDUser;
+import models.beans.dataBinding.form.OpenIDUser;
+import models.beans.dataObject.AccessToken;
 
 import org.codehaus.jackson.node.ObjectNode;
 

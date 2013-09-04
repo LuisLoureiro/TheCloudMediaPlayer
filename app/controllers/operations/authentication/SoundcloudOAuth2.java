@@ -8,13 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import models.authentication.AccessToken;
-import models.beans.Resource;
-import models.beans.ServiceResources;
 import models.beans.dataBinding.Playlist;
 import models.beans.dataBinding.Track;
 import models.beans.dataBinding.TrackStreamUrl;
 import models.beans.dataBinding.UserId;
+import models.beans.dataObject.AccessToken;
+import models.beans.dataObject.Resource;
+import models.beans.dataObject.ServiceResources;
 
 import org.apache.http.HttpResponse;
 
@@ -27,7 +27,7 @@ import controllers.enums.OAUTH_SERVICE_PROVIDERS;
 import controllers.operations.authentication.exceptions.OAuthException;
 import controllers.operations.parsers.IParserStrategy;
 
-public class SoundcloudOAuth2 implements IOAuth
+public class SoundcloudOAuth2 extends AbstractOAuth2
 {
 	private final String APP_KEY, APP_SECRET;
 	private final URI redirectUrl;
@@ -99,6 +99,7 @@ public class SoundcloudOAuth2 implements IOAuth
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_EXCLUSIVE_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
 			HttpResponse resp = wrapper.get(Request.to(Endpoints.MY_PLAYLISTS+".json"));
+			// TODO verify StatusLine before reading the entity! If Unauthorized refresh token!
 			Playlist[] contents = PARSER.parse(Playlist[].class, resp.getEntity().getContent());
 			if(contents != null)
 			{

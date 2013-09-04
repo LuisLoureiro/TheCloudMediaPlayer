@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import models.authentication.AccessToken;
-import models.beans.Resource;
-import models.beans.ServiceResources;
+import models.beans.dataObject.AccessToken;
+import models.beans.dataObject.Resource;
+import models.beans.dataObject.ServiceResources;
 import models.db.OAuth1Token;
 import models.mapper.IMapper;
 import models.mapper.OAuth1TokenMapper;

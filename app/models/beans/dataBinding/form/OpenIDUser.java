@@ -1,4 +1,4 @@
-package models.form;
+package models.beans.dataBinding.form;
 
 import play.data.validation.Constraints.Required;
 

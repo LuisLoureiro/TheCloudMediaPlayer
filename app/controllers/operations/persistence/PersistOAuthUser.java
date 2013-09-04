@@ -3,7 +3,7 @@ package controllers.operations.persistence;
 import java.util.LinkedList;
 import java.util.List;
 
-import models.authentication.AccessToken;
+import models.beans.dataObject.AccessToken;
 import models.db.User;
 import models.db.notEntity.OAuthUser;
 import models.mapper.IMapper;

@@ -1,4 +1,4 @@
-package models.beans;
+package models.beans.dataObject;
 
 import java.util.List;
 

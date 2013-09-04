@@ -3,8 +3,8 @@ package controllers;
 import java.util.LinkedList;
 import java.util.List;
 
-import models.authentication.AccessToken;
-import models.beans.ServiceResources;
+import models.beans.dataObject.AccessToken;
+import models.beans.dataObject.ServiceResources;
 import models.db.OAuth1User;
 import models.db.OAuth2User;
 import models.db.notEntity.OAuthUser;

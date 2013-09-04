@@ -2,8 +2,8 @@ package controllers.operations.authentication;
 
 import java.util.Map;
 
-import models.authentication.AccessToken;
-import models.beans.ServiceResources;
+import models.beans.dataObject.AccessToken;
+import models.beans.dataObject.ServiceResources;
 import controllers.operations.authentication.exceptions.OAuthException;
 
 

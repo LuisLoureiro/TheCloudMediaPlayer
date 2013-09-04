@@ -1,4 +1,4 @@
-package models.authentication;
+package models.beans.dataObject;
 
 /**
  * This class is used to combine the necessary information obtained from the OAuth provider after the exchange of the authorisation code/request token for an access token.<p>

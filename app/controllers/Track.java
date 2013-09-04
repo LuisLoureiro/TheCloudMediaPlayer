@@ -1,6 +1,6 @@
 package controllers;
 
-import models.authentication.AccessToken;
+import models.beans.dataObject.AccessToken;
 import models.db.OAuth1User;
 import models.db.OAuth2User;
 import models.db.notEntity.OAuthUser;
