@@ -5,9 +5,9 @@ import java.util.List;
 
 import models.beans.dataObject.AccessToken;
 import models.beans.dataObject.ServiceResources;
-import models.db.OAuth1User;
-import models.db.OAuth2User;
-import models.db.notEntity.OAuthUser;
+import models.database.OAuth1User;
+import models.database.OAuth2User;
+import models.database.notEntity.OAuthUser;
 import play.db.jpa.Transactional;
 import play.mvc.Controller;
 import play.mvc.Result;

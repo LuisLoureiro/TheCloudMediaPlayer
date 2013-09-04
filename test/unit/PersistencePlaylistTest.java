@@ -11,10 +11,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import models.db.Content;
-import models.db.Playlist;
-import models.db.PlaylistContent;
-import models.db.User;
+import models.database.Content;
+import models.database.Playlist;
+import models.database.PlaylistContent;
+import models.database.User;
 import models.mapper.ContentMapper;
 import models.mapper.PlaylistContentMapper;
 import models.mapper.PlaylistMapper;

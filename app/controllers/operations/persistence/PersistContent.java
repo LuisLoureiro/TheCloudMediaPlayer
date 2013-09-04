@@ -9,9 +9,9 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 
-import models.db.Content;
-import models.db.PlaylistContent;
-import models.db.compositeKeys.ContentKey;
+import models.database.Content;
+import models.database.PlaylistContent;
+import models.database.compositeKeys.ContentKey;
 import models.mapper.ContentMapper;
 import models.mapper.IMapper;
 

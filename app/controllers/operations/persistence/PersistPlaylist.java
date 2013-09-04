@@ -7,11 +7,11 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
-import models.db.Content;
-import models.db.Playlist;
-import models.db.PlaylistContent;
-import models.db.compositeKeys.ContentKey;
-import models.db.compositeKeys.PlaylistContentKey;
+import models.database.Content;
+import models.database.Playlist;
+import models.database.PlaylistContent;
+import models.database.compositeKeys.ContentKey;
+import models.database.compositeKeys.PlaylistContentKey;
 import models.mapper.IMapper;
 import models.mapper.PlaylistContentMapper;
 import models.mapper.PlaylistMapper;

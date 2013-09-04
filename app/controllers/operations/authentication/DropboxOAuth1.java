@@ -11,7 +11,7 @@ import java.util.Properties;
 import models.beans.dataObject.AccessToken;
 import models.beans.dataObject.Resource;
 import models.beans.dataObject.ServiceResources;
-import models.db.OAuth1Token;
+import models.database.OAuth1Token;
 import models.mapper.IMapper;
 import models.mapper.OAuth1TokenMapper;
 

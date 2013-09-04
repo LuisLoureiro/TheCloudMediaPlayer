@@ -6,8 +6,8 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-import models.db.Content;
-import models.db.User;
+import models.database.Content;
+import models.database.User;
 
 import org.codehaus.jackson.node.ObjectNode;
 
@@ -163,7 +163,6 @@ public class Global extends GlobalSettings
 	{
 		System.out.println("before each request..." + request.toString());
 		Action<?> action = super.onRequest(request, actionMethod);
-		System.out.println("after each request..." + request.toString());
 		return action;
 	}
 }

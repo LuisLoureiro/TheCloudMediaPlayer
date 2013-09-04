@@ -1,7 +1,7 @@
 package models.mapper;
 
-import models.db.Content;
-import models.db.compositeKeys.ContentKey;
+import models.database.Content;
+import models.database.compositeKeys.ContentKey;
 
 public class ContentMapper extends AbstractMapper<ContentKey, Content>
 {

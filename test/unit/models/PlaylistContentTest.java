@@ -3,11 +3,11 @@ package unit.models;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import models.db.Content;
-import models.db.Playlist;
-import models.db.PlaylistContent;
-import models.db.User;
-import models.db.compositeKeys.ContentKey;
+import models.database.Content;
+import models.database.Playlist;
+import models.database.PlaylistContent;
+import models.database.User;
+import models.database.compositeKeys.ContentKey;
 
 import org.junit.Test;
 

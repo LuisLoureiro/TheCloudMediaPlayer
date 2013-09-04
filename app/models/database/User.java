@@ -1,4 +1,4 @@
-package models.db;
+package models.database;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,7 +20,7 @@ import javax.persistence.Version;
 @Entity(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "type")
-@DiscriminatorValue(value = "other")
+@DiscriminatorValue(value = "openID")
 public class User
 {
 	@Version

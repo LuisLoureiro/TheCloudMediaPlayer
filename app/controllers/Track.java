@@ -1,9 +1,9 @@
 package controllers;
 
 import models.beans.dataObject.AccessToken;
-import models.db.OAuth1User;
-import models.db.OAuth2User;
-import models.db.notEntity.OAuthUser;
+import models.database.OAuth1User;
+import models.database.OAuth2User;
+import models.database.notEntity.OAuthUser;
 
 import org.codehaus.jackson.node.ObjectNode;
 

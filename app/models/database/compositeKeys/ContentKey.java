@@ -1,4 +1,4 @@
-package models.db.compositeKeys;
+package models.database.compositeKeys;
 
 import java.io.Serializable;
 

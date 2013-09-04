@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import models.beans.dataObject.AccessToken;
-import models.db.User;
-import models.db.notEntity.OAuthUser;
+import models.database.User;
+import models.database.notEntity.OAuthUser;
 import models.mapper.IMapper;
 import models.mapper.UserMapper;
 import controllers.operations.authentication.exceptions.OAuthException;

@@ -1,4 +1,4 @@
-package models.db;
+package models.database;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -6,7 +6,7 @@ import javax.persistence.Id;
 
 import play.data.validation.Constraints.Required;
 
-@Entity(name="oauth1_token")
+@Entity(name="oauth1_tokens")
 public class OAuth1Token {
 
 	@Id

@@ -1,7 +1,7 @@
 package models.mapper;
 
-import models.db.PlaylistContent;
-import models.db.compositeKeys.PlaylistContentKey;
+import models.database.PlaylistContent;
+import models.database.compositeKeys.PlaylistContentKey;
 
 public class PlaylistContentMapper extends AbstractMapper<PlaylistContentKey, PlaylistContent>
 {

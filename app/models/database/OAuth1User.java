@@ -1,4 +1,4 @@
-package models.db;
+package models.database;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -6,8 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.validation.constraints.NotNull;
 
-import models.db.notEntity.OAuthUser;
-
+import models.database.notEntity.OAuthUser;
 import play.data.validation.Constraints.Required;
 
 @Entity(name="oauth1_users")

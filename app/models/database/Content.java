@@ -1,4 +1,4 @@
-package models.db;
+package models.database;
 
 import static javax.persistence.CascadeType.ALL;
 
@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
-import models.db.compositeKeys.ContentKey;
+import models.database.compositeKeys.ContentKey;
 
 @Entity(name = "contents")
 public class Content

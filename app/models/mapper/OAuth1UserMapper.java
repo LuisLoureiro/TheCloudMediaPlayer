@@ -1,6 +1,6 @@
 package models.mapper;
 
-import models.db.OAuth1User;
+import models.database.OAuth1User;
 
 public class OAuth1UserMapper extends AbstractMapper<String, OAuth1User>
 {

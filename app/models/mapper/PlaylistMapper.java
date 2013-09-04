@@ -1,6 +1,6 @@
 package models.mapper;
 
-import models.db.Playlist;
+import models.database.Playlist;
 
 public class PlaylistMapper extends AbstractMapper<Long, Playlist>
 {

@@ -1,4 +1,4 @@
-package models.db;
+package models.database;
 
 import static javax.persistence.CascadeType.ALL;
 

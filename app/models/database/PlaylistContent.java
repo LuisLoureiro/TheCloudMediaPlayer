@@ -1,4 +1,4 @@
-package models.db;
+package models.database;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +9,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 
-import models.db.compositeKeys.PlaylistContentKey;
+import models.database.compositeKeys.PlaylistContentKey;
 
 @Entity(name="playlists_contents")
 @IdClass(PlaylistContentKey.class)

@@ -1,6 +1,6 @@
 package models.mapper;
 
-import models.db.User;
+import models.database.User;
 
 public class UserMapper extends AbstractMapper<String, User>
 {

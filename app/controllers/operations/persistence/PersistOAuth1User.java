@@ -1,8 +1,8 @@
 package controllers.operations.persistence;
 
 import models.beans.dataObject.AccessToken;
-import models.db.OAuth1User;
-import models.db.User;
+import models.database.OAuth1User;
+import models.database.User;
 import models.mapper.IMapper;
 import models.mapper.OAuth1UserMapper;
 import models.mapper.UserMapper;

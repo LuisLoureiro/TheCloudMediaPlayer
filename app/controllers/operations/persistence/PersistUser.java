@@ -1,6 +1,6 @@
 package controllers.operations.persistence;
 
-import models.db.User;
+import models.database.User;
 import models.mapper.IMapper;
 import models.mapper.UserMapper;
 
