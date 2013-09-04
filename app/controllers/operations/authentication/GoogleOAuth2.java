@@ -5,9 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import play.i18n.Lang;
-import play.i18n.Messages;
-
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
@@ -71,10 +68,10 @@ public class GoogleOAuth2 /*extends AbstractOAuth2 */{
 	 * @throws OAuth2ValidationException
 	 * @throws IOException 
 	 */
-	public void validateToken(TokenResponse token, String userId, Lang lang) throws OAuth2ValidationException, IOException {
+	public void validateToken(TokenResponse token, String userId) throws OAuth2ValidationException, IOException {
 		Tokeninfo tokenInfo = isTokenValid(token);
-		if(!isTokenForTheIntendedUser(tokenInfo, userId)) throw new OAuth2ValidationException(Messages.get(lang, "authentication.errors.oauthTokenIntendedUser"));
-		if(!isTokenForOurApp(tokenInfo)) throw new OAuth2ValidationException(Messages.get(lang, "authentication.errors.oauthTokenIntendedApp"));
+		if(!isTokenForTheIntendedUser(tokenInfo, userId)) throw new OAuth2ValidationException("authentication.errors.oauthTokenIntendedUser");
+		if(!isTokenForOurApp(tokenInfo)) throw new OAuth2ValidationException("authentication.errors.oauthTokenIntendedApp");
 	}
 
 	/*@Override*/

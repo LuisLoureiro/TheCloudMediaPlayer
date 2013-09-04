@@ -14,7 +14,6 @@ import models.beans.ServiceResources;
 import models.db.OAuth1Token;
 import models.mapper.IMapper;
 import models.mapper.OAuth1TokenMapper;
-import play.i18n.Messages;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.DropboxLink;
@@ -86,7 +85,8 @@ public class DropboxOAuth1 implements IOAuth
 			// Get the request token pair from the database.
 			IMapper<String, OAuth1Token> oauth1TokenMapper = new OAuth1TokenMapper(); // TODO ver a possibilidade de usar o padrão factory.
 			OAuth1Token token = oauth1TokenMapper.findById(requestToken); 
-			if(token == null ) throw new OAuth1TokenException(Messages.get("authentication.errors.oauthTokenInexistent"));
+			if(token == null )
+				throw new OAuth1TokenException("authentication.errors.oauthTokenInexistent");
 			// Delete from database the request token pair. Are not necessary anymore.
 			oauth1TokenMapper.delete(token);
 			

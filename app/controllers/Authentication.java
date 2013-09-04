@@ -14,7 +14,6 @@ import org.codehaus.jackson.node.ObjectNode;
 import play.api.libs.openid.Errors;
 import play.data.Form;
 import play.db.jpa.Transactional;
-import play.i18n.Lang;
 import play.i18n.Messages;
 import play.libs.Json;
 import play.libs.OpenID;
@@ -169,27 +168,23 @@ public class Authentication extends Controller {
 			// if code == null throw exception
 			Map<String, String[]> body = request().body().asFormUrlEncoded();
 			if(!body.containsKey("code") || !body.containsKey("userId")) {
-				throw new IllegalStateException(Messages.get("authentication.errors.oauthMissingParams"));
+				throw new IllegalStateException("authentication.errors.oauthMissingParams");
 			}
 			// Capture the name of the provider used to authenticate.
 			String providerName = request().getQueryString("provider")
 					,userId = body.get("userId")[0]
-					,userEmail = body.get("userEmail") != null ? body.get("userEmail")[0] : ""
-					,userName = body.get("userName") != null ? body.get("userName")[0] : "";
+					,userEmail = body.containsKey("userEmail") ? body.get("userEmail")[0] : ""
+					,userName = body.containsKey("userName") ? body.get("userName")[0] : "";
 //			// Ensure that this is no request forgery going on.
 //			if (!body.containsKey("csrf") || !body.get("csrf")[0].equals(session("csrf")))
 //			    return unauthorized("Invalid CSRF token.");
-			
-			// Client preferred language
-			// The accept languages are ordered by importance. The method returns the first language that matches an available language or the default application language.
-			Lang lang = Lang.preferred(request().acceptLanguages());
 
 			// Create an OAuth2 object based on the OAuth2 authentication provider used by the user using the factory method pattern.
 			GoogleOAuth2 oauth2Object = new GoogleOAuth2();
 			// exchange the code with an access token
 			TokenResponse token = oauth2Object.exchangeAuthCode(body.get("code")[0]);
 			// validate token
-			oauth2Object.validateToken(token, userId, lang);
+			oauth2Object.validateToken(token, userId);
 			
 			// save the access token and the refresh token
 			PersistOAuth2User.saveUser(providerName, new AccessToken(userId, userEmail, token.getAccessToken(), token.getRefreshToken()), "email", userEmail);
@@ -210,7 +205,9 @@ public class Authentication extends Controller {
 			String returnURL = routes.User.index().absoluteURL(request());
 			if (request().accepts("text/json") || request().accepts("application/json")) {
 				// Return a json object with the url to redirect to.
-				ObjectNode result = Json.newObject(); result.put("status", "OK"); result.put("url", returnURL);
+				ObjectNode result = Json.newObject();
+				result.put("status", "OK");
+				result.put("url", returnURL);
 				return ok(result);
 			}
 			return redirect(returnURL);
@@ -220,7 +217,7 @@ public class Authentication extends Controller {
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
 			if(ex.getClass().equals(OAuth2ValidationException.class))
 			{
-				flash("error", ex.getMessage());
+				flash("error", Messages.get(ex.getMessage()));
 				return forbidden(index.render(form));
 			}
 			if(ex.getClass().equals(IOException.class))
@@ -230,7 +227,7 @@ public class Authentication extends Controller {
 			}
 			if(ex.getClass().equals(IllegalStateException.class))
 			{
-				flash("error", ex.getMessage());
+				flash("error", Messages.get(ex.getMessage()));
 				return badRequest(index.render(form));
 			}
 			throw new OAuthException("authentication.errors.oauthExchangeCodeUnexpected", ex);
