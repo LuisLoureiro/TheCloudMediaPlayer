@@ -155,7 +155,7 @@ public class DropboxOAuth1 implements IOAuth
 			throw new OAuthProcessCanceledException();
 		
 		if(!queryString.containsKey("oauth_token"))
-			throw new OAuthMissingRequiredParametersException("authentication.errors.oauthMissingRequiredParam");
+			throw new OAuthMissingRequiredParametersException();
 		
 		return queryString.get("oauth_token")[0];
 	}

@@ -10,7 +10,6 @@ import controllers.operations.authentication.exceptions.OAuthMissingRequiredPara
 
 public abstract class AbstractOAuth2 implements IOAuth
 {
-	
 	@Override
 	public String verifyCallbackRequest(Map<String, String[]> queryString) throws OAuthException
 	{
@@ -18,7 +17,7 @@ public abstract class AbstractOAuth2 implements IOAuth
 		if(!queryString.containsKey(OAUTH2_ERROR_PARAMETERS.error.name()))
 		{
 			if(!queryString.containsKey("code"))
-				throw new OAuthMissingRequiredParametersException("authentication.errors.oauthMissingRequiredParam");
+				throw new OAuthMissingRequiredParametersException();
 			
 			return queryString.get("code")[0];
 		}
