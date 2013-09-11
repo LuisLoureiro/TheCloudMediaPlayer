@@ -151,7 +151,7 @@ function savePlaylist() {
         id,
         serializedPlaylistContents;
 	if (rows.length === 0) {
-		appendErrorAlert("You cannot save an empty play list.");
+		appendErrorAlert("Não pode guardar listas de reprodução sem conteúdos.");
 		return;
 	}
 	func = function (update, contentsData) {
@@ -185,9 +185,9 @@ function savePlaylist() {
 		setModalBoxContents("Guardar lista de reprodução",
 				'<form id="playlist-saveForm" class="form-horizontal"><fieldset><legend>Indique o nome da nova lista</legend>'
 				+ '<div class="control-group"><label class="control-label">Nome</label>'
-				+ '<div class="controls"><input class="span3" type="text" name="name" placeholder="Ex: First playlist, Best tracks, ..." required="required"></input>'
+				+ '<div class="controls"><input class="span3" type="text" name="name" placeholder="Ex: Primeira lista, Melhores músicas, ..." required="required"></input>'
 				+ '<span class="help-inline">O nome tem que ser preenchido!</span></div></div>'
-				+ '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">Save</button></div></div></fieldset></form>');
+				+ '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">Guardar</button></div></div></fieldset></form>');
 		$('#playlist-saveForm').submit(function (e) {
 			e.preventDefault();
 			func(false, $(this).serialize() + serializePlaylistContents(rows));
@@ -198,7 +198,7 @@ function savePlaylist() {
 		if (serializedPlaylistContents.length !== 0) {
 			func(true, 'name=' + elem.text().trim() + '&id=' + id + serializedPlaylistContents);
         } else {
-            appendErrorAlert('The current play list has no changes to save.');
+            appendErrorAlert('A lista de reprodução atual não contém alterações a gravar!');
         }
 	}
 }
@@ -242,14 +242,14 @@ function deletePlaylist() {
 				+ '<p>Esta eliminação não poderá ser revogada mais tarde!</p>'
 				+ '<form id="playlist-deleteForm" class="form-horizontal">'
 				+ '<input type="hidden" name="id" value="' + id + '"></input>'
-				+ '<div class="form-actions"><button type="submit" class="btn btn-primary">Confirm</button></div>'
+				+ '<div class="form-actions"><button type="submit" class="btn btn-primary">Confirmar</button></div>'
 				+ '</form>');
 		$('#playlist-deleteForm').submit(function (e) {
 			e.preventDefault();
 			func(id);
 		});
 	} else {
-		setModalBoxContents("Erro", '<p>The default play list cannot be deleted!</p>');
+		setModalBoxContents("Erro", '<p>A lista de reprodução por omissão não pode ser removida!</p>');
 	}
 	$('#modalBox').modal('show');
 }
@@ -301,7 +301,7 @@ function appendLoadedContentsToPlayList(playlistBody, contents) {
 		// TODO Show the contents associating the provided.
 		// "Ensure that these contents are still present in their services or if they were not removed or renamed."
 		// Show a Modal window!
-		return "Some contents weren't successfully loaded because you're not connected to the correspondent service provider. " + "Connect to " + notConnectedProviders.join(', ') + ' and refresh the play list contents.';
+		return "Alguns conteúdos não foram carregados, porque não se encontra ligado ao correspondente serviço. Efetue a ligação a " + notConnectedProviders.join(', ') + ' e atualize a lista de reprodução.';
 	}
 }
 function loadPlaylist(elem) {
@@ -330,7 +330,7 @@ function loadPlaylist(elem) {
 			error: defaultJsonErrorHandler
 		});
 	} else {
-        appendErrorAlert("The selected play list doesn't have the id attribute.");
+        appendErrorAlert("A lista de reprodução selecionada não contém o atributo id.");
     }
 }
 $(document).ready(function () {
