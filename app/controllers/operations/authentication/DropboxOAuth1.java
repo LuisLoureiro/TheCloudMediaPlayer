@@ -113,7 +113,7 @@ public class DropboxOAuth1 implements IOAuth
 		try {
 			Entry metadata = new DropboxAPI<WebAuthSession>(
 						new WebAuthSession(new AppKeyPair(APP_KEY, APP_SECRET), ACCESS_TYPE, new AccessTokenPair(accessToken.getAccessToken(), accessToken.getRefreshToken())))
-					.metadata("/", 10, null, true, null);
+					.metadata("/", 0, null, true, null);
 			
 			for(Entry entry : metadata.contents)
 			{
