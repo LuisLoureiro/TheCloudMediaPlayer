@@ -7,15 +7,16 @@ Este projeto consiste no desenvolvimento de uma aplicação _web Mashup_ gratuit
 1. [Web Site](http://thecloudmediaplayer.herokuapp.com)
 1. [Proposta de projeto](https://www.dropbox.com/s/larslc6nq7cau5f/pp32186.pdf)
 1. [Relatório de progresso](https://www.dropbox.com/s/8gjpnj9l9v25uo4/rp32186.pdf)
-1. [Relatório da versão beta]()
-1. [Cartaz]()
+1. [Relatório da versão beta](https://www.dropbox.com/s/gkpb5rq66elqcua/rvb32186.pdf)
+1. [Relatório final](https://www.dropbox.com/s/bhhe4h0pcy9lqsk/Relat%C3%B3rio_final.pdf)
+1. [Cartaz](https://www.dropbox.com/s/zb9mwi0492h5tvj/c32186.pdf)
 
 ## Instalação
 Para que se possa executar a aplicação em ambiente de desenvolvimento numa máquina local, é necessário cumprir alguns requisitos:
 
 * Ter instalada a versão 7 do [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html), ou superior;
 * Instalar a versão 2.1 da _framework Play_, seguindo os passos indicados na [documentação](http://www.playframework.com/documentation/2.1.1/Installing);
-* Fazer `git clone` deste repositório para uma diretoria à escolha, no sistema de ficheiros do sistema operativo;
+* Fazer `git clone https://github.com/LuisLoureiro/TheCloudMediaPlayer.git` para uma diretoria à escolha, no sistema de ficheiros do sistema operativo;
 * Instalar a versão 9.1 do SGBD _[PostgreSQL](http://www.postgresql.org/download/)_, versão 9.1, com uma base de dados intitulada "thecloudmediaplayerdb". Para mais informações sobre a instalação do SGBD PostgreSQL. ler [este](http://www.postgresql.org/docs/9.1/static/installation.html) artigo;
 * Configurar as seguintes variáveis de ambiente no sistema operativo:
     1. PGDATA - Diretoria onde serão guardados os dados do _cluster_ da base de dados. Em sistemas Linux, `/var/lib/pgsql/data` é uma localização comum;
