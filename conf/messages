@@ -27,6 +27,7 @@ authentication.errors.oauthServerError=The authorization server encountered an u
 authentication.errors.oauthTemporarilyUnavailable=The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.
 
 errors.parametersMissing=Some parameters are required and are missing: [{0}].
+errors.oauthInstantiationException=OAuth user is not an instance of an OAuth1 user or an OAuth2 user.
 
 user.welcome=Welcome {0}!
 user.connectTo=Connect to
@@ -54,7 +55,15 @@ user.playList.header.name=Name
 user.playList.errors.uniqueConstraintViolation=There''s a play list with the exact same name. Please choose a different one.
 user.playList.errors.invalidIdOrUserId=The supplied play list ID doesn''t exists or doesn''t match the indicated user.
 
+user.track.errors.noAccessTokenMatchesUserAndService=There''s no access token matching the track service and the current user.
+
 playlist.nameRequired=The name of the play list must be defined!
+oauthUser.providerNameRequired=The provider''s name could not be null!
+oauth1User.oauthTokenRequired=The oauth token could not be null.
+oauth1User.oauthTokenSecretRequired=The oauth token secret could not be null.
+oauth2User.accessTokenRequired=The access token could not be null.
+oauth2User.refreshTokenRequired=The refresh token could not be null.
 
 form.playlistForm.nameRequired=The name of the play list cannot be null.
 form.playlistForm.contentsRequired=The play list cannot be empty.
+form.openIdUser.identifierRequired=The OpenID identifier cannot be null or empty.

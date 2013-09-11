@@ -16,7 +16,7 @@ public class PersistUser {
 	 */
 	public static void saveUser(String userId, String userEmail)
 	{
-		IMapper<String, User> mapper = new UserMapper(); // TODO ver a possibilidade de usar o padrão factory.
+		IMapper<String, User> mapper = new UserMapper(); // TODO static object.
 		User user = mapper.findById(userId);
 		if(user == null)
 		{

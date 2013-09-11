@@ -23,7 +23,7 @@ public class PersistOAuth2User {
 	 */
 	public static void saveUser(String provider, AccessToken token, String findByFieldName, String findByFieldValue)
 	{
-		IMapper<String, OAuth2User> oauth2Mapper = new OAuth2UserMapper(); // TODO ver a possibilidade de usar o padrão factory.
+		IMapper<String, OAuth2User> oauth2Mapper = new OAuth2UserMapper(); // TODO static object.
 		
 		OAuth2User user = oauth2Mapper.findById(token.getUid());
 		if(user == null)

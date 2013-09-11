@@ -53,15 +53,8 @@ public class Authentication extends Controller {
     	}
     	OpenIDUser user = openIDUserForm.get();
     	
-		try {
-			// If the OpenID is invalid, an exception is thrown.
-//			/*Promise<String> redirectUrl = */OpenID.redirectURL(id, routes.Authentication.openIDCallback)/*;
-//			redirectUrl*/.onRedeem(new Callback<String>() {
-//				@Override
-//				public void invoke(String url) throws Throwable {
-//					redirect(url);
-//				}
-//			});
+		try
+		{
 			// Additional attributes
 			Map<String, String> attributes = new HashMap<String, String>();
 			attributes.put(OPENID_ATTRIBUTES.EMAIL.getName(), OPENID_ATTRIBUTES.EMAIL.getUri());
@@ -79,6 +72,8 @@ public class Authentication extends Controller {
 //			attributes.put(OPENID_ATTRIBUTES.LAST_NAME.getName(), OPENID_ATTRIBUTES.LAST_NAME.getUri());
 //			attributes.put(OPENID_ATTRIBUTES.LAST_NAME_AX.getName(), OPENID_ATTRIBUTES.LAST_NAME_AX.getUri());
 //			attributes.put(OPENID_ATTRIBUTES.LAST_NAME_OP.getName(), OPENID_ATTRIBUTES.LAST_NAME_OP.getUri());
+			
+			// If the OpenID is invalid, an exception is thrown.
 			return redirect(
 					OpenID.redirectURL(user.getOpenid_identifier(), routes.Authentication.openIDCallback().absoluteURL(request()), attributes)
 					.get());
@@ -96,26 +91,17 @@ public class Authentication extends Controller {
 			}
 			if(ex.getClass().equals(TimeoutException.class)) {
 				flash("error", Messages.get("authentication.errors.openIdVerificationTimeout"));
-				return status(GATEWAY_TIMEOUT, index.render(openIDUserForm)); // TODO be sure that this is the correct error code!
+				return status(GATEWAY_TIMEOUT, index.render(openIDUserForm));
 			}
 			throw new OpenIDException("authentication.errors.openIdUnexpected");
-//			flash("error", Messages.get("authentication.errors.openIdUnexpected"));
-//			return internalServerError(index.render(openIDUserForm));
 		}
 	}
 
 	@Transactional
 	public static Result openIDCallback() throws OpenIDException {
 		// If the information is not correct or if the server check is false (for example if the redirect URL has been forged), the returned Promise will be a Thrown.
-		try {
-//			OpenID.verifiedId().onRedeem(new Callback<OpenID.UserInfo>() {
-//				@Override
-//				public void invoke(UserInfo info) throws Throwable {
-//					flash("success", "Successfully signed in.");
-//					// redirect to the user home page
-//					redirect(routes.User.index());
-//				}
-//			});
+		try
+		{
 			UserInfo info = OpenID.verifiedId().get(10000L); // default is 5000. It may be too short.
 			// Additional attributes
 			Map<String, String> attributes = info.attributes;
@@ -149,23 +135,21 @@ public class Authentication extends Controller {
 			Form<OpenIDUser> form = Form.form(OpenIDUser.class);
 			if(ex.getClass().equals(TimeoutException.class)) {
 				flash("error", Messages.get("authentication.errors.openIdVerificationTimeout"));
-				return status(GATEWAY_TIMEOUT, index.render(form)); // TODO be sure that this is the correct error code!
+				return status(GATEWAY_TIMEOUT, index.render(form));
 			}
 			if(ex instanceof Errors.AUTH_CANCEL$) {
 				flash("error", Messages.get("authentication.errors.openIdProcessCanceled"));
 				return badRequest(index.render(form));
 			}
 			throw new OpenIDException("authentication.errors.openIdVerificationUnexpected");
-//			flash("error", Messages.get("authentication.errors.openIdVerificationUnexpected"));
-//			return internalServerError(index.render(form));
 		}
 	}
 
 	@Transactional
 	public static Result exchangeCodeWithAccessToken() throws OAuthException
 	{
-		try {
-			// if code == null throw exception
+		try
+		{
 			Map<String, String[]> body = request().body().asFormUrlEncoded();
 			if(!body.containsKey("code") || !body.containsKey("userId")) {
 				throw new IllegalStateException("authentication.errors.oauthMissingParams");
@@ -175,9 +159,6 @@ public class Authentication extends Controller {
 					,userId = body.get("userId")[0]
 					,userEmail = body.containsKey("userEmail") ? body.get("userEmail")[0] : ""
 					,userName = body.containsKey("userName") ? body.get("userName")[0] : "";
-//			// Ensure that this is no request forgery going on.
-//			if (!body.containsKey("csrf") || !body.get("csrf")[0].equals(session("csrf")))
-//			    return unauthorized("Invalid CSRF token.");
 
 			// Create an OAuth2 object based on the OAuth2 authentication provider used by the user using the factory method pattern.
 			GoogleOAuth2 oauth2Object = new GoogleOAuth2();
@@ -223,7 +204,7 @@ public class Authentication extends Controller {
 			if(ex.getClass().equals(IOException.class))
 			{
 				flash("error", ex.getMessage());
-				return status(BAD_GATEWAY, index.render(form)); // TODO be sure that this is the correct error code!
+				return status(BAD_GATEWAY, index.render(form));
 			}
 			if(ex.getClass().equals(IllegalStateException.class))
 			{
@@ -231,8 +212,6 @@ public class Authentication extends Controller {
 				return badRequest(index.render(form));
 			}
 			throw new OAuthException("authentication.errors.oauthExchangeCodeUnexpected", ex);
-//			flash("error", Messages.get("authentication.errors.oauthExchangeCodeUnexpected"));
-//			return internalServerError(index.render(form));
 		}
 	}
 	
@@ -241,19 +220,13 @@ public class Authentication extends Controller {
 	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is thrown before reaching this action.
 	public static Result connectTo(String provider) throws InstantiationException, OAuthException
 	{
-//		try {
-			// Create the object that represents the service
-			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()));
-			
-			// Get request token
-			String redirectUrl = oauthObject.getRequestToken(routes.Authentication.connectToCallback(provider).absoluteURL(request()));
-			
-			// Redirect to the authentication url
-			return redirect(redirectUrl);
-//		} catch (InstantiationException | OAuthException ex) {
-//			flash("error", ex.getMessage());
-//			return badRequest(views.html.user.index.render(null)); // TODO return json.
-//		}
+		IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()));
+		
+		// Get request token
+		String redirectUrl = oauthObject.getRequestToken(routes.Authentication.connectToCallback(provider).absoluteURL(request()));
+		
+		// Redirect to the authentication url
+		return redirect(redirectUrl);
 	}
 	
 	@Authenticated
@@ -261,8 +234,6 @@ public class Authentication extends Controller {
 	// As the routes file doesn't define the parameter as optional the provider is always required. An exception is thrown before reaching this action.
 	public static Result connectToCallback(String provider) throws InstantiationException, OAuthException
 	{
-//		try
-//		{
 		// Create the object that represents the service
 		IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(provider, routes.Authentication.connectToCallback(provider).absoluteURL(request()));
 		
@@ -276,22 +247,12 @@ public class Authentication extends Controller {
 		PersistOAuthUser.saveUser(provider, oauthToken, "id", session(SESSION.USERNAME.toString()));
 		
 		return redirect(routes.User.index());
-//		} catch (InstantiationException | OAuthException ex) {
-//			flash("error", ex.getMessage());
-//			return badRequest(views.html.user.index.render(null)); // TODO return json.
-//		}
 	}
 	
 	@Authenticated
 	public static Result signOut()
 	{
-		// Clear session. TODO Maybe is better to selectively remove the unneeded information.
 		session().clear();
-//		// Remove the username from the session.
-//		if(session(SESSION.USERNAME.getId()) != null)
-//			session().remove(SESSION.USERNAME.getId());
-		
-		// Notify the identity provider if needed: Revoke access tokens.
 		
 		// Redirect to the index page
 		flash("success", Messages.get("authentication.signedOut"));

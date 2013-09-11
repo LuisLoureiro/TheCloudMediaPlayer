@@ -11,9 +11,6 @@ import models.database.User;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import controllers.operations.authentication.exceptions.OAuthException;
-import controllers.operations.authentication.exceptions.OpenIDException;
-import controllers.operations.exceptions.ApplicationOperationException;
 import play.Application;
 import play.GlobalSettings;
 import play.db.jpa.JPA;
@@ -29,10 +26,12 @@ import play.mvc.Result;
 import play.mvc.Results;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
+import controllers.operations.exceptions.ApplicationOperationException;
 
 public class Global extends GlobalSettings
 {
 	// Intercepting application start-up and shutdown
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onStart(Application app)
 	{
@@ -75,11 +74,6 @@ public class Global extends GlobalSettings
 	@Override
 	public Result onError(RequestHeader request, Throwable t)
 	{
-		// return internalServerError(views.html.error.errorPage.render(t));
-		// return
-		// Results.internalServerError(views.html.defaultpages.error.render(null));
-		// return super.onError(request, t);
-		
 		// Get error message
 		String errorMessage;
 		Throwable innerT = t.getCause();
@@ -134,11 +128,6 @@ public class Global extends GlobalSettings
 	@Override
 	public Result onHandlerNotFound(RequestHeader request)
 	{
-		// return
-		// Results.notFound(views.html.error.pageNotFound.render(request.uri()));
-		// return
-		// Results.notFound(views.html.defaultpages.notFound.render(request,
-		// null));
 		return super.onHandlerNotFound(request);
 	}
 	
@@ -147,10 +136,6 @@ public class Global extends GlobalSettings
 	@Override
 	public Result onBadRequest(RequestHeader request, String error)
 	{
-		// return Results.badRequest(views.html.error.badRequest.render());
-		// return
-		// Results.badRequest(views.html.defaultpages.badRequest.render(request,
-		// "Don't try to hack the URI!"));
 		return super.onBadRequest(request, error);
 	}
 	

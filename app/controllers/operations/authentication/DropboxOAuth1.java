@@ -72,7 +72,7 @@ public class DropboxOAuth1 implements IOAuth
 			return authInfo.url;
 		} catch(DropboxException ex)
 		{
-			ex.printStackTrace(); // TODO to remove
+			ex.printStackTrace();
 			throw new OAuthException(ex.getMessage(), ex); // TODO better exception message!
 		}
 	}
@@ -83,7 +83,7 @@ public class DropboxOAuth1 implements IOAuth
 		try
 		{
 			// Get the request token pair from the database.
-			IMapper<String, OAuth1Token> oauth1TokenMapper = new OAuth1TokenMapper(); // TODO ver a possibilidade de usar o padrão factory.
+			IMapper<String, OAuth1Token> oauth1TokenMapper = new OAuth1TokenMapper(); // TODO create Persistence class.
 			OAuth1Token token = oauth1TokenMapper.findById(requestToken); 
 			if(token == null )
 				throw new OAuth1TokenException("authentication.errors.oauthTokenInexistent");
@@ -101,7 +101,7 @@ public class DropboxOAuth1 implements IOAuth
 			return new AccessToken(dropboxUID, null, tokenPair.key, tokenPair.secret);
 		} catch(DropboxException ex)
 		{
-			ex.printStackTrace(); // TODO to remove
+			ex.printStackTrace();
 			throw new OAuth1TokenException(ex.getMessage(), ex); // TODO better exception message!
 		}
 	}
@@ -126,7 +126,7 @@ public class DropboxOAuth1 implements IOAuth
 				}
 			}
 		} catch (DropboxException e) {
-			e.printStackTrace(); // TODO remove!
+			e.printStackTrace();
 			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
 		}
 		return new ServiceResources(OAUTH_SERVICE_PROVIDERS.DROPBOX.getBestCase(), resources);
@@ -142,7 +142,7 @@ public class DropboxOAuth1 implements IOAuth
 			
 			return link.url;
 		} catch (DropboxException e) {
-			e.printStackTrace(); // TODO remove!
+			e.printStackTrace();
 			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
 		}
 	}

@@ -27,6 +27,7 @@ authentication.errors.oauthServerError=O servidor de autorização encontrou uma
 authentication.errors.oauthTemporarilyUnavailable=O servidor de autorização não consegue, de momento, processar o pedido devido a uma manutenção ou uma temporária sobrecarga no servidor.
 
 errors.parametersMissing=Alguns parâmetros obrigatórios estão em falta: [{0}].
+errors.oauthInstantiationException=O utilizador OAuth não é uma instância de um utilizador OAuth2 ou OAuth1.
 
 user.welcome=Bem-vindo {0}!
 user.connectTo=Ligar a
@@ -54,7 +55,15 @@ user.playList.header.name=Nome
 user.playList.errors.uniqueConstraintViolation=Já existe uma lista de reprodução com o mesmo nome. Por favor, escolha um nome diferente.
 user.playList.errors.invalidIdOrUserId=O ID de lista de reprodução fornecido não existe ou não corresponde ao utilizador indicado.
 
+user.track.errors.noAccessTokenMatchesUserAndService=Não foi encontrado nenhum token de acesso que corresponda ao utilizador atual e ao respetivo serviço.
+
 playlist.nameRequired=O nome da lista de reprodução deve ser indicado!
+oauthUser.providerNameRequired=O nome do fornecedor OAuth não pode ser nulo!
+oauth1User.oauthTokenRequired=O token oauth não pode ser nulo.
+oauth1User.oauthTokenSecretRequired=O código secreto oauth não pode ser nulo.
+oauth2User.accessTokenRequired=O token de acesso não pode ser nulo.
+oauth2User.refreshTokenRequired=O token de atualização não pode ser nulo.
 
 form.playlistForm.nameRequired=O nome da lista de reprodução não pode ser nulo.
 form.playlistForm.contentsRequired=A lista de reprodução não pode estar vazia.
+form.openIdUser.identifierRequired=O identificador OpenID não pode nulo ou vazio.

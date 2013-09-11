@@ -5,7 +5,7 @@ import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.SoundcloudOAuth2;
 import controllers.operations.parsers.JsonParser;
 
-public class OAuthFactory // TODO think about the use of the singleton pattern. NO. See method exchange of soundcloud. We're setting an oauth token to the wrapper. See again!! 
+public class OAuthFactory 
 {
 	private static JsonParser jsonParser;
 	

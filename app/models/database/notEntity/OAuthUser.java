@@ -10,7 +10,7 @@ import models.database.User;
 public abstract class OAuthUser extends User
 {
 	@Column(name="provider_name", nullable=false)
-	@Required(message="The provider's name could not be null")
+	@Required(message="oauthUser.providerNameRequired")
 	private String providerName;
 	
 	public String getProviderName() {

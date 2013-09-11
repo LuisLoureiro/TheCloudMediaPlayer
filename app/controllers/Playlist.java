@@ -43,7 +43,8 @@ public class Playlist extends Controller
 	    PlaylistForm playlist = playlistForm.get();
 	    
 	    long id = playlist.getId();
-		Utils.ITransform<PlaylistForm.Content, controllers.operations.persistence.dataObjects.Content> transform = new Utils.ITransform<PlaylistForm.Content, controllers.operations.persistence.dataObjects.Content>()
+		Utils.ITransform<PlaylistForm.Content, controllers.operations.persistence.dataObjects.Content> transform = 
+				new Utils.ITransform<PlaylistForm.Content, controllers.operations.persistence.dataObjects.Content>()
 		{
 			@Override
 			public controllers.operations.persistence.dataObjects.Content transform(Content elem)

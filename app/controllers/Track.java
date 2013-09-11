@@ -8,6 +8,7 @@ import models.database.notEntity.OAuthUser;
 import org.codehaus.jackson.node.ObjectNode;
 
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -28,43 +29,33 @@ public class Track extends Controller
 		// TODO Use annotations
 		String providerName = ctx()._requestHeader().getQueryString("providerName").get();
 		if(providerName == null)
-			return badRequest("The query string parameter 'providerName' is missing.");
+			return badRequest(Messages.get("errors.parametersMissing", "providerName"));
 		
 		// Find access token
 		OAuthUser token = PersistOAuthUser.findByUserIdAndProviderName(session(SESSION.USERNAME.toString()), providerName);
 		if(token == null)
-			return badRequest("There's no access token matching the track service the current user.");
+			return badRequest(Messages.get("user.track.errors.noAccessTokenMatchesUserAndService"));
 		
-//		try {
-			IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(providerName, routes.Authentication.connectToCallback(providerName).absoluteURL(request()));
-			
-			AccessToken accessToken = new AccessToken(token.getId(), token.getEmail(), null, null);
-			if(token instanceof OAuth1User)
-			{
-				accessToken.setAccessToken(((OAuth1User) token).getOauthToken());
-				accessToken.setRefreshToken(((OAuth1User) token).getOauthTokenSecret());
-			} else if(token instanceof OAuth2User)
-			{
-				accessToken.setAccessToken(((OAuth2User) token).getAccessToken());
-				accessToken.setRefreshToken(((OAuth2User) token).getRefreshToken());
-			} else
-			{
-				throw new InstantiationException("OAuthUser object is not an instance of OAuth1User or OAuth2User.");
-			}
-			String location = oauthObject.getResourceStreamUrl(accessToken, trackId);
-			
-			// Return a json object with the url to use to stream this track.
-			ObjectNode result = Json.newObject();
-			result.put("url", location);
-			return ok(result);
-//		} catch (InstantiationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return internalServerError("Some unexpected error has occurred.");
-//		} catch (OAuthException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return internalServerError(e.getMessage());
-//		}
+		IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(providerName, routes.Authentication.connectToCallback(providerName).absoluteURL(request()));
+		
+		AccessToken accessToken = new AccessToken(token.getId(), token.getEmail(), null, null);
+		if(token instanceof OAuth1User)
+		{
+			accessToken.setAccessToken(((OAuth1User) token).getOauthToken());
+			accessToken.setRefreshToken(((OAuth1User) token).getOauthTokenSecret());
+		} else if(token instanceof OAuth2User)
+		{
+			accessToken.setAccessToken(((OAuth2User) token).getAccessToken());
+			accessToken.setRefreshToken(((OAuth2User) token).getRefreshToken());
+		} else
+		{
+			throw new InstantiationException("errors.oauthInstantiationException");
+		}
+		String location = oauthObject.getResourceStreamUrl(accessToken, trackId);
+		
+		// Return a json object with the url to use to stream this track.
+		ObjectNode result = Json.newObject();
+		result.put("url", location);
+		return ok(result);
 	}
 }

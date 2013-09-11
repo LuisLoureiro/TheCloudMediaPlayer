@@ -9,7 +9,6 @@ public class PlaylistForm
 	private long id;
 	@Required(message="form.playlistForm.nameRequired")
 	private String name;
-//	@Required(message="form.playlistForm.contentsRequired")
 	private List<Content> contentsToAdd;
 	private List<Content> contentsToRemove;
 

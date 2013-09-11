@@ -30,7 +30,7 @@ import controllers.operations.parsers.IParserStrategy;
 public class SoundcloudOAuth2 extends AbstractOAuth2
 {
 	private final String APP_KEY, APP_SECRET;
-	private final URI redirectUrl;
+	private final URI REDIRECT_URL;
 	
 	private final IParserStrategy PARSER;
 
@@ -43,12 +43,11 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 			this.APP_KEY = properties.getProperty("SOUNDCLOUD_CLIENT_ID");
 			this.APP_SECRET = properties.getProperty("SOUNDCLOUD_CLIENT_SECRET");
 			
-			this.redirectUrl = new URI(redirectUrl);
+			this.REDIRECT_URL = new URI(redirectUrl);
 			
 			this.PARSER = parser;
 		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace(); // TODO remove!
-			// TODO Auto-generated catch block
+			e.printStackTrace();
 			throw new InstantiationException(e.getMessage());
 		}
 	}
@@ -57,7 +56,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 	public String getRequestToken(String callbackUrl)
 	{
 		// TODO we should send a state value, confirming it in the callback.
-		return new ApiWrapper(APP_KEY, APP_SECRET, redirectUrl, null)
+		return new ApiWrapper(APP_KEY, APP_SECRET, REDIRECT_URL, null)
 				.authorizationCodeUrl(Endpoints.CONNECT)
 				.toString();
 	}
@@ -68,7 +67,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 		AccessToken uidAccessRefreshToken = new AccessToken();
 		try {
 //			Token accessToken = this.WRAPPER.authorizationCode(requestToken);
-			ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, redirectUrl, null);
+			ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, REDIRECT_URL, null);
 			Token accessToken = wrapper.authorizationCode(requestToken);
 			
 			uidAccessRefreshToken.setAccessToken(accessToken.access);
@@ -94,7 +93,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 	{
 		List<Resource> resourcesList = new LinkedList<Resource>();
 		try {
-			ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, redirectUrl, new Token(accessToken.getAccessToken(), accessToken.getRefreshToken()));
+			ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, REDIRECT_URL, new Token(accessToken.getAccessToken(), accessToken.getRefreshToken()));
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_FAVORITES+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_EXCLUSIVE_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
@@ -113,7 +112,6 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			// TODO throw new
 		}
@@ -124,7 +122,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 	@Override
 	public String getResourceStreamUrl(AccessToken accessToken, String trackId) throws OAuthException
 	{
-		ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, redirectUrl, new Token(accessToken.getAccessToken(), accessToken.getRefreshToken()));
+		ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, REDIRECT_URL, new Token(accessToken.getAccessToken(), accessToken.getRefreshToken()));
 		
 		try {
 			HttpResponse resp = wrapper.get(Request.to(Endpoints.TRACK_DETAILS+".json", Integer.parseInt(trackId))); // TODO consider the track streamable property!
@@ -137,7 +135,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 					return trackStreamUrl.getLocation();
 			}
 		} catch (IOException e) {
-			e.printStackTrace(); // TODO remove!
+			e.printStackTrace();
 			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
 		}
 		

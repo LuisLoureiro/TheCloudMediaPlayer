@@ -23,7 +23,7 @@ public class PersistOAuth1User {
 	 */
 	public static void saveUser(String provider, AccessToken token, String findByFieldName, String findByFieldValue)
 	{
-		IMapper<String, OAuth1User> oauth1Mapper = new OAuth1UserMapper(); // TODO ver a possibilidade de usar o padrão factory.
+		IMapper<String, OAuth1User> oauth1Mapper = new OAuth1UserMapper(); // TODO static object.
 		
 		OAuth1User user = oauth1Mapper.findById(token.getUid());
 		if(user == null)
@@ -32,7 +32,7 @@ public class PersistOAuth1User {
 			User existingRecord = null;
 			if(findByFieldName != null && !findByFieldName.isEmpty())
 			{
-				for (User auxUser : new UserMapper().findBy(findByFieldName, findByFieldValue)) { // TODO ver a possibilidade de usar o padrão factory.
+				for (User auxUser : new UserMapper().findBy(findByFieldName, findByFieldValue)) {
 					existingRecord = auxUser;
 					break;
 				}

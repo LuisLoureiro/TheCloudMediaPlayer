@@ -15,10 +15,10 @@ import play.data.validation.Constraints.Required;
 public class OAuth2User extends OAuthUser
 {
 	@Column(name="access_token", nullable=false)
-	@NotNull(message="The access_token could not be null")
+	@NotNull(message="oauth2User.accessTokenRequired")
 	private String accessToken;
 	@Column(name="refresh_token", nullable=false)
-	@Required(message="The refresh_token could not be null")
+	@Required(message="oauth2User.refreshTokenRequired")
 	private String refreshToken;
 	@Column(name="expires_in")
 	private long expiresIn;

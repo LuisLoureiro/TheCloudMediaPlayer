@@ -15,10 +15,10 @@ import play.data.validation.Constraints.Required;
 public class OAuth1User extends OAuthUser
 {
 	@Column(name="oauth_token", nullable=false)
-	@NotNull(message="The oauth token could not be null")
+	@NotNull(message="oauth1User.oauthTokenRequired")
 	private String oauthToken;
 	@Column(name="oauth_token_secret", nullable=false)
-	@Required(message="The oauth token secret could not be null")
+	@Required(message="oauth1User.oauthTokenSecretRequired")
 	private String oauthTokenSecret;
 	
 	public String getOauthToken() {

@@ -4,7 +4,7 @@ import play.data.validation.Constraints.Required;
 
 public class OpenIDUser {
 
-	@Required(message="The OpenID identifier cannot be null or empty.")
+	@Required(message="form.openIdUser.identifierRequired")
 	private String openid_identifier;
 
 	public String getOpenid_identifier() {

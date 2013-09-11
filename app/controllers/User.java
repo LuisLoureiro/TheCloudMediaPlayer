@@ -56,7 +56,6 @@ public class User extends Controller {
 					session(oauthToken.getProviderName(), "authenticated");
 				} catch (InstantiationException | OAuthException e) {
 					flash("error", e.getMessage());
-//					return badRequest(index.render(listServiceResources));
 				}
 			}
 		}
