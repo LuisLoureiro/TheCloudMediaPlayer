@@ -5,7 +5,7 @@
     <h2>@Messages.get("authentication.title")</h2>
     @helper.form(action = routes.Authentication.openID(), 'id -> "openIDForm") {
     	@helper.inputText(openIDForm("openid_identifier"), 'id -> "openID", 'autofocus -> "autofocus", '_label -> "OpenID", '_showConstraints -> false)
-    	<input type="submit" name="Sign in"/>
+    	<input type="submit" value='@Messages.get("authentication.submit.button")'/>
     }<br/>
 	<div id="signinButton">
 		<span class="g-signin"
@@ -20,6 +20,6 @@
 	</div>
 	<div id="result"></div>
 	<script type="text/javascript">
-	    $('#openIDForm>dl>dt').append('<a href="http://openidexplained.com" target="_blank">What\'s this?</a>');
+	    $('#openIDForm>dl>dt').append('<a href="http://openidexplained.com" target="_blank">@Messages.get("authentication.what.is.openid")</a>');
     </script>
 }
