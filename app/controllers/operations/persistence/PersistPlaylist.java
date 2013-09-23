@@ -1,7 +1,6 @@
 package controllers.operations.persistence;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -155,10 +154,7 @@ public class PersistPlaylist
 		
 		playlist.setUser(null);
 		
-		List<PlaylistContent> contents = new ArrayList<PlaylistContent>(playlist.getContents().size());
-		Collections.copy(contents, playlist.getContents());
-		
-		updatePlaylistContents(playlist, null, contents);
+		updatePlaylistContents(playlist, null, new ArrayList<PlaylistContent>(playlist.getContents()));
 		MAPPER.delete(playlist);
 		
 		return playlist.getName();
