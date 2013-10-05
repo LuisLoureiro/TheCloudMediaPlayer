@@ -9,6 +9,8 @@ Este projeto consiste no desenvolvimento de uma aplicação _web Mashup_ gratuit
 1. [Relatório de progresso](https://www.dropbox.com/s/8gjpnj9l9v25uo4/rp32186.pdf)
 1. [Relatório da versão beta](https://www.dropbox.com/s/gkpb5rq66elqcua/rvb32186.pdf)
 1. [Relatório final](https://www.dropbox.com/s/bhhe4h0pcy9lqsk/Relat%C3%B3rio_final.pdf)
+1. [Apresentação final](https://www.dropbox.com/s/p8vssjg7h09p7cl/a32186.pdf)
+1. Demo [(.webm)](https://www.dropbox.com/s/t66h19e9vq3u5uz/apresenta%C3%A7%C3%A3o_projeto_final_curso.webm)
 1. [Cartaz](https://www.dropbox.com/s/zb9mwi0492h5tvj/c32186.pdf)
 
 ## Instalação
