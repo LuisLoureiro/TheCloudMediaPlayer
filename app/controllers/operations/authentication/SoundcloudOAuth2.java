@@ -88,7 +88,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 	}
 
 	@Override
-	public ServiceResources getResources(AccessToken accessToken)
+	public ServiceResources getResources(AccessToken accessToken) throws OAuthException
 	{
 		List<Resource> resourcesList = new LinkedList<Resource>();
 		try {
@@ -112,7 +112,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			// TODO throw new OAuthException
+			throw new OAuthException(e.getMessage(), e); // TODO better exception message!
 		}
 		
 		return new ServiceResources(OAUTH_SERVICE_PROVIDERS.SOUNDCLOUD.toString(), resourcesList);
