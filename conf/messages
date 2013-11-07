@@ -32,9 +32,9 @@ errors.parametersMissing=Some parameters are required and are missing: [{0}].
 errors.oauthInstantiationException=OAuth user is not an instance of an OAuth1 user or an OAuth2 user.
 
 user.welcome=Welcome {0}!
-user.connectTo=Connect to
 user.startPlayer=Start player
 user.connectTo=Connect to ...
+user.connected=Connected
 user.playing=Playing
 user.contents=Contents
 user.playList=Play list

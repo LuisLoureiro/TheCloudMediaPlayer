@@ -32,9 +32,9 @@ errors.parametersMissing=Alguns parâmetros obrigatórios estão em falta: [{0}]
 errors.oauthInstantiationException=O utilizador OAuth não é uma instância de um utilizador OAuth2 ou OAuth1.
 
 user.welcome=Bem-vindo {0}!
-user.connectTo=Ligar a
 user.startPlayer=Iniciar player
 user.connectTo=Ligar a ...
+user.connected=Ligado
 user.playing=Em reprodução
 user.contents=Conteúdos
 user.playList=Lista de reprodução

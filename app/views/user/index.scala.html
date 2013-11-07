@@ -23,7 +23,7 @@
 	              <ul class="dropdown-menu">
 	                @for(provider <- OAUTH_SERVICE_PROVIDERS.values) {
 	                   <li><a href="@routes.Authentication.connectTo(provider.toString)">@provider.getBestCase 
-	                       @if("authenticated".equals(ctx.session.get(provider.toString))) {<span class="badge badge-info">connected</span>}
+	                       @if("authenticated".equals(ctx.session.get(provider.toString))) {<span class="badge badge-info">@Messages.get("user.connected")</span>}
 	                   </a></li>
 	                }
 	              </ul>
