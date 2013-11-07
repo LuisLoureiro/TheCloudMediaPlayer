@@ -77,8 +77,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 //			uidAccessRefreshToken.setExpiresIn(accessToken.expiresIn); // Non-expiring token!
 			
 			// TODO think about the possibility to use the public uri to be the id. It's unique! Think about it for every service!
-			// TODO beware about the .json and the PARSER.
-			HttpResponse response = wrapper.get(Request.to(Endpoints.MY_DETAILS+".json"));
+			HttpResponse response = wrapper.get(Request.to(Endpoints.MY_DETAILS));
 			uidAccessRefreshToken.setUid(
 					PARSER.parse(UserId.class, response.getEntity().getContent())
 						.getId());
@@ -94,10 +93,10 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 		List<Resource> resourcesList = new LinkedList<Resource>();
 		try {
 			ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, REDIRECT_URL, new Token(accessToken.getAccessToken(), accessToken.getRefreshToken()));
-//			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_FAVORITES+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
-//			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
-//			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_EXCLUSIVE_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
-			HttpResponse resp = wrapper.get(Request.to(Endpoints.MY_PLAYLISTS+".json"));
+//			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_FAVORITES).usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
+//			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_TRACKS).usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
+//			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_EXCLUSIVE_TRACKS).usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
+			HttpResponse resp = wrapper.get(Request.to(Endpoints.MY_PLAYLISTS));
 			
 			Playlist[] contents = PARSER.parse(Playlist[].class, resp.getEntity().getContent());
 			if(contents != null)
@@ -113,7 +112,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			// TODO throw new
+			// TODO throw new OAuthException
 		}
 		
 		return new ServiceResources(OAUTH_SERVICE_PROVIDERS.SOUNDCLOUD.toString(), resourcesList);
@@ -125,7 +124,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 		ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, REDIRECT_URL, new Token(accessToken.getAccessToken(), accessToken.getRefreshToken()));
 		
 		try {
-			HttpResponse resp = wrapper.get(Request.to(Endpoints.TRACK_DETAILS+".json", Integer.parseInt(trackId))); // TODO consider the track streamable property!
+			HttpResponse resp = wrapper.get(Request.to(Endpoints.TRACK_DETAILS, Integer.parseInt(trackId))); // TODO consider the track streamable property!
 			Track trackDetails = PARSER.parse(Track.class, resp.getEntity().getContent());
 			if(trackDetails != null)
 			{
