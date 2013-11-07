@@ -57,7 +57,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 	{
 		// TODO we should send a state value, confirming it in the callback.
 		return new ApiWrapper(APP_KEY, APP_SECRET, REDIRECT_URL, null)
-				.authorizationCodeUrl(Endpoints.CONNECT)
+				.authorizationCodeUrl(Endpoints.CONNECT, Token.SCOPE_NON_EXPIRING)
 				.toString();
 	}
 
@@ -66,15 +66,15 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 	{
 		AccessToken uidAccessRefreshToken = new AccessToken();
 		try {
-//			Token accessToken = this.WRAPPER.authorizationCode(requestToken);
 			ApiWrapper wrapper = new ApiWrapper(APP_KEY, APP_SECRET, REDIRECT_URL, null);
 			Token accessToken = wrapper.authorizationCode(requestToken);
 			
 			uidAccessRefreshToken.setAccessToken(accessToken.access);
-			uidAccessRefreshToken.setRefreshToken(accessToken.refresh);
+//			uidAccessRefreshToken.setRefreshToken(accessToken.refresh); // Non-expiring token!
+			
 			// See http://tools.ietf.org/html/draft-ietf-oauth-v2-31#page-40
 			// The expires in returned in the Token object is the expire date instead of lifetime in seconds as said in the ieft draft.
-			uidAccessRefreshToken.setExpiresIn(accessToken.expiresIn);
+//			uidAccessRefreshToken.setExpiresIn(accessToken.expiresIn); // Non-expiring token!
 			
 			// TODO think about the possibility to use the public uri to be the id. It's unique! Think about it for every service!
 			// TODO beware about the .json and the PARSER.
@@ -98,7 +98,7 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
 //			HttpResponse resp = this.WRAPPER.get(Request.to(Endpoints.MY_EXCLUSIVE_TRACKS+".json").usingToken(new Token(accessToken.getAccessToken(), accessToken.getRefreshToken())));
 			HttpResponse resp = wrapper.get(Request.to(Endpoints.MY_PLAYLISTS+".json"));
-			// TODO verify StatusLine before reading the entity! If Unauthorized refresh token!
+			
 			Playlist[] contents = PARSER.parse(Playlist[].class, resp.getEntity().getContent());
 			if(contents != null)
 			{
