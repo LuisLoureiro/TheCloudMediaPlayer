@@ -36,7 +36,7 @@ public class PersistPlaylist
 						@Override
 						public PlaylistContent transform(controllers.operations.persistence.dataObjects.Content elem)
 						{
-							Content content = PersistContent.findIfNullSave(elem.getId(), elem.getProvider());
+							Content content = PersistContent.findIfNullCreate(elem.getId(), elem.getProvider());
 							return new PlaylistContent(elem.getIdx(), content, playlist);
 						}
 					}), null);
@@ -75,7 +75,7 @@ public class PersistPlaylist
 						@Override
 						public PlaylistContent transform(controllers.operations.persistence.dataObjects.Content elem)
 						{
-							Content content = PersistContent.findIfNullSave(elem.getId(), elem.getProvider());
+							Content content = PersistContent.findIfNullCreate(elem.getId(), elem.getProvider());
 							return new PlaylistContent(elem.getIdx(), content, playlist);
 						}
 					})
