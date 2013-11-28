@@ -30,7 +30,7 @@ public class PersistPlaylist
 		try
 		{
 			final Playlist playlist = new Playlist(0, name, new UserMapper().findById(userId), null);
-			updatePlaylistContents(playlist
+			updatePlaylistContents(playlist, null
 					, Utils.transform(contents, new ITransform<controllers.operations.persistence.dataObjects.Content, PlaylistContent>()
 					{
 						@Override
@@ -39,7 +39,7 @@ public class PersistPlaylist
 							Content content = PersistContent.findIfNullCreate(elem.getId(), elem.getProvider());
 							return new PlaylistContent(elem.getIdx(), content, playlist);
 						}
-					}), null);
+					}));
 			MAPPER.save(playlist);
 			/*
 			 * Java EE 6 tutorial : "The state of persistent entities is
@@ -70,15 +70,6 @@ public class PersistPlaylist
 		final Playlist playlist = MAPPER.findById(id);
 		
 		updatePlaylistContents(playlist
-				, Utils.transform(contentsToAdd, new Utils.ITransform<controllers.operations.persistence.dataObjects.Content, PlaylistContent>()
-					{
-						@Override
-						public PlaylistContent transform(controllers.operations.persistence.dataObjects.Content elem)
-						{
-							Content content = PersistContent.findIfNullCreate(elem.getId(), elem.getProvider());
-							return new PlaylistContent(elem.getIdx(), content, playlist);
-						}
-					})
 				, Utils.transformWithPredicate(contentsToRemove, new ITransform<controllers.operations.persistence.dataObjects.Content, PlaylistContent>()
 					{
 						private final IMapper<PlaylistContentKey, PlaylistContent> MAPPER = new PlaylistContentMapper();
@@ -95,7 +86,15 @@ public class PersistPlaylist
 							{
 								return elem != null;
 							}
-							
+						})
+				, Utils.transform(contentsToAdd, new Utils.ITransform<controllers.operations.persistence.dataObjects.Content, PlaylistContent>()
+						{
+							@Override
+							public PlaylistContent transform(controllers.operations.persistence.dataObjects.Content elem)
+							{
+								Content content = PersistContent.findIfNullCreate(elem.getId(), elem.getProvider());
+								return new PlaylistContent(elem.getIdx(), content, playlist);
+							}
 						}));
 		MAPPER.update(playlist);
 	}
@@ -154,7 +153,7 @@ public class PersistPlaylist
 		
 		playlist.setUser(null);
 		
-		updatePlaylistContents(playlist, null, new ArrayList<PlaylistContent>(playlist.getContents()));
+		updatePlaylistContents(playlist, new ArrayList<PlaylistContent>(playlist.getContents()), null);
 		MAPPER.delete(playlist);
 		
 		return playlist.getName();
@@ -167,15 +166,8 @@ public class PersistPlaylist
 	}
 	
 	private static void updatePlaylistContents(Playlist playlist,
-			List<PlaylistContent> contentsToAdd, List<PlaylistContent> contentsToRemove)
+			List<PlaylistContent> contentsToRemove, List<PlaylistContent> contentsToAdd)
 	{
-		if(contentsToAdd != null && !contentsToAdd.isEmpty())
-		{
-			for(PlaylistContent contentToAdd : contentsToAdd)
-			{
-				playlist.addContent(contentToAdd);
-			}
-		}
 		if(contentsToRemove != null && !contentsToRemove.isEmpty())
 		{
 			for(PlaylistContent contentToRemove : contentsToRemove)
@@ -183,6 +175,13 @@ public class PersistPlaylist
 				playlist.removeContent(contentToRemove);
 			}
 			PersistContent.deleteContentsWithoutPlaylist(contentsToRemove);
+		}
+		if(contentsToAdd != null && !contentsToAdd.isEmpty())
+		{
+			for(PlaylistContent contentToAdd : contentsToAdd)
+			{
+				playlist.addContent(contentToAdd);
+			}
 		}
 	}
 }
