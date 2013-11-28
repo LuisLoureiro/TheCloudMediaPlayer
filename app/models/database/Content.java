@@ -1,6 +1,9 @@
 package models.database;
 
-import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.DETACH;
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.REFRESH;
+import static javax.persistence.CascadeType.REMOVE;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,6 +16,7 @@ import javax.persistence.Version;
 
 import models.database.compositeKeys.ContentKey;
 
+
 @Entity(name = "contents")
 public class Content
 {
@@ -22,7 +26,7 @@ public class Content
 	@EmbeddedId
 	private ContentKey				key;
 	
-	@OneToMany(cascade = { ALL }, mappedBy = "content", orphanRemoval=true)
+	@OneToMany(cascade = { MERGE, REMOVE, DETACH, REFRESH }, mappedBy = "content", orphanRemoval=true)
 	private List<PlaylistContent>	playlists;
 	
 	public Content()

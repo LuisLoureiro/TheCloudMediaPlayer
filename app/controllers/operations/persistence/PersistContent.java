@@ -43,13 +43,14 @@ public class PersistContent
 		}
 	}
 	
-	static Content findIfNullCreate(String id, String provider)
+	static Content findIfNullSave(String id, String provider)
 	{
 		ContentKey key = new ContentKey(id, provider);
 		Content content = CONTENT_MAPPER.findById(key);
 		if(content == null)
 		{
 			content = new Content(key, null);
+			CONTENT_MAPPER.save(content);
 		}
 		
 		return content;
