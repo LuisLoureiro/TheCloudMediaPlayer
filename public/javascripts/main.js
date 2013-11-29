@@ -12,6 +12,15 @@ var theCloudMediaPlayer = (function () {
 		function getIdx() { return idx_f; }
 		function getId() { return id_f; }
 		function getProvider() { return provider_f; }
+        function equals(other) {
+            if (!other || typeof other !== typeof this) { return false; }
+            if (this.getIdx() === other.getIdx()
+                    && this.getId() === other.getId()
+                    && this.getProvider() === other.getProvider()) {
+                return true;
+            }
+            return false;
+        }
         
 		this.getIdx = getIdx;
 		this.getId = getId;
@@ -19,29 +28,61 @@ var theCloudMediaPlayer = (function () {
 		this.setIdx = setIdx;
 		this.setId = setId;
 		this.setProvider = setProvider;
+        this.equals = equals;
 	}
 	return {
 		playlistFuncs : {
 			getDifferences : function (tableRows) {
-				var diffs = {toAdd : [], toRemove : []};
-				tableRows.each(function (idx) {
-					var $playlistContent = $(this).find('a:first'),
-                        playlistContentId = $playlistContent.attr('data-track-id'),
-                        playlistContentProvider = $playlistContent.attr('data-provider-name'),
-                        currentPlaylistContent;
-					
-					if (theCloudMediaPlayer.currentPlaylist) {
-						currentPlaylistContent = theCloudMediaPlayer.currentPlaylist.contents[idx];
-						if (!currentPlaylistContent) {
-                            diffs.toAdd.push(new Content(idx, playlistContentId, playlistContentProvider));
-                        } else if (playlistContentId !== currentPlaylistContent.id || playlistContentProvider !== currentPlaylistContent.provider) {
-							diffs.toRemove.push(new Content(idx, currentPlaylistContent.id, currentPlaylistContent.provider));
-							diffs.toAdd.push(new Content(idx, playlistContentId, playlistContentProvider));
-						}
-					} else {
-						diffs.toAdd.push(new Content(idx, playlistContentId, playlistContentProvider));
-					}
-				});
+				var diffs = {toAdd : [], toRemove : []},
+                    currentPlaylist = theCloudMediaPlayer.currentPlaylist;
+                
+                if (!currentPlaylist) {
+                    tableRows.each(function (idx) {
+                        var $pContent = $(this).find('a:first');
+                        
+						diffs.toAdd.push(new Content(idx, $pContent.attr('data-track-id'), $pContent.attr('data-provider-name')));
+                    });
+                } else {
+                    // More adds or the same number of adds and removes.
+                    if (tableRows.length >= currentPlaylist.contents.length) {
+				        tableRows.each(function (idx) {
+                            var $pContent = $(this).find('a:first'),
+                                content = new Content(idx, $pContent.attr('data-track-id'), $pContent.attr('data-provider-name')),
+                                cpContent = currentPlaylist.contents[idx],
+                                currentPlaylistContent;
+                            
+                            if (!cpContent) {
+                                diffs.toAdd.push(content);
+                            } else {
+                                currentPlaylistContent = new Content(idx, cpContent.id, cpContent.provider);
+                                
+                                if (!content.equals(currentPlaylistContent)) {
+                                    diffs.toRemove.push(currentPlaylistContent);
+                                    diffs.toAdd.push(content);
+                                }
+                            }
+                        });
+                    // More removes.
+                    } else {
+                        $.each(currentPlaylist.contents, function (idx, cpContent) {
+                            var $pContent = tableRows[idx],
+                                content,
+                                currentPlaylistContent = new Content(idx, cpContent.id, cpContent.provider);
+                            
+                            if (!$pContent) {
+                                diffs.toRemove.push(currentPlaylistContent);
+                            } else {
+                                $pContent = $($pContent).find('a:first');
+                                content = new Content(idx, $pContent.attr('data-track-id'), $pContent.attr('data-provider-name'));
+                                
+                                if (!content.equals(currentPlaylistContent)) {
+                                    diffs.toRemove.push(currentPlaylistContent);
+                                    diffs.toAdd.push(content);
+                                }
+                            }
+                        });
+                    }
+                }
 				
 				return diffs;
 			}
