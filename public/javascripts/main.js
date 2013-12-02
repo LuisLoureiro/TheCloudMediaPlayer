@@ -1,5 +1,6 @@
 var theCloudMediaPlayer = (function () {
-	var currentPlaylist = undefined;
+	var currentPlaylist = undefined,
+        modifiedCurrentPlaylist = undefined;
 	function Content(idx, id, provider) {
 		// Fields
 		var idx_f = idx,
@@ -32,9 +33,14 @@ var theCloudMediaPlayer = (function () {
 	}
 	return {
 		playlistFuncs : {
+            saveDifferences : function () {
+                theCloudMediaPlayer.currentPlaylist = theCloudMediaPlayer.modifiedCurrentPlaylist;
+                theCloudMediaPlayer.modifiedCurrentPlaylist = undefined;
+            },
 			getDifferences : function (tableRows) {
 				var diffs = {toAdd : [], toRemove : []},
-                    currentPlaylist = theCloudMediaPlayer.currentPlaylist;
+                    currentPlaylist = theCloudMediaPlayer.currentPlaylist,
+                    modifiedCurrentPlaylist = theCloudMediaPlayer.modifiedCurrentPlaylist = $.extend(true, {}, currentPlaylist);
                 
                 if (!currentPlaylist) {
                     tableRows.each(function (idx) {
@@ -51,14 +57,16 @@ var theCloudMediaPlayer = (function () {
                                 cpContent = currentPlaylist.contents[idx],
                                 currentPlaylistContent;
                             
-                            if (!cpContent) {
+                            if (!cpContent) { // This only occurs on the last elements of the table rows.
                                 diffs.toAdd.push(content);
+                                modifiedCurrentPlaylist.contents.push({id: content.getId(), provider: content.getProvider()});
                             } else {
                                 currentPlaylistContent = new Content(idx, cpContent.id, cpContent.provider);
                                 
                                 if (!content.equals(currentPlaylistContent)) {
                                     diffs.toRemove.push(currentPlaylistContent);
                                     diffs.toAdd.push(content);
+                                    modifiedCurrentPlaylist.contents[idx] = {id: content.getId(), provider: content.getProvider()};
                                 }
                             }
                         });
@@ -69,8 +77,11 @@ var theCloudMediaPlayer = (function () {
                                 content,
                                 currentPlaylistContent = new Content(idx, cpContent.id, cpContent.provider);
                             
-                            if (!$pContent) {
+                            if (!$pContent) { // This only occurs on the last elements of the current playlist.
                                 diffs.toRemove.push(currentPlaylistContent);
+                                // Using currentPlaylist.contents[idx] because the modifiedCurrentPlaylist 
+                                // is being updated and the indexes might not correspond.
+                                modifiedCurrentPlaylist.contents.pop(currentPlaylist.contents[idx]);
                             } else {
                                 $pContent = $($pContent).find('a:first');
                                 content = new Content(idx, $pContent.attr('data-track-id'), $pContent.attr('data-provider-name'));
@@ -78,6 +89,7 @@ var theCloudMediaPlayer = (function () {
                                 if (!content.equals(currentPlaylistContent)) {
                                     diffs.toRemove.push(currentPlaylistContent);
                                     diffs.toAdd.push(content);
+                                    modifiedCurrentPlaylist.contents[idx] = {id: content.getId(), provider: content.getProvider()};
                                 }
                             }
                         });
@@ -211,6 +223,8 @@ function savePlaylist() {
                     // Hide the 'empty' item
                     $('.playlist-load-empty').hide();
                 }
+                // update current playlist data.
+                theCloudMediaPlayer.playlistFuncs.saveDifferences();
                 appendSuccessAlert(data.message);
 		    },
             error: defaultJsonErrorHandler,
@@ -269,6 +283,7 @@ function deletePlaylist() {
                     if ($('#playlist-load').parent().nextAll(':not(.playlist-loading,.playlist-load-empty)').length === 0) {
                         $('.playlist-load-empty').show();
                     }
+                    theCloudMediaPlayer.currentPlaylist = undefined;
                     appendSuccessAlert(data.message);
                 },
                 error: defaultJsonErrorHandler,
