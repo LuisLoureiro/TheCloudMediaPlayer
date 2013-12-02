@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
@@ -41,7 +41,10 @@ public class Playlist
 	private User					user;
 	
 	@OneToMany(cascade = { ALL }, mappedBy = "playlist", orphanRemoval=true)
-	@OrderBy("position ASC")
+	// This annotation guarantees that the collection is retrieved and maintained ordered in-memory. The @OrderBy does not.
+	// See http://wiki.eclipse.org/EclipseLink/Examples/JPA/Collectionordering
+	@OrderColumn
+//	@OrderBy("position ASC")
 	private List<PlaylistContent>	contents;
 	
 	public Playlist()
