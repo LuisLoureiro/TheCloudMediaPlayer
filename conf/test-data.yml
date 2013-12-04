@@ -1,50 +1,50 @@
 # http://code.google.com/p/snakeyaml/wiki/Documentation#YAML_syntax
 
 users:
-    - &firstUser !!models.db.User
+    - &firstUser !!models.database.User
         id:     firstUser
         email:  first@mail.com
 
-    - &secondUser !!models.db.User
+    - &secondUser !!models.database.User
         id:     secondUser
 
 composite_keys:
-    - &firstContentKey !!models.db.compositeKeys.ContentKey
+    - &firstContentKey !!models.database.compositeKeys.ContentKey
         id:         firstContent
         provider:   dropbox
 
-    - &secondContentKey !!models.db.compositeKeys.ContentKey
+    - &secondContentKey !!models.database.compositeKeys.ContentKey
         id:         secondContent
         provider:   soundcloud
 
 contents:
-    - &firstContent !!models.db.Content
+    - &firstContent !!models.database.Content
         key: *firstContentKey
 
-    - &secondContent !!models.db.Content
+    - &secondContent !!models.database.Content
         key: *secondContentKey
 
 playlists:
-    - &firstPlaylist !!models.db.Playlist
+    - &firstPlaylist !!models.database.Playlist
         name:   firstPlaylist
         user:   *firstUser
 
-    - &secondPlaylist !!models.db.Playlist
+    - &secondPlaylist !!models.database.Playlist
         name:   secondPlaylist
         user:   *secondUser
 
 playlists_contents:
-    - !!models.db.PlaylistContent
+    - !!models.database.PlaylistContent
         position: 1
         playlist: *firstPlaylist
         content: *secondContent
 
-    - !!models.db.PlaylistContent
+    - !!models.database.PlaylistContent
         position: 2
         playlist: *firstPlaylist
         content: *firstContent
 
-    - !!models.db.PlaylistContent
+    - !!models.database.PlaylistContent
         position: 1
         playlist: *secondPlaylist
         content: *firstContent
