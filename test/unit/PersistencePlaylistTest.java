@@ -24,7 +24,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import play.i18n.Messages;
 import play.libs.F.Callback0;
 import play.libs.F.Function0;
 import controllers.operations.persistence.PersistPlaylist;
@@ -201,7 +200,7 @@ public class PersistencePlaylistTest extends BaseTest
 				}
 				catch(Exception e)
 				{
-					assertEquals(Messages.get("user.playList.errors.uniqueConstraintViolation"), e.getMessage());
+					assertEquals("user.playList.errors.uniqueConstraintViolation", e.getMessage());
 				}
 			}
 		});
