@@ -23,6 +23,8 @@ GET 	/auth/signout				        controllers.Authentication.signOut()
 # User home page
 GET		/user						        controllers.User.index()
 
+DELETE  /user                               controllers.User.delete()
+
 # Get track stream url
 GET     /track/streamurl/:trackId           controllers.Track.getStreamUrl(trackId: String)
 
