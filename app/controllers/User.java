@@ -17,7 +17,9 @@ import controllers.enums.SESSION;
 import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.exceptions.OAuthException;
 import controllers.operations.authentication.factory.OAuthFactory;
+import controllers.operations.exceptions.ApplicationOperationException;
 import controllers.operations.persistence.PersistOAuthUser;
+import controllers.operations.persistence.PersistUser;
 
 public class User extends Controller {
 
@@ -61,5 +63,16 @@ public class User extends Controller {
 		}
 		
 		return ok(index.render(listServiceResources));
+	}
+	
+	@Authenticated
+	@Transactional
+	public static Result delete() throws ApplicationOperationException
+	{
+		PersistUser.deleteUser(session(SESSION.USERNAME.toString()));
+		
+		session().clear();
+
+		return noContent();
 	}
 }

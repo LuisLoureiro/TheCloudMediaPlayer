@@ -98,7 +98,19 @@ var theCloudMediaPlayer = (function () {
 				
 				return diffs;
 			}
-		}
+		},
+        userFuncs: {
+            deleteAccount: function () {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/user',
+                    success: function () {
+                        window.location.assign('/');
+                    },
+                    error: defaultJsonErrorHandler
+                });
+            }
+        }
 	};
 }());
 
@@ -410,10 +422,14 @@ $(document).ready(function () {
 	// Get the list of user's play lists.
 	$('#playlist-load').click(function (e) {
 		e.preventDefault(); // prevent url change with href.
-		e.stopPropagation(); // to maintain visible the menu.
+		e.stopPropagation(); // to maintain the visibility of the menu.
 		loadPlaylists($(this).parent().parent());
     });
 	$(document).on("click", ".playlist-load-item", function (e) {loadPlaylist(this); });
+    $('#deleteAccount').click(function (e) {
+		e.stopPropagation(); // to maintain the visibility of the menu.
+        theCloudMediaPlayer.userFuncs.deleteAccount();
+    });
 	
 	// Modal box events
 //	$('#modalBox').on('hidden', function(){});
