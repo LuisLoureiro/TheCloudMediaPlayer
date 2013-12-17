@@ -24,8 +24,7 @@ var googleHelper = (function () {
 			if (authResult.access_token) {
 		        // The user is signed in. Save the access token to be used in the client side.
 		        this.authResult = authResult;
-		        // After we load the Google+ API, render the user info.
-//		        gapi.client.load('plus','v1',this.renderUserInfo);
+		        // After we load the OAuth2 API, render the user info.
 		        gapi.client.load('oauth2', 'v2', this.renderUserInfo);
 			} else if (authResult.error) {
 			    // There was an error.
@@ -45,29 +44,24 @@ var googleHelper = (function () {
                     return;
                 }
 			    // Send the code to the server
-                googleHelper.serverExchangeCode(googleHelper.authResult.code, profile.id, profile.email, profile.name);
-//              $('#profile').append($('<p><img src=\"' + profile.image.url + '\"></p>'));
-//              $('#profile').append($('<p>Hello ' + profile.displayName + '!<br />Tagline: ' + profile.tagline + '<br />About: ' + profile.aboutMe + '</p>'));
-//              if (profile.cover && profile.coverPhoto) {
-//                  $('#profile').append($('<p><img src=\"' + profile.cover.coverPhoto.url + '\"></p>'));
-//              }
+                googleHelper.serverExchangeCode(profile.id, profile.email, profile.name);
 	        });
 		},
-		serverExchangeCode: function (authorizationCode, userId, userEmail, userName) {
+		serverExchangeCode: function (userId, userEmail, userName) {
 			$.ajax({
                 type: 'POST',
                 url: '/auth/exchangecode?provider=google',
                 contentType: "application/x-www-form-urlencoded; charset=UTF-8",
                 dataType: 'json',
                 data: {
-                    'code': authorizationCode,
+                    'code': googleHelper.authResult.code,
                     'userId': userId,
                     'userEmail' : userEmail,
                     'userName' : userName
 //                  'csrf': 
                 },
                 success: function (data) {
-                    if (data && data.status === 'OK') {
+                    if (data && data.url) {
                         window.location.assign(data.url);
                     }
                 },

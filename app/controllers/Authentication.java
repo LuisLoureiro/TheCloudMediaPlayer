@@ -187,7 +187,6 @@ public class Authentication extends Controller {
 			if (request().accepts("text/json") || request().accepts("application/json")) {
 				// Return a json object with the url to redirect to.
 				ObjectNode result = Json.newObject();
-				result.put("status", "OK");
 				result.put("url", returnURL);
 				return ok(result);
 			}
