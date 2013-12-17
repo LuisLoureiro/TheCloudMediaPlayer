@@ -73,31 +73,9 @@ var googleHelper = (function () {
 			        appendErrorAlert(I18nJS.oauthExchangeCodeUnexpected);
 			    }
 		    });
-		},
-		disconnectUser: function () {
-			var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + this.clientAccessToken;
-			$.ajax({
-			    type: 'GET',
-			    url: revokeUrl,
-			    contentType: "application/json",
-			    dataType: 'jsonp',
-			    success: function (nullResponse) {
-			        // Do something now that user is disconnected
-			        // The response is always undefined.
-				    window.location.assign('/auth/signout');
-			    },
-			    error: function (e) {
-			        // Handle the error
-			        console.log(e);
-			    }
-			});
 		}
 	};
 }());
 function signInCallback(authResult) {
 	googleHelper.signInCallback(authResult);
 }
-function disconnectUser() {
-	googleHelper.disconnectUser();
-}
-$('#googleSignOut').click(disconnectUser);

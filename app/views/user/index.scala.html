@@ -34,11 +34,9 @@
 	              <ul class="dropdown-menu">
 	                @{val email = ctx.session.get(SESSION.EMAIL.toString); if(email != null && !email.isEmpty()) dispayListItem(email)}
 	                <li class="divider"></li>
-	                <li>@if("google".equals(ctx.session.get(SESSION.PROVIDER.toString))) {
-    					<a class="btn btn-danger" href="#" id="googleSignOut">@Messages.get("authentication.signOut")</a>
-    					} else {
-    					<a class="btn btn-danger" href="@routes.Authentication.signOut()" id="signOut">@Messages.get("authentication.signOut")</a>
-    				}</li>
+	                <li>
+	                    <a class="btn btn-danger" href="@routes.Authentication.signOut()" id="signOut">@Messages.get("authentication.signOut")</a>
+    				</li>
     				<li>
     				    <button id="deleteAccount">@Messages.get("user.deleteAccount")</button>
     				</li>
