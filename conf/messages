@@ -58,6 +58,9 @@ user.playList.errors.uniqueConstraintViolation=There''s a play list with the exa
 user.playList.errors.invalidIdOrUserId=The supplied play list ID doesn''t exists or doesn''t match the indicated user.
 
 user.track.errors.noAccessTokenMatchesUserAndService=There''s no access token matching the track service and the current user.
+user.account.delete.buttonTitle=Delete account
+user.account.deleted=Account successfully deleted.
+user.account.deleted.notPossibleToRevokeGoogleToken=Failed to revoke token. Successfully complete the process by manually revoking it. Go to https://security.google.com/settings/security/permissions.
 
 playlist.nameRequired=The name of the play list must be defined!
 oauthUser.providerNameRequired=The provider''s name could not be null!

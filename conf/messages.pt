@@ -58,6 +58,9 @@ user.playList.errors.uniqueConstraintViolation=Já existe uma lista de reproduç
 user.playList.errors.invalidIdOrUserId=O ID de lista de reprodução fornecido não existe ou não corresponde ao utilizador indicado.
 
 user.track.errors.noAccessTokenMatchesUserAndService=Não foi encontrado nenhum token de acesso que corresponda ao utilizador atual e ao respetivo serviço.
+user.account.delete.buttonTitle=Remover conta
+user.account.deleted=Conta removida com sucesso.
+user.account.deleted.notPossibleToRevokeGoogleToken=Não foi possível revogar o token de acesso. Precisa de revogá-lo manualmente para terminar o processo com sucesso. Siga este endereço: https://security.google.com/settings/security/permissions.
 
 playlist.nameRequired=O nome da lista de reprodução deve ser indicado!
 oauthUser.providerNameRequired=O nome do fornecedor OAuth não pode ser nulo!
