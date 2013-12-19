@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,11 +10,13 @@ import models.database.OAuth1User;
 import models.database.OAuth2User;
 import models.database.notEntity.OAuthUser;
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security.Authenticated;
 import views.html.user.index;
 import controllers.enums.SESSION;
+import controllers.operations.authentication.GoogleOAuth2;
 import controllers.operations.authentication.IOAuth;
 import controllers.operations.authentication.exceptions.OAuthException;
 import controllers.operations.authentication.factory.OAuthFactory;
@@ -67,12 +70,28 @@ public class User extends Controller {
 	
 	@Authenticated
 	@Transactional
-	public static Result delete() throws ApplicationOperationException
+	public static Result delete() throws ApplicationOperationException, InstantiationException, IOException
 	{
+		String message = "user.account.deleted";
+//		OAuthFactory.getInstanceFromProviderName(session(SESSION.PROVIDER.toString()), null);
+		if("google".equals(session(SESSION.PROVIDER.toString())))
+		{
+			// TODO use factory!
+			GoogleOAuth2 oauth2Object = new GoogleOAuth2();
+			try
+			{
+				oauth2Object.revokeToken(session(SESSION.ACCESS_TOKEN.toString()));
+			}
+			catch(OAuthException ex)
+			{
+				message = ex.getMessage();
+			}
+		}
 		PersistUser.deleteUser(session(SESSION.USERNAME.toString()));
 		
 		session().clear();
 
+		flash("success", Messages.get(message));
 		return noContent();
 	}
 }

@@ -9,6 +9,9 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -17,6 +20,7 @@ import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Tokeninfo;
 
 import controllers.operations.authentication.exceptions.OAuth2ValidationException;
+import controllers.operations.authentication.exceptions.OAuthException;
 
 public class GoogleOAuth2 /*extends AbstractOAuth2 */{
 
@@ -29,6 +33,10 @@ public class GoogleOAuth2 /*extends AbstractOAuth2 */{
 	 * Default JSON factory to use to deserialize JSON.
 	 */
 	private final JsonFactory JSON_FACTORY = new JacksonFactory();
+	/**
+	 * The address to use when revoking access and refresh tokens.
+	 */
+	private final String REVOKE_URL_FORMAT = "https://accounts.google.com/o/oauth2/revoke?token=%s";
 
 	public GoogleOAuth2() throws InstantiationException {
 		try {
@@ -98,5 +106,31 @@ public class GoogleOAuth2 /*extends AbstractOAuth2 */{
 	/*@Override*/
 	public boolean isTokenForOurApp(Tokeninfo tokenInfo) {
 	    return tokenInfo.getIssuedTo().equals(CLIENT_ID);
+	}
+	
+	public void revokeToken(String token) throws IOException, OAuthException
+	{
+		HttpResponse revokeResponse = null;
+        // Execute HTTP GET request to revoke current token.
+        try
+        {
+            revokeResponse = TRANSPORT.createRequestFactory()
+                    .buildGetRequest(new GenericUrl(
+                        String.format(REVOKE_URL_FORMAT, token)))
+                    .execute();
+        } catch(HttpResponseException ex)
+        {
+        	throw new OAuthException("user.account.deleted.notPossibleToRevokeGoogleToken", ex);
+        } finally
+        {
+        	if(revokeResponse != null)
+        	{
+        		try
+				{
+					revokeResponse.disconnect();
+				}
+				catch(IOException e){}
+        	}
+        }
 	}
 }
