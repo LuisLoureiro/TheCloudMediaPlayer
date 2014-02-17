@@ -28,6 +28,7 @@ authentication.errors.oauthInvalidScope=The requested scope is invalid, unknown,
 authentication.errors.oauthServerError=The authorization server encountered an unexpected condition that prevented it from fulfilling the request.
 authentication.errors.oauthTemporarilyUnavailable=The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.
 
+errors.genericMessage=Occurred an unexpected error. Please contact us if the problem continues.
 errors.parametersMissing=Some parameters are required and are missing: [{0}].
 errors.oauthInstantiationException=OAuth user is not an instance of an OAuth1 user or an OAuth2 user.
 

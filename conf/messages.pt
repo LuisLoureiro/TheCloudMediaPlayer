@@ -28,6 +28,7 @@ authentication.errors.oauthInvalidScope=O scope do pedido é inválido, desconhe
 authentication.errors.oauthServerError=O servidor de autorização encontrou uma condição inesperada que o impede de cumprir o pedido.
 authentication.errors.oauthTemporarilyUnavailable=O servidor de autorização não consegue, de momento, processar o pedido devido a uma manutenção ou uma temporária sobrecarga no servidor.
 
+errors.genericMessage=Ocorreu um erro inesperado. Contacte-nos se o problema persistir.
 errors.parametersMissing=Alguns parâmetros obrigatórios estão em falta: [{0}].
 errors.oauthInstantiationException=O utilizador OAuth não é uma instância de um utilizador OAuth2 ou OAuth1.
 
