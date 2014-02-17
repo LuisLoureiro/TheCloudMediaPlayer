@@ -1,8 +1,6 @@
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -20,12 +18,11 @@ import play.libs.F.Callback0;
 import play.libs.Json;
 import play.libs.Yaml;
 import play.mvc.Action;
+import play.mvc.Http.Context;
 import play.mvc.Http.Request;
 import play.mvc.Http.RequestHeader;
 import play.mvc.Result;
 import play.mvc.Results;
-import scala.Tuple2;
-import scala.collection.JavaConversions;
 import controllers.operations.exceptions.ApplicationOperationException;
 
 public class Global extends GlobalSettings
@@ -76,29 +73,21 @@ public class Global extends GlobalSettings
 	{
 		// Get error message
 		String errorMessage;
-		Throwable innerT = t.getCause();
-		if(innerT != null)
+		try
 		{
-			try
-			{
-				throw innerT.getCause();
-			}
-			catch(ApplicationOperationException | InstantiationException e)
-			{
-				errorMessage = Messages.get(Lang.preferred(request.acceptLanguages()), e.getMessage());
-			}
-			catch(NullPointerException e)
-			{
-				errorMessage = innerT.getMessage();
-			}
-			catch(Throwable e)
-			{
-				errorMessage = e.getMessage();
-			}
+			throw handleThrowable(t);
 		}
-		else
+		catch(ApplicationOperationException | InstantiationException e)
 		{
-			errorMessage = t.getMessage();
+			errorMessage = Messages.get(Lang.preferred(request.acceptLanguages()), e.getMessage());
+		}
+		catch(NullPointerException e)
+		{
+			errorMessage = Messages.get(Lang.preferred(request.acceptLanguages()), "errors.genericMessage");
+		}
+		catch(Throwable e)
+		{
+			errorMessage = e.getMessage();
 		}
 		
 		// Content negotiation
@@ -116,9 +105,7 @@ public class Global extends GlobalSettings
 		Result ret = Results.internalServerError(views.html.application.index.render());
 		
 		// Flash error message!
-		Set<Tuple2<String, String>> flashSet = new HashSet<Tuple2<String, String>>();
-		flashSet.add(new Tuple2<String, String>("error", errorMessage));
-		ret.getWrappedResult().flashing(JavaConversions.asScalaSet(flashSet).toSeq());
+		Context.current().flash().put("error", errorMessage);
 		return ret;
 	}
 	
@@ -149,5 +136,15 @@ public class Global extends GlobalSettings
 		System.out.println("before each request..." + request.toString());
 		Action<?> action = super.onRequest(request, actionMethod);
 		return action;
+	}
+
+	private Throwable handleThrowable(Throwable t)
+	{
+		if(t != null)
+		{
+			Throwable cause = t.getCause();
+			return cause != null && !t.equals(cause) ? handleThrowable(cause): t;
+		}
+		return t;
 	}
 }
