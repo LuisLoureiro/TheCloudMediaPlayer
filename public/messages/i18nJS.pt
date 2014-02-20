@@ -16,9 +16,11 @@
 "playlist.save.errorEmptyPlaylist":"Não pode guardar listas de reprodução sem conteúdos.",
 "playlist.delete.modalBox.title":"Confirmação da eliminação da lista de reprodução",
 "playlist.delete.modalBox.confirmationWithoutQuestionMark":"Tem a certeza que deseja eliminar permanentemente a lista de reprodução ",
+"playlist.delete.modalBox.confirmation":"Tem a certeza que deseja eliminar permanentemente a lista de reprodução '{0}'?",
 "playlist.delete.modalBox.warning":"Esta eliminação não poderá ser revogada mais tarde!",
 "playlist.delete.errorDefaultPlaylist":"A lista de reprodução por omissão não pode ser removida!",
 "playlist.load.infoNotConnectedToServices":"Alguns conteúdos não foram carregados, porque não se encontra ligado aos correspondentes serviços.",
 "playlist.load.infoReconnectAndRefresh":"Efetue a ligação a {0} e atualize a lista de reprodução.",
+"playList.load.successMessage":"A lista de reprodução '{0}' foi carregada com sucesso.",
 "playlist.load.errorSelectedPlaylistHasNoIdAttribute":"A lista de reprodução selecionada não contém o atributo id."
 }

@@ -16,9 +16,11 @@
 "playlist.save.errorEmptyPlaylist":"Empty play lists cannot be saved.",
 "playlist.delete.modalBox.title":"Confirmation of the play list removal",
 "playlist.delete.modalBox.confirmationWithoutQuestionMark":"Are you sure you want to permanently remove the play list ",
+"playlist.delete.modalBox.confirmation":"Are you sure you want to permanently remove the '{0}' play list?",
 "playlist.delete.modalBox.warning":"This removal cannot be revoked later!",
 "playlist.delete.errorDefaultPlaylist":"The default play list cannot be removed!",
-"playlist.load.infoNotConnectedToServices":"Alguns conteúdos não foram carregados, porque não se encontra ligado aos correspondentes serviços.",
+"playlist.load.infoNotConnectedToServices":"Some contents weren't successfully loaded because you're not connected to the matching services.",
 "playlist.load.infoReconnectAndRefresh":"Perform the connection to {0} and update the play list.",
+"playList.load.successMessage":"The play list '{0}' was successfully loaded.",
 "playlist.load.errorSelectedPlaylistHasNoIdAttribute":"The selected play list has no id attribute."
 }

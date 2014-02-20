@@ -50,7 +50,6 @@ user.playList.save.createdSuccessfully=A lista de reprodução foi criada com su
 user.playList.load=carregar
 user.playList.load.update=atualizar
 user.playList.load.empty=vazio
-user.playList.load.successMessage=A lista de reprodução ''{0}'' foi carregada com sucesso.
 user.playList.clean=limpar
 user.playList.delete=apagar
 user.playList.delete.successMessage=A lista de reprodução ''{0}'' foi apagado com sucesso.
