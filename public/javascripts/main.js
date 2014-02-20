@@ -308,8 +308,8 @@ function deletePlaylist() {
 	if (id) {
 		// Show a confirmation window before Ajax call
 		setModalBoxContents(I18nJS["playlist.delete.modalBox.title"],
-				'<p>' + I18nJS["playlist.delete.modalBox.confirmationWithoutQuestionMark"] + elem.text().trim()
-				+ '"?</p><p>' + I18nJS["playlist.delete.modalBox.warning"]
+				'<p>' + I18nJS["playlist.delete.modalBox.confirmation"].format(elem.text().trim())
+				+ '</p><p>' + I18nJS["playlist.delete.modalBox.warning"]
 				+ '</p><form id="playlist-deleteForm" class="form-horizontal">'
 				+ '<input type="hidden" name="id" value="' + id + '"></input>'
 				+ '<div class="form-actions"><button type="submit" class="btn btn-primary">' + I18nJS.Confirm
@@ -383,18 +383,21 @@ function loadPlaylist(elem) {
 			url: '/playlist/' + id,
 			dataType: 'json',
 			success: function (data) {
-				// Clean all the items of the current play list
-				// Update the play list name.
-				$('#playlist-clean').click();
-                $('#playlist-name').html(data.title + ' <b class="caret"></b>').attr('data-playlist-id', data.id);
-                theCloudMediaPlayer.currentPlaylist = data;
-                // Place all the contents in the list.
-                var notConnectedProvidersInfoMessage = appendLoadedContentsToPlayList($('#playlist-table>tbody'), data.contents);
-                if (notConnectedProvidersInfoMessage) {
-                    appendInfoAlert(notConnectedProvidersInfoMessage);
-                } else {
-					// Show a success message.
-                    appendSuccessAlert(data.message);
+                if(data && data.playlists && data.playlists !== 0) {
+                    var loadedPlaylist = data.playlists[0];
+                    // Clean all the items of the current play list
+                    // Update the play list name.
+                    $('#playlist-clean').click();
+                    $('#playlist-name').html(loadedPlaylist.title + ' <b class="caret"></b>').attr('data-playlist-id', loadedPlaylist.id);
+                    theCloudMediaPlayer.currentPlaylist = loadedPlaylist;
+                    // Place all the contents in the list.
+                    var notConnectedProvidersInfoMessage = appendLoadedContentsToPlayList($('#playlist-table>tbody'), loadedPlaylist.contents);
+                    if (notConnectedProvidersInfoMessage) {
+                        appendInfoAlert(notConnectedProvidersInfoMessage);
+                    } else {
+                        // Show a success message.
+                        appendSuccessAlert(I18nJS["playList.load.successMessage"].format(loadedPlaylist.title));
+                    }
                 }
 			},
 			error: defaultJsonErrorHandler
