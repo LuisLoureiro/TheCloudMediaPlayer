@@ -1,16 +1,22 @@
 package controllers;
 
+import static play.libs.Akka.future;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import models.beans.dataObject.AccessToken;
 import models.beans.dataObject.ServiceResources;
 import models.database.OAuth1User;
 import models.database.OAuth2User;
 import models.database.notEntity.OAuthUser;
-import play.db.jpa.Transactional;
+import play.api.mvc.RequestHeader;
+import play.db.jpa.JPA;
 import play.i18n.Messages;
+import play.libs.F.Function;
+import play.libs.F.Function0;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security.Authenticated;
@@ -27,71 +33,147 @@ import controllers.operations.persistence.PersistUser;
 public class User extends Controller {
 
 	@Authenticated
-	@Transactional(readOnly=true)
 	public static Result index()
 	{
-		// Get the username from the session object.
-		// Ask the data access layer for all the access tokens for this user.
-		// Refresh some, if necessary.
-		// Get the contents from all the available services.
-		List<ServiceResources> listServiceResources = new LinkedList<ServiceResources>();
-		
-		List<OAuthUser> tokens = PersistOAuthUser.findAllAccessTokens(session(SESSION.USERNAME.toString()));
-		if(tokens != null)
+		final String username = session(SESSION.USERNAME.toString());
+		final RequestHeader requestHeader = ctx()._requestHeader();
+		final StringBuffer errorMessages = new StringBuffer();
+		return async(future(new Callable<List<ServiceResources>>()
 		{
-			for(OAuthUser oauthToken : tokens)
+			@Override
+			public List<ServiceResources> call() throws Exception
 			{
 				try
 				{
-					IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(oauthToken.getProviderName(),
-								routes.Authentication.connectToCallback(oauthToken.getProviderName()).absoluteURL(request()));
-					if(oauthToken instanceof OAuth1User)
+					return JPA.withTransaction("default", true, new Function0<List<ServiceResources>>()
 					{
-						listServiceResources.add(
-								oauthObject.getResources(
-										new AccessToken(oauthToken.getId(), null, ((OAuth1User)oauthToken).getOauthToken(), ((OAuth1User)oauthToken).getOauthTokenSecret())));
-					} else if(oauthToken instanceof OAuth2User)
-					{
-						listServiceResources.add(
-								oauthObject.getResources(
-										new AccessToken(oauthToken.getId(), null, ((OAuth2User)oauthToken).getAccessToken(), ((OAuth2User)oauthToken).getRefreshToken())));
-					}
-					
-					// Save in the session cookie the information about the successful authentication with the resources provider.
-					session(oauthToken.getProviderName(), "authenticated");
-				} catch (InstantiationException | OAuthException e) {
-					flash("error", e.getMessage());
+						@Override
+						public List<ServiceResources> apply() throws Throwable
+						{
+							// Get the username from the session object.
+							// Ask the data access layer for all the access tokens for this user.
+							// Refresh some, if necessary.
+							// Get the contents from all the available services.
+							List<ServiceResources> listServiceResources = new LinkedList<ServiceResources>();
+							List<OAuthUser> tokens = PersistOAuthUser.findAllAccessTokens(username);
+							if(tokens != null)
+							{
+								for(OAuthUser oauthToken : tokens)
+								{
+									try
+									{
+										IOAuth oauthObject = OAuthFactory.getInstanceFromProviderName(oauthToken.getProviderName(),
+													routes.Authentication.connectToCallback(oauthToken.getProviderName()).absoluteURL(false, requestHeader));
+										if(oauthToken instanceof OAuth1User)
+										{
+											listServiceResources.add(
+													oauthObject.getResources(
+															new AccessToken(oauthToken.getId(), null, ((OAuth1User)oauthToken).getOauthToken(), ((OAuth1User)oauthToken).getOauthTokenSecret())));
+										} else if(oauthToken instanceof OAuth2User)
+										{
+											listServiceResources.add(
+													oauthObject.getResources(
+															new AccessToken(oauthToken.getId(), null, ((OAuth2User)oauthToken).getAccessToken(), ((OAuth2User)oauthToken).getRefreshToken())));
+										}
+									} catch (InstantiationException | OAuthException e)
+									{
+										errorMessages.append(e.getMessage());
+									}
+								}
+							}
+							
+							return listServiceResources;
+						}
+					});
+				}
+				catch(Throwable e1)
+				{
+					e1.printStackTrace();
+					throw new Exception(e1);
 				}
 			}
-		}
-		
-		return ok(index.render(listServiceResources));
+		}).map(new Function<List<ServiceResources>, Result>()
+		{
+			@Override
+			public Result apply(List<ServiceResources> resources) throws Throwable
+			{
+				// Save in the session cookie the information about the successfully authentication with the resources provider.
+				for(ServiceResources serviceResources : resources)
+				{
+					session(serviceResources.getServiceName(), "authenticated");
+				}
+				if(errorMessages.length() != 0)
+				{
+					flash("error", errorMessages.toString());
+				}
+				return ok(index.render(resources));
+			}
+		}));
 	}
 	
 	@Authenticated
-	@Transactional
 	public static Result delete() throws ApplicationOperationException, InstantiationException, IOException
 	{
-		String message = "user.account.deleted";
-//		OAuthFactory.getInstanceFromProviderName(session(SESSION.PROVIDER.toString()), null);
-		if("google".equals(session(SESSION.PROVIDER.toString())))
+		final String provider = session(SESSION.PROVIDER.toString());
+		final String accessToken = session(SESSION.ACCESS_TOKEN.toString());
+		final String username = session(SESSION.USERNAME.toString());
+		return async(future(new Callable<String>()
 		{
-			// TODO use factory!
-			GoogleOAuth2 oauth2Object = new GoogleOAuth2();
-			try
+			@Override
+			public String call() throws Exception
 			{
-				oauth2Object.revokeToken(session(SESSION.ACCESS_TOKEN.toString()));
+				try
+				{
+					return JPA.withTransaction(new Function0<String>()
+					{
+						@Override
+						public String apply() throws Throwable
+						{
+							String errorMessage = null;
+//						OAuthFactory.getInstanceFromProviderName(session(SESSION.PROVIDER.toString()), null);
+							if("google".equals(provider))
+							{
+								// TODO use factory!
+								GoogleOAuth2 oauth2Object = new GoogleOAuth2();
+								try
+								{
+									oauth2Object.revokeToken(accessToken);
+								}
+								catch(OAuthException ex)
+								{
+									errorMessage = ex.getMessage();
+								}
+							}
+							PersistUser.deleteUser(username);
+							
+							return errorMessage;
+						}
+					});
+				}
+				catch(Throwable e)
+				{
+					e.printStackTrace();
+					throw new Exception(e);
+				}
 			}
-			catch(OAuthException ex)
+		}).map(new Function<String, Result>()
+		{
+			@Override
+			public Result apply(String errorMessage) throws Throwable
 			{
-				message = ex.getMessage();
-			}
-		}
-		PersistUser.deleteUser(session(SESSION.USERNAME.toString()));
-		
-		session().clear();
+				String successMessage = "user.account.deleted";
+				session().clear();
 
-		flash("success", Messages.get(message));
-		return noContent();
+				if(errorMessage != null)
+				{
+					flash("error", Messages.get(errorMessage));
+				}
+				else
+				{
+					flash("success", Messages.get(successMessage));
+				}
+				return noContent();
+			}
+		}));
 	}
 }
