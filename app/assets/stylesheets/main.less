@@ -1,0 +1,71 @@
+/**
+ *     VARIABLES
+ */
+@fb-login-bgColor: #3B5998;
+@fb-login-bgColorActive: #2F477A;
+@fb-login-bgColorRGBA: rgba(59, 89, 152, 240/255);
+@fb-login-bgColorActiveRGBA: rgba(47, 71, 122, 240/255);
+@fb-login-buttonHeight: 40px;
+/**
+ *     MIXINS
+ */
+.border-radius(@px) {
+    -webkit-border-radius: @px;
+    -moz-border-radius: @px;
+    border-radius: @px;
+}
+
+/**
+ *     MAIN STYLES
+ */
+input:invalid+span.help-inline,
+td:hover > a.playlist-resource + a.remove{
+    visibility: visible;
+}
+input:valid+span.help-inline,
+td > a.playlist-resource + a.remove{
+    visibility: hidden;
+}
+#openID{
+    padding-left: 30px;
+    background-image: url('/assets/images/openid-icon-100x100.png');
+    background-repeat: no-repeat;
+    background-size: 28px;
+}
+#openIDForm label{
+    display: inline-block;
+    padding-right: 10px;
+}
+.font-medium {
+    font-size: medium;
+}
+.underline-span span {
+    text-decoration: underline;
+}
+.fb-login {
+    font: bold small sans-serif;
+    border: none;
+    margin: none;
+    height: @fb-login-buttonHeight;
+    background: url("/assets/images/f_small.png") no-repeat scroll 8px center @fb-login-bgColor;
+    background-color: @fb-login-bgColorRGBA;
+    padding: 0px 8px 0px 35px;
+    .border-radius(3px)
+}
+.fb-login>a {
+    display: table; /* For correct alignment. */
+    line-height: @fb-login-buttonHeight; /* To vertical align text.*/
+    width: 100%; /* With text-align, to horizontal align text. */
+    text-align: center; /* With width, to horizontal align text. */
+}
+.fb-login>a,.fb-login {
+    text-decoration: none;
+    color: #FFF;
+}
+.fb-login:hover {
+    cursor: pointer;
+}
+.fb-login:active {
+    background-color: @fb-login-bgColorActive;
+    background-color: @fb-login-bgColorActiveRGBA;
+}
