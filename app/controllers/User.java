@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.llorieruo.projects.oauth2Login.OAuth2Factory;
+import com.llorieruo.projects.oauth2Login.providers.IOAuth2;
+
 import models.beans.dataObject.AccessToken;
 import models.beans.dataObject.ServiceResources;
 import models.database.OAuth1User;
@@ -130,19 +133,24 @@ public class User extends Controller {
 						public String apply() throws Throwable
 						{
 							String errorMessage = null;
-//						OAuthFactory.getInstanceFromProviderName(session(SESSION.PROVIDER.toString()), null);
-							if("google".equals(provider))
+							try
 							{
 								// TODO use factory!
-								GoogleOAuth2 oauth2Object = new GoogleOAuth2();
-								try
+								// OAuthFactory.getInstanceFromProviderName(session(SESSION.PROVIDER.toString()), null);
+								if("google".equals(provider))
 								{
+									GoogleOAuth2 oauth2Object = new GoogleOAuth2();
 									oauth2Object.revokeToken(accessToken);
 								}
-								catch(OAuthException ex)
+								else if("facebook".equals(provider))
 								{
-									errorMessage = ex.getMessage();
+									IOAuth2 oauth2Instance = OAuth2Factory.getInstance("facebook");
+									oauth2Instance.revokeToken(accessToken); // TODO Check that Facebook returned true. If false, warn user.
 								}
+							}
+							catch(OAuthException | IOException ex)
+							{
+								errorMessage = ex.getMessage();
 							}
 							PersistUser.deleteUser(username);
 							

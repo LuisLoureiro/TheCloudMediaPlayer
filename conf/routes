@@ -13,6 +13,8 @@ GET		/auth/openidcallback                controllers.Authentication.openIDCallba
 
 POST	/auth/exchangecode                  controllers.Authentication.exchangeCodeWithAccessToken()
 
+GET     /auth/authenticate/:provider        controllers.Authentication.authenticate(provider: String)
+
 GET     /auth/connectto/:provider           controllers.Authentication.connectTo(provider: String)
 
 # See 6.2.3 http://oauth.net/core/1.0/#auth_step2

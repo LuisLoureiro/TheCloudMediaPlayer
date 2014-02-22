@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 
+import models.beans.dataBinding.form.AuthorizationRequestObject;
 import models.beans.dataBinding.form.ExchangeCodeForm;
 import models.beans.dataBinding.form.OpenIDUser;
 import models.beans.dataObject.AccessToken;
@@ -32,9 +33,14 @@ import play.libs.OpenID.UserInfo;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security.Authenticated;
+import security.CSRF;
+import security.annotations.CheckCSRFToken;
 import views.html.authentication.index;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
+import com.llorieruo.projects.oauth2Login.OAuth2Factory;
+import com.llorieruo.projects.oauth2Login.dataObjects.AccessTokenSuccessfulResponse;
+import com.llorieruo.projects.oauth2Login.providers.IOAuth2;
 
 import controllers.enums.SESSION;
 import controllers.operations.authentication.GoogleOAuth2;
@@ -50,18 +56,17 @@ import controllers.operations.persistence.PersistUser;
 
 public class Authentication extends Controller
 {
-	
 	public static Result index()
 	{
     	Form<OpenIDUser> openIDForm = Form.form(OpenIDUser.class);
-        return ok(index.render(openIDForm));
+    	return ok(index.render(openIDForm, getFacebookAuthenticationUrl()));
 	}
 
 	public static Result openID() throws OpenIDException
 	{
     	final Form<OpenIDUser> openIDUserForm = Form.form(OpenIDUser.class).bindFromRequest();
-    	if(openIDUserForm.hasErrors()) {
-    		return badRequest(index.render(openIDUserForm));
+    	if(openIDUserForm.hasErrors()) { 
+    		return badRequest(index.render(openIDUserForm, getFacebookAuthenticationUrl()));
     	}
     	final OpenIDUser user = openIDUserForm.get();
     	final String callbackUrl = routes.Authentication.openIDCallback().absoluteURL(request());
@@ -133,7 +138,7 @@ public class Authentication extends Controller
 				if(redirectUrl.isError())
 				{
 					flash("error", Messages.get(redirectUrl.getActionError().getMessage()));
-					return status(redirectUrl.getActionError().getResponseStatus(), index.render(openIDUserForm));
+					return status(redirectUrl.getActionError().getResponseStatus(), index.render(openIDUserForm, getFacebookAuthenticationUrl()));
 				}
 				return redirect(redirectUrl.getData());
 			}
@@ -217,12 +222,12 @@ public class Authentication extends Controller
 			if(ex.getClass().equals(TimeoutException.class))
 			{
 				flash("error", Messages.get("authentication.errors.openIdVerificationTimeout"));
-				return status(GATEWAY_TIMEOUT, index.render(form));
+				return status(GATEWAY_TIMEOUT, index.render(form, getFacebookAuthenticationUrl()));
 			}
 			if(ex instanceof Errors.AUTH_CANCEL$)
 			{
 				flash("error", Messages.get("authentication.errors.openIdProcessCanceled"));
-				return badRequest(index.render(form));
+				return badRequest(index.render(form, getFacebookAuthenticationUrl()));
 			}
 			throw new OpenIDException("authentication.errors.openIdVerificationUnexpected");
 		}
@@ -328,7 +333,7 @@ public class Authentication extends Controller
 				{
 					Form<OpenIDUser> form = Form.form(OpenIDUser.class);
 					flash("error", Messages.get(user.getActionError().getMessage()));
-					return status(user.getActionError().getResponseStatus(), index.render(form));
+					return status(user.getActionError().getResponseStatus(), index.render(form, getFacebookAuthenticationUrl()));
 				}
 				
 				AuthenticatedUser userData = user.getData();
@@ -355,6 +360,70 @@ public class Authentication extends Controller
 					return ok(result);
 				}
 				return redirect(returnURL);
+			}
+		}));
+	}
+	
+	@CheckCSRFToken
+	public static Result authenticate(final String provider) throws Throwable
+	{
+		// Capture the request parameters.
+		final AuthorizationRequestObject requestParams = Form.form(AuthorizationRequestObject.class).bindFromRequest().get();
+		
+		if(requestParams.getError() != null)
+			return badRequest(requestParams.getError_description());
+		
+		return async(future(new Callable<AuthenticatedUser>()
+		{
+			@Override
+			public AuthenticatedUser call() throws Exception
+			{
+				try
+				{
+					return JPA.withTransaction(new Function0<AuthenticatedUser>()
+					{
+						@Override
+						public AuthenticatedUser apply() throws Throwable
+						{
+							AuthenticatedUser user = new AuthenticatedUser();
+							IOAuth2 oauth2Instance = OAuth2Factory.getInstance(provider);
+							// Receive the authorization code and exchange it with an access token;
+							AccessTokenSuccessfulResponse accessToken = oauth2Instance.exchangeAuthCode(requestParams.getCode());
+							// Inspect the access token, confirming identity of the current user
+							// and that was this application that generated the token.
+							String userId = oauth2Instance.validateToken(accessToken, requestParams.getUserId());
+							// Save the user in the database.
+							PersistOAuth2User.saveUser(provider,
+									// TODO - Facebook doesn't use the refresh token.
+									new AccessToken(userId, null, accessToken.getAccess_token(), "TODO"/*accessToken.getRefresh_token()*/),
+									null, null);
+							
+							user.setAccessToken(accessToken.getAccess_token());
+							user.setUserId(userId);
+							user.setUserName(userId);
+							
+							return user;
+						}
+					});
+				}
+				catch(Throwable e)
+				{
+					e.printStackTrace();
+					throw new Exception(e);
+				}
+			}
+		}).map(new Function<AuthenticatedUser, Result>()
+		{
+			@Override
+			public Result apply(AuthenticatedUser user) throws Throwable
+			{
+				// redirect to the user home page
+				flash("success", Messages.get("authentication.signedIn"));
+				
+				session(SESSION.ACCESS_TOKEN.toString(), user.getAccessToken());
+				session(SESSION.USERNAME.toString(), user.getUserId());
+				session(SESSION.FULL_NAME.toString(), user.getUserName());
+				return redirect(routes.User.index());
 			}
 		}));
 	}
@@ -447,10 +516,18 @@ public class Authentication extends Controller
 	@Authenticated
 	public static Result signOut()
 	{
+		// TODO clear information about user's access token.
 		session().clear();
 		
 		// Redirect to the index page
 		flash("success", Messages.get("authentication.signedOut"));
 		return redirect(routes.Application.index());
+	}
+	
+	private static String getFacebookAuthenticationUrl()
+	{
+		return String.format("%s&state=%s&scope=%s",
+				OAuth2Factory.getInstance("facebook").getAuthenticationUrl(),
+				CSRF.addAndReturnToken(session()), "email");
 	}
 }

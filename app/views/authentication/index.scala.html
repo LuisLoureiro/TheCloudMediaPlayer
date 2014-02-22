@@ -1,4 +1,4 @@
-@(openIDForm: Form[models.beans.dataBinding.form.OpenIDUser])
+@(openIDForm: Form[models.beans.dataBinding.form.OpenIDUser], facebookAuthUrl: String)
 @import play.i18n._
 
 @main() {
@@ -19,6 +19,12 @@
 		</span>
 	</div>
 	<div id="result"></div>
+    @if(session.get("username") != null) {
+        <a href="@routes.User.index()">Get in!</a>
+    } else {
+        <!-- <button class="fb-login">Log in with Facebook</button> -->
+        <div class="fb-login"><a href="@facebookAuthUrl">Log in with Facebook</a></div>
+    }
 	<script type="text/javascript">
 	    $('#openIDForm>dl>dt').append('<a href="http://openidexplained.com" target="_blank">@Messages.get("authentication.what.is.openid")</a>');
     </script>

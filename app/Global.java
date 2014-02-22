@@ -9,6 +9,9 @@ import models.database.User;
 
 import org.codehaus.jackson.node.ObjectNode;
 
+import com.llorieruo.projects.oauth2Login.OAuth2Factory;
+import com.llorieruo.projects.oauth2Login.proxy.FacebookOAuth2Proxy;
+
 import play.Application;
 import play.GlobalSettings;
 import play.db.jpa.JPA;
@@ -23,6 +26,7 @@ import play.mvc.Http.Request;
 import play.mvc.Http.RequestHeader;
 import play.mvc.Result;
 import play.mvc.Results;
+import controllers.routes;
 import controllers.operations.exceptions.ApplicationOperationException;
 
 public class Global extends GlobalSettings
@@ -32,6 +36,9 @@ public class Global extends GlobalSettings
 	@Override
 	public void onStart(Application app)
 	{
+		OAuth2Factory.registerInstance("facebook", 
+				// Passing a proxy to the real OAuth2 object.
+				new FacebookOAuth2Proxy((app.isProd() ? "http://thecloudmediaplayer.herokuapp.com" : "http://localhost:9000")+routes.Authentication.authenticate("facebook").url()));
 		// Logger.info("Application has started");
 		if(app.isTest())
 		{
