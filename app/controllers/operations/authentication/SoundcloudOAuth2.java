@@ -70,11 +70,12 @@ public class SoundcloudOAuth2 extends AbstractOAuth2
 			Token accessToken = wrapper.authorizationCode(requestToken);
 			
 			uidAccessRefreshToken.setAccessToken(accessToken.access);
-//			uidAccessRefreshToken.setRefreshToken(accessToken.refresh); // Non-expiring token!
+			// SoundCloud users are using the non-expiring tokens. These tokens don't return a refresh token.
+			uidAccessRefreshToken.setRefreshToken(accessToken.refresh);
 			
 			// See http://tools.ietf.org/html/draft-ietf-oauth-v2-31#page-40
 			// The expires in returned in the Token object is the expire date instead of lifetime in seconds as said in the ieft draft.
-//			uidAccessRefreshToken.setExpiresIn(accessToken.expiresIn); // Non-expiring token!
+			uidAccessRefreshToken.setExpiresIn(accessToken.expiresIn); // Non-expiring token!
 			
 			// TODO think about the possibility to use the public uri to be the id. It's unique! Think about it for every service!
 			HttpResponse response = wrapper.get(Request.to(Endpoints.MY_DETAILS));

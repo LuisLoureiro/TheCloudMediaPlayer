@@ -7,7 +7,6 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.validation.constraints.NotNull;
 
 import models.database.notEntity.OAuthUser;
-import play.data.validation.Constraints.Required;
 
 @Entity(name="oauth2_users")
 @PrimaryKeyJoinColumn(name="id", referencedColumnName="id")
@@ -17,8 +16,8 @@ public class OAuth2User extends OAuthUser
 	@Column(name="access_token", nullable=false)
 	@NotNull(message="oauth2User.accessTokenRequired")
 	private String accessToken;
-	@Column(name="refresh_token", nullable=false)
-	@Required(message="oauth2User.refreshTokenRequired")
+	@Column(name="refresh_token") //, nullable=false)
+	// @Required(message="oauth2User.refreshTokenRequired")
 	private String refreshToken;
 	@Column(name="expires_in")
 	private long expiresIn;

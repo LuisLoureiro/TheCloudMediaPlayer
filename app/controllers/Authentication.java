@@ -394,8 +394,7 @@ public class Authentication extends Controller
 							String userId = oauth2Instance.validateToken(accessToken, requestParams.getUserId());
 							// Save the user in the database.
 							PersistOAuth2User.saveUser(provider,
-									// TODO - Facebook doesn't use the refresh token.
-									new AccessToken(userId, null, accessToken.getAccess_token(), "TODO"/*accessToken.getRefresh_token()*/),
+									new AccessToken(userId, null, accessToken.getAccess_token(), accessToken.getRefresh_token()),
 									null, null);
 							
 							user.setAccessToken(accessToken.getAccess_token());
