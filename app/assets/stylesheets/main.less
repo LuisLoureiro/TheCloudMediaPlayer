@@ -5,6 +5,8 @@
 @fb-login-bgColorActive: #2F477A;
 @fb-login-bgColorRGBA: rgba(59, 89, 152, 240/255);
 @fb-login-bgColorActiveRGBA: rgba(47, 71, 122, 240/255);
+@fb-login-bgColorHover: #3d5c9d;
+@fb-login-bgColorHoverRGBA: rgba(61, 92, 157, 240/255);
 @fb-login-buttonHeight: 40px;
 /**
  *     MIXINS
@@ -59,10 +61,12 @@ td > a.playlist-resource + a.remove{
     text-align: center; /* With width, to horizontal align text. */
 }
 .fb-login>a,.fb-login {
-    text-decoration: none;
-    color: #FFF;
+    text-decoration: none !important;
+    color: #FFF !important;
 }
 .fb-login:hover {
+    background-color: @fb-login-bgColorHover;
+    background-color: @fb-login-bgColorHoverRGBA;
     cursor: pointer;
 }
 .fb-login:active {
